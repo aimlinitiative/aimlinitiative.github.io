@@ -9,12 +9,23 @@ export default function WeekList() {
     const { user, profile } = useAuth();
     const isTeacher = profile?.role === "educator";
     const [weeks, setWeeks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         async function load() {
-            const q = query(collection(db, "weeks"), orderBy("index", "asc"));
-            const snap = await getDocs(q);
-            setWeeks(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+            try {
+                setLoading(true);
+                setError(null);
+                const q = query(collection(db, "weeks"), orderBy("index", "asc"));
+                const snap = await getDocs(q);
+                setWeeks(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+            } catch (err) {
+                console.error("Error loading weeks:", err);
+                setError("Failed to load course chapters. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
         }
         load();
     }, []);
@@ -30,6 +41,16 @@ export default function WeekList() {
                     </p>
                 </div>
             )}
+            {error && (
+                <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+                    <p className="text-sm text-red-800">{error}</p>
+                </div>
+            )}
+            {loading ? (
+                <div className="text-center py-12">
+                    <p className="text-gray-600">Loading course chapters...</p>
+                </div>
+            ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {weeks.map((w) => (
                     <div key={w.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
@@ -69,6 +90,7 @@ export default function WeekList() {
                     </div>
                 ))}
             </div>
+            )}
         </div>
     );
 }

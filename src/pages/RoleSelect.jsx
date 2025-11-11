@@ -14,7 +14,7 @@ export default function RoleSelect() {
 
 	useEffect(() => {
 		if (profile?.role) {
-			navigate("/dashboard", { replace: true });
+			navigate("/weeks", { replace: true });
 		}
 	}, [profile?.role, navigate]);
 
@@ -25,7 +25,7 @@ export default function RoleSelect() {
 		setSaving(true);
 		try {
 			await setDoc(doc(db, "users", user.uid), { role }, { merge: true });
-			navigate("/dashboard", { replace: true });
+			navigate("/weeks", { replace: true });
 		} catch (e) {
 			setErr(e.message);
 		} finally {

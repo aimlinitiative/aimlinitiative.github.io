@@ -17,32 +17,79 @@ export default function Quiz() {
 	const [answerKey, setAnswerKey] = useState({});
 	const [weekId, setWeekId] = useState(null);
 	const [submitted, setSubmitted] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
 		async function load() {
-			const qDoc = await getDoc(doc(db, "quizzes", quizId));
-			if (qDoc.exists()) {
-				setQuiz(qDoc.data());
-			} else {
-				setQuiz(null);
-			}
-			const keyDoc = await getDoc(doc(db, "quiz_answers", quizId));
-			if (keyDoc.exists()) {
-				setAnswerKey(keyDoc.data().key || {});
-				setWeekId(keyDoc.data().weekId || null);
-			} else {
-				setAnswerKey({});
-				setWeekId(null);
+			try {
+				setLoading(true);
+				setError(null);
+				const qDoc = await getDoc(doc(db, "quizzes", quizId));
+				if (qDoc.exists()) {
+					setQuiz(qDoc.data());
+				} else {
+					setQuiz(null);
+				}
+				try {
+					const keyDoc = await getDoc(doc(db, "quiz_answers", quizId));
+					if (keyDoc.exists()) {
+						setAnswerKey(keyDoc.data().key || {});
+						setWeekId(keyDoc.data().weekId || null);
+					} else {
+						setAnswerKey({});
+						setWeekId(null);
+					}
+				} catch (err) {
+					console.error("Error loading answer key:", err);
+					setAnswerKey({});
+					setWeekId(null);
+				}
+			} catch (err) {
+				console.error("Error loading quiz:", err);
+				setError("Failed to load quiz. Please try again later.");
+			} finally {
+				setLoading(false);
 			}
 		}
 		load();
 	}, [quizId]);
+
+	if (loading) {
+		return (
+			<div className="mx-auto max-w-3xl px-4 py-16">
+				<p className="text-gray-600">Loading quiz...</p>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="mx-auto max-w-3xl px-4 py-16">
+				<div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+					<p className="text-sm text-red-800">{error}</p>
+				</div>
+				<Link
+					to="/weeks"
+					className="inline-block px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 underline"
+				>
+					Back to Coursework
+				</Link>
+			</div>
+		);
+	}
 
 	if (!quiz) {
 		return (
 			<div className="mx-auto max-w-3xl px-4 py-16">
 				<h1 className="text-3xl font-bold">Quiz not found</h1>
 				<p className="mt-3 text-sm text-gray-600">Check with your educator for the latest materials.</p>
+				<Link
+					to="/weeks"
+					className="mt-4 inline-block px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 underline"
+				>
+					Back to Coursework
+				</Link>
 			</div>
 		);
 	}

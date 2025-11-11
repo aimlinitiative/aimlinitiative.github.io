@@ -5,9 +5,16 @@ export default function Home() {
         <div className="bg-white text-gray-900">
             {/* Hero */}
             <section className="mx-auto max-w-6xl px-4 py-16">
-                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                    Learn AI with clarity
-                </h1>
+                <div className="flex flex-col items-center mb-8">
+                    <img 
+                        src="/logo.jpg" 
+                        alt="AIML Initiative" 
+                        className="h-24 w-24 object-contain mb-4"
+                    />
+                    <h1 className="text-4xl font-bold tracking-tight sm:text-5xl text-center">
+                        Learn AI with clarity
+                    </h1>
+                </div>
                 <p className="mt-3 max-w-2xl text-lg text-gray-600">
                     Workshops, Colab notebooks, and projects that make machine learning
                     feel approachable and useful.

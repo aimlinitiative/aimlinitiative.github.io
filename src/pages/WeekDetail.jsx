@@ -15,6 +15,8 @@ export default function WeekDetail() {
 	const [week, setWeek] = useState(null);
 	const [student, setStudent] = useState(null);
 	const [progress, setProgress] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	async function resolveHtml(data) {
 		if (!data) return "";
@@ -52,21 +54,35 @@ export default function WeekDetail() {
 
 	useEffect(() => {
 		async function loadWeek() {
-			const w = await getDoc(doc(db, "weeks", weekId));
-			if (w.exists()) {
-				const data = { id: w.id, ...w.data() };
-				setWeek(data);
-				const s = await getDoc(doc(db, "materials_student", weekId));
-				if (s.exists()) {
-					const studentData = s.data();
-					const html = await resolveHtml(studentData);
-					setStudent({ ...studentData, guideHtmlResolved: html });
+			try {
+				setLoading(true);
+				setError(null);
+				const w = await getDoc(doc(db, "weeks", weekId));
+				if (w.exists()) {
+					const data = { id: w.id, ...w.data() };
+					setWeek(data);
+					try {
+						const s = await getDoc(doc(db, "materials_student", weekId));
+						if (s.exists()) {
+							const studentData = s.data();
+							const html = await resolveHtml(studentData);
+							setStudent({ ...studentData, guideHtmlResolved: html });
+						} else {
+							setStudent(null);
+						}
+					} catch (err) {
+						console.error("Error loading student materials:", err);
+						setStudent(null);
+					}
 				} else {
+					setWeek(null);
 					setStudent(null);
 				}
-			} else {
-				setWeek(null);
-				setStudent(null);
+			} catch (err) {
+				console.error("Error loading week:", err);
+				setError("Failed to load chapter content. Please try again later.");
+			} finally {
+				setLoading(false);
 			}
 		}
 		loadWeek();
@@ -85,11 +101,41 @@ export default function WeekDetail() {
 		loadProgress();
 	}, [user, currentClassId, week]);
 
+	if (loading) {
+		return (
+			<div className="mx-auto max-w-3xl px-4 py-16">
+				<p className="text-gray-600">Loading chapter content...</p>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="mx-auto max-w-3xl px-4 py-16">
+				<div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+					<p className="text-sm text-red-800">{error}</p>
+				</div>
+				<Link
+					to="/weeks"
+					className="inline-block px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 underline"
+				>
+					Back to Coursework
+				</Link>
+			</div>
+		);
+	}
+
 	if (!week) {
 		return (
 			<div className="mx-auto max-w-3xl px-4 py-16">
 				<h1 className="text-3xl font-bold">Chapter not found</h1>
 				<p className="mt-3 text-sm text-gray-600">Check with your educator for course materials.</p>
+				<Link
+					to="/weeks"
+					className="mt-4 inline-block px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 underline"
+				>
+					Back to Coursework
+				</Link>
 			</div>
 		);
 	}

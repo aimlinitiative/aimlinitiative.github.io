@@ -13,14 +13,25 @@ export default function Colab() {
 	const { currentClassId } = useClass();
 	const [week, setWeek] = useState(null);
 	const [progress, setProgress] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
 		async function loadWeek() {
-			const w = await getDoc(doc(db, "weeks", weekId));
-			if (w.exists()) {
-				setWeek({ id: w.id, ...w.data() });
-			} else {
-				setWeek(null);
+			try {
+				setLoading(true);
+				setError(null);
+				const w = await getDoc(doc(db, "weeks", weekId));
+				if (w.exists()) {
+					setWeek({ id: w.id, ...w.data() });
+				} else {
+					setWeek(null);
+				}
+			} catch (err) {
+				console.error("Error loading week:", err);
+				setError("Failed to load chapter content. Please try again later.");
+			} finally {
+				setLoading(false);
 			}
 		}
 		loadWeek();
@@ -39,11 +50,41 @@ export default function Colab() {
 		loadProgress();
 	}, [user, currentClassId, week]);
 
+	if (loading) {
+		return (
+			<div className="mx-auto max-w-3xl px-4 py-16">
+				<p className="text-gray-600">Loading chapter content...</p>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="mx-auto max-w-3xl px-4 py-16">
+				<div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+					<p className="text-sm text-red-800">{error}</p>
+				</div>
+				<Link
+					to="/weeks"
+					className="inline-block px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 underline"
+				>
+					Back to Coursework
+				</Link>
+			</div>
+		);
+	}
+
 	if (!week) {
 		return (
 			<div className="mx-auto max-w-3xl px-4 py-16">
 				<h1 className="text-3xl font-bold">Chapter not found</h1>
 				<p className="mt-3 text-sm text-gray-600">Check with your educator for course materials.</p>
+				<Link
+					to="/weeks"
+					className="mt-4 inline-block px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 underline"
+				>
+					Back to Coursework
+				</Link>
 			</div>
 		);
 	}

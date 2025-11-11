@@ -23,8 +23,13 @@ export default function Navbar() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     {/* Left side: logo */}
-                    <Link to="/" className="flex items-center">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+                    <Link to="/" className="flex items-center gap-2">
+                        <img 
+                            src="/logo.jpg" 
+                            alt="AIML Initiative" 
+                            className="h-10 w-10 object-contain"
+                        />
+                        <span className="text-xl font-bold text-gray-900 hidden sm:inline">
                             AIML Initiative
                         </span>
                     </Link>
@@ -43,15 +48,15 @@ export default function Navbar() {
                         >
                             Resources
                         </Link>
+                        <Link
+                            to="/weeks"
+                            className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+                        >
+                            Coursework
+                        </Link>
 
                         {user && (
                             <>
-                                <Link
-                                    to="/weeks"
-                                    className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                                >
-                                    Coursework
-                                </Link>
                                 <Link
                                     to="/progress"
                                     className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"

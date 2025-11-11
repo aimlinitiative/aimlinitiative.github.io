@@ -21,7 +21,8 @@ export default function Login() {
         try {
             if (mode === "signin") {
                 await signInWithEmailAndPassword(auth, email.trim(), pw);
-                nav("/dashboard");
+                // AuthProvider will handle redirect based on role/profile
+                nav("/weeks");
             } else {
                 const cred = await createUserWithEmailAndPassword(auth, email.trim(), pw);
                 try {
@@ -36,7 +37,8 @@ export default function Login() {
                     // Ignore write errors here; AuthProvider will create the doc on first load,
                     // and RoleGate/RoleSelect will handle role assignment.
                 }
-                nav("/dashboard");
+                // New users go to role selection if needed, otherwise to coursework
+                nav("/weeks");
             }
         } catch (e2) {
             setErr(e2.message);
