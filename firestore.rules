@@ -1,0 +1,96 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+	function signedIn() {
+	  return request.auth != null;
+	}
+
+	function userDoc() {
+	  return get(/databases/$(database)/documents/users/$(request.auth.uid));
+	}
+
+	function userIs(role) {
+	  return signedIn() && userDoc().data.role == role;
+	}
+
+	match /users/{uid} {
+	  allow read: if signedIn() && (request.auth.uid == uid || userIs('educator'));
+	  // Allow creating own profile (with or without role initially)
+	  allow create: if signedIn()
+		&& request.auth.uid == uid;
+	  // Allow updates to own profile but prevent changing role once set.
+	  // Permit setting role exactly once if it was not present before.
+	  allow update: if signedIn()
+		&& request.auth.uid == uid
+		&& (
+		  // role unchanged
+		  request.resource.data.role == resource.data.role
+		  ||
+		  // previously no role, now setting a valid role
+		  (!('role' in resource.data) && (request.resource.data.role in ['student','educator']))
+		);
+	  // Allow deleting own account
+	  allow delete: if signedIn() && request.auth.uid == uid;
+	}
+
+	// Course content - allow public reads for weeks and student materials
+	match /weeks/{weekId} {
+	  allow read: if true;
+	}
+	match /materials_student/{weekId} {
+	  allow read: if true;
+	}
+	match /materials_teacher/{weekId} {
+	  allow read: if userIs('educator');
+	}
+
+	// Classes and membership
+	match /classes/{classId} {
+	  allow read: if signedIn();
+	  allow create: if userIs('educator')
+		&& request.resource.data.ownerUid == request.auth.uid
+		&& request.resource.data.name is string
+		&& request.resource.data.code is string;
+	  allow update: if userIs('educator')
+		&& resource.data.ownerUid == request.auth.uid;
+	  // Allow educators to delete classes they own
+	  allow delete: if userIs('educator')
+		&& resource.data.ownerUid == request.auth.uid;
+	}
+	match /class_members/{memberId} {
+	  allow read: if signedIn();
+	  allow create: if signedIn()
+		&& request.resource.data.uid == request.auth.uid
+		&& (
+		  (userIs('educator') && request.resource.data.role == 'educator') ||
+		  (userIs('student') && request.resource.data.role == 'student')
+		);
+	  // Allow users to delete their own membership
+	  allow delete: if signedIn()
+		&& resource.data.uid == request.auth.uid;
+	}
+
+	match /quizzes/{quizId} {
+	  allow read: if true;
+	}
+	match /quiz_answers/{quizId} {
+	  allow read: if true;
+	}
+
+	// Quiz attempts (writes via Cloud Function)
+	match /attempts/{attemptId} {
+	  allow read: if signedIn();
+	}
+
+	// Student progress (students can write their own progress)
+	match /progress/{progressId} {
+	  allow read: if signedIn();
+	  allow create, update: if signedIn()
+		&& request.resource.data.uid == request.auth.uid;
+	  // Allow users to delete their own progress
+	  allow delete: if signedIn()
+		&& resource.data.uid == request.auth.uid;
+	}
+  }
+}
