@@ -5,19 +5,17 @@ export default function Footer() {
                 <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
                     <p>© {new Date().getFullYear()} AIML Initiative</p>
                     <div className="flex items-center gap-4">
+                        Website created by{ " " }
                         <a
                             className="hover:text-gray-900"
-                            href="https://github.com/aimlinitiative"
+                            href="https://ibrahimpiri.com"
                             target="_blank"
                             rel="noreferrer"
                         >
-                            GitHub
+                            Ibrahim Piri
                         </a>
-                        <a className="hover:text-gray-900" href="#contact">
-                            Contact
-                        </a>
-                        <a className="hover:text-gray-900" href="#privacy">
-                            Privacy
+                        <a className="hover:text-gray-900" href="aimlinitiative@gmail.com">
+                            Contact: aimlinitiative@gmail.com
                         </a>
                     </div>
                 </div>
