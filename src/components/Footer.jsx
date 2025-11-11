@@ -5,18 +5,14 @@ export default function Footer() {
                 <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
                     <p>© {new Date().getFullYear()} AIML Initiative</p>
                     <div className="flex items-center gap-4">
-                        Website created by{ " " }
-                        <a
+                        Website created by{" "} <a
                             className="hover:text-gray-900"
                             href="https://ibrahimpiri.com"
                             target="_blank"
                             rel="noreferrer"
-                        >
-                            Ibrahim Piri
-                        </a>
-                        <a className="hover:text-gray-900" href="aimlinitiative@gmail.com">
-                            Contact: aimlinitiative@gmail.com
-                        </a>
+                        > Ibrahim Piri </a>
+                        Course content created by Adrian Erlikhman and Michael Tarekegn
+                        Contact: aimlinitiative@gmail.com
                     </div>
                 </div>
             </div>
