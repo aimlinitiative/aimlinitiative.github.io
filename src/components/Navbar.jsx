@@ -1,120 +1,56 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider";
-import { signOut } from "firebase/auth";
-import { auth } from "../lib/firebase";
-import ClassPicker from "./ClassPicker";
+import { useState, useEffect } from "react";
+
+const LINKS = [
+    { href: "#about", label: "Who we are" },
+    { href: "#work", label: "What we do" },
+    { href: "#involved", label: "Get involved" },
+    { href: "#contact", label: "Contact" },
+];
 
 export default function Navbar() {
-    const { user, profile } = useAuth();
-    const navigate = useNavigate();
-    const isTeacher = profile?.role === "educator";
+    const [open, setOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
-    async function handleLogout() {
-        await signOut(auth);
-        navigate("/login");
-    }
-
-    const displayName = profile?.firstName && profile?.lastName 
-        ? `${profile.firstName} ${profile.lastName}`.trim()
-        : profile?.email?.split("@")[0] || "User";
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
 
     return (
-        <nav className="bg-white border-b border-gray-200 shadow-sm">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 items-center justify-between">
-                    {/* Left side: logo */}
-                    <Link to="/" className="flex items-center gap-2">
-                        <img 
-                            src="/logo.jpg" 
-                            alt="AIML Initiative" 
-                            className="h-10 w-10 object-contain"
-                        />
-                        <span className="text-xl font-bold text-gray-900 hidden sm:inline">
-                            AIML Initiative
-                        </span>
-                    </Link>
+        <header className={`sticky top-0 z-50 border-b transition-colors duration-300 ${scrolled ? "border-white/10 bg-bg/80 backdrop-blur-md" : "border-transparent bg-transparent"}`}>
+            <nav className="container-page flex h-16 items-center justify-between">
+                <a href="#top" className="flex items-center gap-2.5">
+                    <img src="/logo.jpg" alt="AIML-LI" className="h-8 w-8 rounded-lg object-cover ring-1 ring-white/10" />
+                    <span className="display text-[15px] font-semibold tracking-tight text-ink">AIML-LI</span>
+                </a>
 
-                    {/* Center: navigation links */}
-                    <div className="hidden md:flex md:items-center md:gap-1">
-                        <Link
-                            to="/about"
-                            className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                        >
-                            About
-                        </Link>
-                        <Link
-                            to="/resources"
-                            className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                        >
-                            Resources
-                        </Link>
-                        <Link
-                            to="/weeks"
-                            className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                        >
-                            Coursework
-                        </Link>
+                <div className="hidden items-center gap-8 md:flex">
+                    {LINKS.map((l) => (
+                        <a key={l.href} href={l.href} className="text-sm font-medium text-muted transition-colors hover:text-ink">{l.label}</a>
+                    ))}
+                    <a href="#involved" className="btn-accent !py-2">Partner with us</a>
+                </div>
 
-                        {user && (
-                            <>
-                                <Link
-                                    to="/progress"
-                                    className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                                >
-                                    Progress
-                                </Link>
+                <button className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-ink md:hidden"
+                    onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                        {open ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 12h18M3 6h18M3 18h18" />}
+                    </svg>
+                </button>
+            </nav>
 
-                                {isTeacher ? (
-                                    <Link
-                                        to="/classes"
-                                        className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                                    >
-                                        Classes
-                                    </Link>
-                                ) : (
-                                    <Link
-                                        to="/join"
-                                        className="px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                                    >
-                                        Join Class
-                                    </Link>
-                                )}
-                            </>
-                        )}
-                    </div>
-
-                    {/* Right side: user menu */}
-                    <div className="flex items-center gap-3">
-                        {user ? (
-                            <>
-                                {user && <div className="mx-2"><ClassPicker /></div>}
-                                <Link
-                                    to="/profile"
-                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    <span className="hidden sm:inline">{displayName}</span>
-                                </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow"
-                                >
-                                    Sign out
-                                </button>
-                            </>
-                        ) : (
-                            <Link
-                                to="/login"
-                                className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow"
-                            >
-                                Sign in
-                            </Link>
-                        )}
+            {open && (
+                <div className="border-t border-white/10 bg-bg px-6 py-3 md:hidden">
+                    <div className="flex flex-col">
+                        {LINKS.map((l) => (
+                            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="border-b border-white/10 py-3 text-sm font-medium text-ink last:border-0">{l.label}</a>
+                        ))}
+                        <a href="#involved" onClick={() => setOpen(false)} className="btn-accent mt-3 justify-center">Partner with us</a>
                     </div>
                 </div>
-            </div>
-        </nav>
+            )}
+        </header>
     );
 }
