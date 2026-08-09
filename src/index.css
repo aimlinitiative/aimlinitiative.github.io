@@ -61,7 +61,7 @@ section[id] { scroll-margin-top: 6rem; }
 /* Outlined display text for the marquee */
 .text-outline {
     color: transparent;
-    -webkit-text-stroke: 1px rgba(244,244,243,0.55);
+    -webkit-text-stroke: 1px rgba(246,246,245,0.7);
 }
 
 @media (prefers-reduced-motion: reduce) {
