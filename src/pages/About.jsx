@@ -70,9 +70,9 @@ export default function About() {
                     {TEAM.map((m, i) => (
                         <Reveal key={m.name} delay={i * 100}>
                             <div className="panel h-full p-7 text-center">
-                                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl font-display text-2xl font-bold text-white" style={{ backgroundImage: "linear-gradient(135deg,#b302e8,#ff5147)" }}>{m.initials}</div>
+                                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl font-display text-2xl font-bold text-white" style={{ backgroundImage: "linear-gradient(135deg,#2563eb,#22d3ee)" }}>{m.initials}</div>
                                 <h3 className="mt-5 font-display text-lg font-bold text-white">{m.name}</h3>
-                                <p className="mono mt-1 text-xs uppercase tracking-wider text-[#c76bff]">{m.role}</p>
+                                <p className="mono mt-1 text-xs uppercase tracking-wider text-brand-400">{m.role}</p>
                             </div>
                         </Reveal>
                     ))}

@@ -20,7 +20,7 @@ export default function Contact() {
         window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     };
 
-    const inputCls = "mt-2 w-full rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-plasma";
+    const inputCls = "mt-2 w-full rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-brand-500";
 
     return (
         <div className="container-wide py-16 sm:py-24">
@@ -39,10 +39,10 @@ export default function Contact() {
                 {PATHS.map((p, i) => (
                     <Reveal key={p.t} delay={i * 90}>
                         <a href={`mailto:${EMAIL}?subject=${encodeURIComponent(p.subject)}`} className="panel ring-grad panel-hover flex h-full flex-col p-7">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl text-lg text-white" style={{ backgroundImage: "linear-gradient(135deg,#b302e8,#ff5147)" }}>{p.icon}</div>
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl text-lg text-white" style={{ backgroundImage: "linear-gradient(135deg,#2563eb,#22d3ee)" }}>{p.icon}</div>
                             <h3 className="mt-5 font-display text-lg font-bold text-white">{p.t}</h3>
                             <p className="mt-2 flex-1 text-sm text-white/60">{p.d}</p>
-                            <span className="mono mt-4 text-sm text-[#c76bff]">Email us →</span>
+                            <span className="mono mt-4 text-sm text-brand-400">Email us →</span>
                         </a>
                     </Reveal>
                 ))}
@@ -72,7 +72,7 @@ export default function Contact() {
                     <button type="submit" className="btn-primary sm:w-fit sm:justify-self-start">Compose email →</button>
                 </form>
                 <p className="mt-6 border-t border-white/10 pt-5 text-sm text-white/50">
-                    Prefer to email directly? <a href={`mailto:${EMAIL}`} className="ulink text-[#c76bff]">{EMAIL}</a>
+                    Prefer to email directly? <a href={`mailto:${EMAIL}`} className="ulink text-brand-400">{EMAIL}</a>
                 </p>
             </Reveal>
         </div>

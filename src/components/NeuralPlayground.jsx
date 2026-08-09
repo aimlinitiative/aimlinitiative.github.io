@@ -143,11 +143,11 @@ const DOMAIN = 1.15;
 const RES = 72;
 const STEPS_PER_FRAME = 3;
 
-// Dark theme: purple region -> coral region; bright points.
-const C0 = [40, 8, 60];     // class A region (purple-dark)
-const C1 = [58, 16, 16];    // class B region (coral-dark)
-const PT0 = "#c76bff";      // class A point (purple)
-const PT1 = "#ff5147";      // class B point (coral)
+// Dark theme: blue region -> amber region; bright points.
+const C0 = [10, 26, 58];    // class A region (blue-dark)
+const C1 = [58, 40, 8];     // class B region (amber-dark)
+const PT0 = "#4d9bff";      // class A point (blue)
+const PT1 = "#ffb020";      // class B point (amber)
 
 export default function NeuralPlayground({ compact = false }) {
     const [dataset, setDataset] = useState("spiral");
@@ -266,8 +266,8 @@ export default function NeuralPlayground({ compact = false }) {
                         className="aspect-square w-full rounded-xl bg-ink-950 ring-1 ring-white/10"
                     />
                     <div className="pointer-events-none absolute left-3 top-3 flex gap-2">
-                        <span className="mono rounded bg-black/50 px-2 py-1 text-[11px] font-medium text-[#c76bff] backdrop-blur">● class A</span>
-                        <span className="mono rounded bg-black/50 px-2 py-1 text-[11px] font-medium text-coral backdrop-blur">● class B</span>
+                        <span className="mono rounded bg-black/50 px-2 py-1 text-[11px] font-medium text-[#4d9bff] backdrop-blur">● class A</span>
+                        <span className="mono rounded bg-black/50 px-2 py-1 text-[11px] font-medium text-amber-400 backdrop-blur">● class B</span>
                     </div>
                 </div>
 
@@ -282,10 +282,10 @@ export default function NeuralPlayground({ compact = false }) {
                                     onClick={() => setDataset(d.key)}
                                     className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
                                         dataset === d.key
-                                            ? "text-white shadow-lg shadow-plasma/30"
+                                            ? "text-white shadow-lg shadow-brand-500/30"
                                             : "border border-white/10 text-white/70 hover:bg-white/5"
                                     }`}
-                                    style={dataset === d.key ? { backgroundImage: "linear-gradient(100deg,#b302e8,#ff5147)" } : undefined}
+                                    style={dataset === d.key ? { backgroundImage: "linear-gradient(100deg,#2563eb,#22d3ee)" } : undefined}
                                 >
                                     {d.label}
                                 </button>
@@ -331,13 +331,13 @@ function Slider({ label, value, display, min, max, step, onChange }) {
         <div>
             <div className="flex items-center justify-between">
                 <span className="label">{label}</span>
-                <span className="mono text-xs text-[#c76bff]">{display}</span>
+                <span className="mono text-xs text-brand-400">{display}</span>
             </div>
             <input
                 type="range"
                 min={min} max={max} step={step} value={value}
                 onChange={(e) => onChange(parseFloat(e.target.value))}
-                className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-plasma"
+                className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-brand-500"
             />
         </div>
     );

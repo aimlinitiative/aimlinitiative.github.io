@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 /* Site-wide animated "compute field": drifting nodes wired together,
- * tinted purple->coral, reacting subtly to the cursor. Fixed behind content. */
+ * tinted blue->cyan, reacting subtly to the cursor. Fixed behind content. */
 export default function Particles() {
     const ref = useRef(null);
 
@@ -24,12 +24,13 @@ export default function Particles() {
                 x: Math.random() * w, y: Math.random() * h,
                 vx: (Math.random() - 0.5) * 0.26, vy: (Math.random() - 0.5) * 0.26,
                 r: Math.random() * 1.5 + 0.6,
-                c: Math.random(), // 0=purple, 1=coral
+                c: Math.random(), // 0=blue, 1=cyan
             }));
         }
 
         const LINK = 128, MOUSE_R = 200;
-        const mix = (t) => `rgba(${Math.round(179 + (255 - 179) * t)}, ${Math.round(2 + (81 - 2) * t)}, ${Math.round(232 + (71 - 232) * t)}`;
+        // blue (#3b82f6) -> cyan (#22d3ee)
+        const mix = (t) => `rgba(${Math.round(59 + (34 - 59) * t)}, ${Math.round(130 + (211 - 130) * t)}, ${Math.round(246 + (238 - 246) * t)}`;
 
         function frame() {
             ctx.clearRect(0, 0, w, h);
