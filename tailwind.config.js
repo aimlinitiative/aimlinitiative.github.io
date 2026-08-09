@@ -6,8 +6,8 @@ export default {
             colors: {
                 bg: "#0a0a0b",
                 surface: "#111114",
-                ink: "#ededec",     // primary text
-                muted: "#8b8b92",   // secondary text
+                ink: "#f4f4f3",     // primary text
+                muted: "#b3b3bd",   // secondary text (readable on dark)
                 line: "rgba(255,255,255,0.10)",
                 accent: "#3ecf8e",  // emerald
                 accentdk: "#2fb579",

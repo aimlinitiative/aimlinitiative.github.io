@@ -18,7 +18,7 @@ body {
     min-height: 100vh;
     font-family: "Hanken Grotesk", system-ui, sans-serif;
     line-height: 1.6;
-    color: #ededec;
+    color: #f4f4f3;
     background-color: #0a0a0b;
     letter-spacing: -0.01em;
 }
@@ -61,7 +61,7 @@ section[id] { scroll-margin-top: 6rem; }
 /* Outlined display text for the marquee */
 .text-outline {
     color: transparent;
-    -webkit-text-stroke: 1px rgba(237,237,236,0.35);
+    -webkit-text-stroke: 1px rgba(244,244,243,0.55);
 }
 
 @media (prefers-reduced-motion: reduce) {

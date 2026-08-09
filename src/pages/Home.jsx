@@ -43,8 +43,8 @@ export default function Home() {
                         classrooms — starting with LAUSD, the nation's second-largest district.
                     </p>
                     <p className="mt-6 text-base text-ink opacity-0 animate-fade-up" style={{ animationDelay: "260ms" }}>
-                        Students learn to train{" "}
-                        <Typewriter className="display font-semibold text-accent" words={["a first model", "an image classifier", "a chatbot", "their own AI"]} />
+                        Students learn to{" "}
+                        <Typewriter className="display font-semibold text-accent" words={["train their first model", "build an image classifier", "talk to an LLM", "spot AI bias", "question the algorithm", "ship their own AI"]} />
                     </p>
                     <div className="mt-9 flex flex-col items-center justify-center gap-3 opacity-0 animate-fade-up sm:flex-row" style={{ animationDelay: "320ms" }}>
                         <a href="#involved" className="btn-accent w-full sm:w-auto">Get involved</a>
