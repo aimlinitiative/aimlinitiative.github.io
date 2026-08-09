@@ -2,63 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Root variables */
 :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    line-height: 1.6;
-    font-weight: 400;
-
-    color-scheme: light;
-    color: #1f2937;
-    background-color: #f9fafb;
-
+    color-scheme: dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Body styling */
-body {
-    margin: 0;
-    min-width: 320px;
-    min-height: 100vh;
-    display: block;
-    background-color: #f9fafb;
-}
-
-/* Smooth scrolling */
 html {
     scroll-behavior: smooth;
 }
 
-/* Prose styling for guide content */
-.prose {
-    color: #374151;
-    line-height: 1.75;
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: "Inter", system-ui, sans-serif;
+    line-height: 1.6;
+    color: #e5e7f0;
+    background-color: #0a0a1a;
+    /* Ambient gradient wash behind everything */
+    background-image:
+        radial-gradient(60rem 40rem at 15% -10%, rgba(99, 102, 241, 0.18), transparent 60%),
+        radial-gradient(50rem 40rem at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+        radial-gradient(70rem 50rem at 50% 120%, rgba(79, 70, 229, 0.14), transparent 60%);
+    background-attachment: fixed;
 }
 
-.prose h1, .prose h2, .prose h3 {
-    color: #111827;
-    font-weight: 700;
-    margin-top: 1.5em;
-    margin-bottom: 0.75em;
+@layer components {
+    .container-page {
+        @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+    }
+
+    /* Gradient text */
+    .text-gradient {
+        @apply bg-clip-text text-transparent;
+        background-image: linear-gradient(100deg, #a5b4fc 0%, #818cf8 30%, #22d3ee 100%);
+    }
+
+    /* Glass card */
+    .glass {
+        @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+    }
+    .glass-hover {
+        @apply transition duration-300 hover:border-white/20 hover:bg-white/[0.06] hover:-translate-y-1;
+    }
+
+    /* Buttons */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition duration-200;
+    }
+    .btn-primary {
+        @apply btn text-white shadow-lg shadow-brand-600/25;
+        background-image: linear-gradient(100deg, #4f46e5, #6366f1 55%, #22d3ee 140%);
+    }
+    .btn-primary:hover {
+        @apply -translate-y-0.5 shadow-xl shadow-brand-600/40;
+    }
+    .btn-ghost {
+        @apply btn border border-white/15 text-white/90 hover:border-white/35 hover:bg-white/5;
+    }
+
+    /* Section eyebrow label */
+    .eyebrow {
+        @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-300;
+    }
+
+    .link-underline {
+        @apply border-b border-transparent transition hover:border-brand-300/60;
+    }
 }
 
-.prose p {
-    margin-top: 1em;
-    margin-bottom: 1em;
+/* Scroll-reveal (driven by IntersectionObserver adding .is-visible) */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
 }
 
-.prose a {
-    color: #2563eb;
-    text-decoration: underline;
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+    html {
+        scroll-behavior: auto;
+    }
 }
 
-.prose a:hover {
-    color: #1d4ed8;
+/* Thin custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
-
-.font-navbar {
-    font-family: 'Inter', sans-serif;
+::-webkit-scrollbar-track {
+    background: #0a0a1a;
+}
+::-webkit-scrollbar-thumb {
+    background: #2a2a4a;
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3a3a5f;
 }
