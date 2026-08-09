@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-    color-scheme: light;
+    color-scheme: dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -16,35 +16,29 @@ body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
     line-height: 1.6;
-    color: #14161a;
-    background-color: #ffffff;
+    color: #ededec;
+    background-color: #0a0a0b;
     letter-spacing: -0.01em;
 }
 
-/* Offset anchor targets so sticky header doesn't cover them */
 section[id] { scroll-margin-top: 6rem; }
 
 @layer components {
     .container-page { @apply mx-auto w-full max-w-6xl px-6 sm:px-8; }
 
-    /* Small uppercase eyebrow label */
-    .eyebrow {
-        @apply text-xs font-semibold uppercase tracking-[0.14em] text-brand;
-    }
+    .display { font-family: "Space Grotesk", system-ui, sans-serif; letter-spacing: -0.03em; }
 
-    /* Buttons — solid, no gradients */
-    .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-colors duration-200;
-    }
-    .btn-primary { @apply btn bg-ink text-white hover:bg-black; }
-    .btn-brand { @apply btn bg-brand text-white hover:bg-branddk; }
-    .btn-ghost { @apply btn border border-line text-ink hover:border-ink; }
+    .eyebrow { @apply font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-accent; }
 
-    .link { @apply text-brand underline-offset-4 hover:underline; }
+    .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-colors duration-200; }
+    .btn-accent { @apply btn bg-accent text-bg hover:bg-accentdk; }
+    .btn-solid { @apply btn bg-ink text-bg hover:bg-white; }
+    .btn-ghost { @apply btn border border-white/15 text-ink hover:border-white/40 hover:bg-white/5; }
 
-    .card { @apply rounded-2xl border border-line bg-white; }
+    .link { @apply text-accent underline-offset-4 hover:underline; }
+    .card { @apply rounded-2xl border border-white/10 bg-surface; }
 }
 
 /* Reveal on scroll */
@@ -56,13 +50,28 @@ section[id] { scroll-margin-top: 6rem; }
 }
 .reveal.is-visible { opacity: 1; transform: none; }
 
+/* Marquee (the one spicy element) */
+.marquee-mask {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track { animation: marquee 26s linear infinite; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Outlined display text for the marquee */
+.text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(237,237,236,0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
+    .marquee-track { animation: none; }
     html { scroll-behavior: auto; }
     .animate-fade-up { animation: none !important; opacity: 1 !important; }
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #f7f8fa; }
-::-webkit-scrollbar-thumb { background: #d3d5db; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #b9bcc4; }
+::-webkit-scrollbar-track { background: #0a0a0b; }
+::-webkit-scrollbar-thumb { background: #26262b; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #35353c; }

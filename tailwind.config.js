@@ -4,16 +4,18 @@ export default {
     theme: {
         extend: {
             colors: {
-                ink: "#14161a",     // near-black text
-                muted: "#5b6270",   // secondary text
-                line: "#e7e8ec",    // hairline borders
-                paper: "#ffffff",
-                paper2: "#f7f8fa",  // subtle section tint
-                brand: "#1f5fbf",   // logo blue
-                branddk: "#184b98",
+                bg: "#0a0a0b",
+                surface: "#111114",
+                ink: "#ededec",     // primary text
+                muted: "#8b8b92",   // secondary text
+                line: "rgba(255,255,255,0.10)",
+                accent: "#3ecf8e",  // emerald
+                accentdk: "#2fb579",
             },
             fontFamily: {
-                sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+                display: ["'Space Grotesk'", "system-ui", "sans-serif"],
+                sans: ["'Hanken Grotesk'", "system-ui", "-apple-system", "sans-serif"],
+                mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
             },
             maxWidth: { "6xl": "72rem" },
             keyframes: {
@@ -21,6 +23,7 @@ export default {
                     "0%": { opacity: "0", transform: "translateY(16px)" },
                     "100%": { opacity: "1", transform: "translateY(0)" },
                 },
+                marquee: { "0%": { transform: "translateX(0)" }, "100%": { transform: "translateX(-50%)" } },
             },
             animation: {
                 "fade-up": "fade-up 0.7s cubic-bezier(0.16,1,0.3,1) forwards",

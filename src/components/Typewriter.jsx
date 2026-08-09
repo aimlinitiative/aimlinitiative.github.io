@@ -25,7 +25,7 @@ export default function Typewriter({ words, className = "" }) {
     return (
         <span className={className}>
             {text}
-            <span className="font-normal text-brand/50">|</span>
+            <span className="font-normal text-accent/60">|</span>
         </span>
     );
 }

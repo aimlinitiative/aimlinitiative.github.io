@@ -14,13 +14,13 @@ export const SOCIALS = [
 
 export default function Footer() {
     return (
-        <footer className="border-t border-line bg-paper2">
+        <footer className="border-t border-white/10 bg-bg">
             <div className="container-page py-12">
                 <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-3">
-                        <img src="/logo.jpg" alt="AIML-LI" className="h-9 w-9 rounded-lg object-cover" />
+                        <img src="/logo.jpg" alt="AIML-LI" className="h-9 w-9 rounded-lg object-cover ring-1 ring-white/10" />
                         <div>
-                            <div className="font-semibold text-ink">AIML-LI</div>
+                            <div className="display font-semibold text-ink">AIML-LI</div>
                             <div className="text-sm text-muted">AI/ML Literacy Initiative</div>
                         </div>
                     </div>
@@ -28,18 +28,18 @@ export default function Footer() {
                     <div className="flex items-center gap-3">
                         {SOCIALS.map((s) => (
                             <a key={s.label} href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-ink hover:text-ink">
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-muted transition-colors hover:border-accent hover:text-accent">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{s.icon}</svg>
                             </a>
                         ))}
                         <a href={`mailto:${EMAIL}`} aria-label="Email"
-                            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-ink hover:text-ink">
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-muted transition-colors hover:border-accent hover:text-accent">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
                         </a>
                     </div>
                 </div>
 
-                <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center">
+                <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-white/10 pt-6 text-xs text-muted sm:flex-row sm:items-center">
                     <p>© {new Date().getFullYear()} AI/ML Literacy Initiative. Open-source curriculum for educators.</p>
                     <p>Founded by Adrian Erlikhman & Michael Tarekegn · Los Angeles</p>
                 </div>
