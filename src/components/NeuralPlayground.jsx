@@ -66,7 +66,7 @@ function trainBatch(net, X, Y, lr) {
         lossSum += -(y * Math.log(p) + (1 - y) * Math.log(1 - p));
 
         const deltas = new Array(L);
-        deltas[L - 1] = [out - y]; // sigmoid + BCE => dL/dz = out - y
+        deltas[L - 1] = [out - y];
         for (let l = L - 2; l >= 0; l--) {
             const next = net.layers[l + 1];
             const aThis = acts[l + 1];
@@ -74,7 +74,7 @@ function trainBatch(net, X, Y, lr) {
             for (let j = 0; j < net.layers[l].fout; j++) {
                 let s = 0;
                 for (let o = 0; o < next.fout; o++) s += next.W[o][j] * deltas[l + 1][o];
-                d[j] = s * (1 - aThis[j] * aThis[j]); // tanh'
+                d[j] = s * (1 - aThis[j] * aThis[j]);
             }
             deltas[l] = d;
         }
@@ -123,7 +123,6 @@ function makeData(kind, N = 220) {
             const nz = () => (Math.random() - 0.5) * 0.14;
             push(r * Math.cos(t) + nz(), r * Math.sin(t) + nz(), c);
         } else {
-            // two gaussian blobs
             const c = i % 2;
             const cx = c ? 0.45 : -0.45;
             const cy = c ? 0.45 : -0.45;
@@ -140,15 +139,15 @@ const DATASETS = [
     { key: "gauss", label: "Clusters" },
 ];
 
-const DOMAIN = 1.15;      // plotting half-range
-const RES = 72;           // decision-boundary grid resolution
+const DOMAIN = 1.15;
+const RES = 72;
 const STEPS_PER_FRAME = 3;
 
-// class 0 (cyan-ish) -> class 1 (indigo-ish)
-const C0 = [8, 51, 68];
-const C1 = [55, 48, 130];
-const PT0 = "#22d3ee";
-const PT1 = "#a5b4fc";
+// Light theme: faint region tints; ink vs accent points on white.
+const C0 = [255, 232, 228]; // class A region (faint accent)
+const C1 = [223, 222, 216]; // class B region (faint ink)
+const PT0 = "#ff3d23";      // class A point (accent)
+const PT1 = "#121110";      // class B point (ink)
 
 export default function NeuralPlayground({ compact = false }) {
     const [dataset, setDataset] = useState("spiral");
@@ -217,7 +216,7 @@ export default function NeuralPlayground({ compact = false }) {
                 ctx.fillStyle = Y[i] === 1 ? PT1 : PT0;
                 ctx.fill();
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = "rgba(6,6,15,0.85)";
+                ctx.strokeStyle = "rgba(243,242,237,0.9)";
                 ctx.stroke();
             }
         }
@@ -258,39 +257,33 @@ export default function NeuralPlayground({ compact = false }) {
     }, [dataset, hidden, depth, seed]);
 
     return (
-        <div className="glass overflow-hidden p-4 sm:p-5">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="tile p-4 sm:p-5">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_248px]">
                 {/* Canvas */}
                 <div className="relative">
                     <canvas
                         ref={canvasRef}
-                        className="aspect-square w-full rounded-xl bg-ink-950 ring-1 ring-white/10"
+                        className="aspect-square w-full rounded-xl bg-white ring-1 ring-ink/10"
                     />
                     <div className="pointer-events-none absolute left-3 top-3 flex gap-2">
-                        <span className="rounded-md bg-black/40 px-2 py-1 text-[11px] font-medium text-cyan-300 backdrop-blur">
-                            ● class A
-                        </span>
-                        <span className="rounded-md bg-black/40 px-2 py-1 text-[11px] font-medium text-brand-300 backdrop-blur">
-                            ● class B
-                        </span>
+                        <span className="mono rounded bg-paper/80 px-2 py-1 text-[11px] font-medium text-accent">● class A</span>
+                        <span className="mono rounded bg-paper/80 px-2 py-1 text-[11px] font-medium text-ink">● class B</span>
                     </div>
                 </div>
 
                 {/* Controls */}
                 <div className="flex flex-col gap-4">
                     <div>
-                        <label className="text-[11px] font-semibold uppercase tracking-wider text-white/45">
-                            Dataset
-                        </label>
+                        <span className="label">Dataset</span>
                         <div className="mt-2 grid grid-cols-2 gap-2">
                             {DATASETS.map((d) => (
                                 <button
                                     key={d.key}
                                     onClick={() => setDataset(d.key)}
-                                    className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                                    className={`rounded-full px-3 py-2 text-xs font-medium transition ${
                                         dataset === d.key
-                                            ? "bg-brand-600 text-white shadow-lg shadow-brand-600/30"
-                                            : "border border-white/10 text-white/70 hover:bg-white/5"
+                                            ? "bg-ink text-paper"
+                                            : "border border-ink/20 text-ink hover:border-ink"
                                     }`}
                                 >
                                     {d.label}
@@ -299,45 +292,15 @@ export default function NeuralPlayground({ compact = false }) {
                         </div>
                     </div>
 
-                    <Slider
-                        label="Learning rate"
-                        value={lr}
-                        display={lr.toFixed(2)}
-                        min={0.05}
-                        max={2}
-                        step={0.05}
-                        onChange={setLr}
-                    />
-                    <Slider
-                        label="Neurons / layer"
-                        value={hidden}
-                        display={hidden}
-                        min={2}
-                        max={12}
-                        step={1}
-                        onChange={(v) => setHidden(Math.round(v))}
-                    />
-                    <Slider
-                        label="Hidden layers"
-                        value={depth}
-                        display={depth}
-                        min={1}
-                        max={4}
-                        step={1}
-                        onChange={(v) => setDepth(Math.round(v))}
-                    />
+                    <Slider label="Learning rate" value={lr} display={lr.toFixed(2)} min={0.05} max={2} step={0.05} onChange={setLr} />
+                    <Slider label="Neurons / layer" value={hidden} display={hidden} min={2} max={12} step={1} onChange={(v) => setHidden(Math.round(v))} />
+                    <Slider label="Hidden layers" value={depth} display={depth} min={1} max={4} step={1} onChange={(v) => setDepth(Math.round(v))} />
 
                     <div className="grid grid-cols-2 gap-2">
-                        <button
-                            onClick={() => setPlaying((v) => !v)}
-                            className="btn-primary !py-2.5 text-sm"
-                        >
+                        <button onClick={() => setPlaying((v) => !v)} className="btn-primary !py-2.5 text-sm">
                             {playing ? "Pause" : "Train"}
                         </button>
-                        <button
-                            onClick={() => { setSeed((s) => s + 1); setPlaying(true); }}
-                            className="btn-ghost !py-2.5 text-sm"
-                        >
+                        <button onClick={() => { setSeed((s) => s + 1); setPlaying(true); }} className="btn-ghost !py-2.5 text-sm">
                             Reset
                         </button>
                     </div>
@@ -345,17 +308,17 @@ export default function NeuralPlayground({ compact = false }) {
             </div>
 
             {/* Stats bar */}
-            <div className="mt-4 grid grid-cols-3 gap-3 border-t border-white/10 pt-4">
+            <div className="mt-4 grid grid-cols-3 gap-3 border-t border-ink/12 pt-4">
                 <Metric label="Epoch" value={stats.epoch.toLocaleString()} />
                 <Metric label="Loss" value={stats.loss.toFixed(3)} />
                 <Metric label="Accuracy" value={`${(stats.acc * 100).toFixed(1)}%`} highlight />
             </div>
             {!compact && (
-                <p className="mt-4 text-xs leading-relaxed text-white/45">
-                    This is a real neural network training in your browser — no server, no
-                    libraries. Every frame runs a forward pass and backpropagation in plain
-                    JavaScript. Watch the shaded <span className="text-brand-300">decision boundary</span>{" "}
-                    reshape itself to separate the two classes as the model learns.
+                <p className="mt-4 text-xs leading-relaxed text-ink2">
+                    A real neural network training in your browser — no server, no libraries. Every
+                    frame runs a forward pass and backpropagation in plain JavaScript. Watch the
+                    shaded <span className="text-accent">decision boundary</span> reshape itself to
+                    separate the two classes as the model learns.
                 </p>
             )}
         </div>
@@ -366,19 +329,14 @@ function Slider({ label, value, display, min, max, step, onChange }) {
     return (
         <div>
             <div className="flex items-center justify-between">
-                <label className="text-[11px] font-semibold uppercase tracking-wider text-white/45">
-                    {label}
-                </label>
-                <span className="font-mono text-xs text-brand-300">{display}</span>
+                <span className="label">{label}</span>
+                <span className="mono text-xs text-accent">{display}</span>
             </div>
             <input
                 type="range"
-                min={min}
-                max={max}
-                step={step}
-                value={value}
+                min={min} max={max} step={step} value={value}
                 onChange={(e) => onChange(parseFloat(e.target.value))}
-                className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-brand-500"
+                className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-ink/15 accent-accent"
             />
         </div>
     );
@@ -386,11 +344,9 @@ function Slider({ label, value, display, min, max, step, onChange }) {
 
 function Metric({ label, value, highlight }) {
     return (
-        <div className="rounded-xl bg-white/[0.03] px-3 py-2.5 text-center ring-1 ring-white/10">
-            <div className={`font-mono text-lg font-semibold ${highlight ? "text-gradient" : "text-white"}`}>
-                {value}
-            </div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40">{label}</div>
+        <div className="rounded-lg border border-ink/12 px-3 py-2.5 text-center">
+            <div className={`mono text-lg font-semibold ${highlight ? "text-accent" : "text-ink"}`}>{value}</div>
+            <div className="label mt-0.5 !text-[10px]">{label}</div>
         </div>
     );
 }

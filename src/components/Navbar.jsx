@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import Magnetic from "./Magnetic";
 
 const LINKS = [
-    { to: "/program", label: "Program" },
-    { to: "/demo", label: "Live Demo" },
-    { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
+    { to: "/program", label: "Program", n: "01" },
+    { to: "/demo", label: "Live Demo", n: "02" },
+    { to: "/about", label: "About", n: "03" },
+    { to: "/contact", label: "Contact", n: "04" },
 ];
 
 export default function Navbar() {
@@ -25,70 +26,59 @@ export default function Navbar() {
     return (
         <header
             className={`sticky top-0 z-50 transition-colors duration-300 ${
-                scrolled
-                    ? "border-b border-white/10 bg-ink-900/80 backdrop-blur-xl"
-                    : "border-b border-transparent bg-transparent"
+                scrolled ? "border-b border-ink/10 bg-paper/85 backdrop-blur-md" : "border-b border-transparent"
             }`}
         >
-            <nav className="container-page flex h-16 items-center justify-between">
-                <Link to="/" className="flex items-center gap-2.5">
-                    <img src="/logo.jpg" alt="AIML-LI" className="h-9 w-9 rounded-lg object-cover ring-1 ring-white/15" />
-                    <div className="leading-tight">
-                        <span className="block font-display text-base font-bold text-white">AIML-LI</span>
-                        <span className="block text-[10px] uppercase tracking-[0.16em] text-white/45">Literacy Initiative</span>
-                    </div>
-                </Link>
-
-                <div className="hidden items-center gap-1 md:flex">
-                    {LINKS.map((l) => (
-                        <NavLink
-                            key={l.to}
-                            to={l.to}
-                            className={({ isActive }) =>
-                                `rounded-lg px-3.5 py-2 text-sm font-medium transition ${
-                                    isActive ? "text-white" : "text-white/65 hover:text-white"
-                                }`
-                            }
-                        >
-                            {l.label}
-                        </NavLink>
-                    ))}
-                    <Link to="/contact" className="btn-primary ml-2 !px-4 !py-2">
-                        Partner with us
+            <nav className="container-wide flex h-20 items-center justify-between">
+                <Magnetic strength={0.25}>
+                    <Link to="/" className="serif text-2xl font-semibold tracking-tight text-ink" data-cursor>
+                        AIML<span className="text-accent">·</span>LI
                     </Link>
+                </Magnetic>
+
+                <div className="hidden items-center gap-8 md:flex">
+                    {LINKS.map((l) => (
+                        <Magnetic key={l.to} strength={0.3}>
+                            <NavLink
+                                to={l.to}
+                                className={({ isActive }) =>
+                                    `label ulink flex items-center gap-1.5 !text-[12px] ${isActive ? "text-ink" : "text-ink2"}`
+                                }
+                            >
+                                <span className="index-num">{l.n}</span>
+                                {l.label}
+                            </NavLink>
+                        </Magnetic>
+                    ))}
+                    <Magnetic strength={0.4}>
+                        <Link to="/contact" className="btn-primary !px-5 !py-2.5 !text-xs" data-cursor>
+                            Partner with us
+                        </Link>
+                    </Magnetic>
                 </div>
 
                 <button
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-white md:hidden"
+                    className="flex h-10 w-10 items-center justify-center md:hidden"
                     onClick={() => setOpen((v) => !v)}
                     aria-label="Toggle menu"
                     aria-expanded={open}
                 >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                         {open ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 12h18M3 6h18M3 18h18" />}
                     </svg>
                 </button>
             </nav>
 
             {open && (
-                <div className="border-t border-white/10 bg-ink-900/95 px-5 py-4 backdrop-blur-xl md:hidden">
-                    <div className="flex flex-col gap-1">
+                <div className="border-t border-ink/10 bg-paper px-5 py-5 md:hidden">
+                    <div className="flex flex-col divide-y divide-ink/10">
                         {LINKS.map((l) => (
-                            <NavLink
-                                key={l.to}
-                                to={l.to}
-                                className={({ isActive }) =>
-                                    `rounded-lg px-3 py-2.5 text-sm font-medium ${
-                                        isActive ? "bg-white/10 text-white" : "text-white/70"
-                                    }`
-                                }
-                            >
+                            <NavLink key={l.to} to={l.to} className="label flex items-center gap-2 py-4 !text-sm text-ink">
+                                <span className="index-num">{l.n}</span>
                                 {l.label}
                             </NavLink>
                         ))}
-                        <Link to="/contact" className="btn-primary mt-2">
-                            Partner with us
-                        </Link>
+                        <Link to="/contact" className="btn-primary mt-4 justify-center">Partner with us</Link>
                     </div>
                 </div>
             )}

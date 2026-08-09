@@ -33,14 +33,14 @@ export default function Stat({ value, suffix = "", prefix = "", label, sub, deci
     const shown = decimals > 0 ? display.toFixed(decimals) : Math.round(display).toLocaleString();
 
     return (
-        <div ref={ref} className="text-center">
-            <div className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <div ref={ref}>
+            <div className="serif text-5xl font-medium tracking-tight text-ink sm:text-6xl">
                 {prefix}
-                <span className="text-gradient">{shown}</span>
-                {suffix}
+                {shown}
+                <span className="text-accent">{suffix}</span>
             </div>
-            <div className="mt-2 text-sm font-semibold text-white/90">{label}</div>
-            {sub && <div className="mt-0.5 text-xs text-white/50">{sub}</div>}
+            <div className="mt-2 text-sm font-semibold text-ink">{label}</div>
+            {sub && <div className="mono mt-0.5 text-[11px] text-ink2">{sub}</div>}
         </div>
     );
 }
