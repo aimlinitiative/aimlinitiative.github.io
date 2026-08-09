@@ -143,11 +143,11 @@ const DOMAIN = 1.15;
 const RES = 72;
 const STEPS_PER_FRAME = 3;
 
-// Light theme: faint region tints; ink vs accent points on white.
-const C0 = [255, 232, 228]; // class A region (faint accent)
-const C1 = [223, 222, 216]; // class B region (faint ink)
-const PT0 = "#ff3d23";      // class A point (accent)
-const PT1 = "#121110";      // class B point (ink)
+// Dark theme: purple region -> coral region; bright points.
+const C0 = [40, 8, 60];     // class A region (purple-dark)
+const C1 = [58, 16, 16];    // class B region (coral-dark)
+const PT0 = "#c76bff";      // class A point (purple)
+const PT1 = "#ff5147";      // class B point (coral)
 
 export default function NeuralPlayground({ compact = false }) {
     const [dataset, setDataset] = useState("spiral");
@@ -216,7 +216,7 @@ export default function NeuralPlayground({ compact = false }) {
                 ctx.fillStyle = Y[i] === 1 ? PT1 : PT0;
                 ctx.fill();
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = "rgba(243,242,237,0.9)";
+                ctx.strokeStyle = "rgba(8,8,10,0.85)";
                 ctx.stroke();
             }
         }
@@ -257,17 +257,17 @@ export default function NeuralPlayground({ compact = false }) {
     }, [dataset, hidden, depth, seed]);
 
     return (
-        <div className="tile p-4 sm:p-5">
+        <div className="panel ring-grad p-4 sm:p-5">
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_248px]">
                 {/* Canvas */}
                 <div className="relative">
                     <canvas
                         ref={canvasRef}
-                        className="aspect-square w-full rounded-xl bg-white ring-1 ring-ink/10"
+                        className="aspect-square w-full rounded-xl bg-ink-950 ring-1 ring-white/10"
                     />
                     <div className="pointer-events-none absolute left-3 top-3 flex gap-2">
-                        <span className="mono rounded bg-paper/80 px-2 py-1 text-[11px] font-medium text-accent">● class A</span>
-                        <span className="mono rounded bg-paper/80 px-2 py-1 text-[11px] font-medium text-ink">● class B</span>
+                        <span className="mono rounded bg-black/50 px-2 py-1 text-[11px] font-medium text-[#c76bff] backdrop-blur">● class A</span>
+                        <span className="mono rounded bg-black/50 px-2 py-1 text-[11px] font-medium text-coral backdrop-blur">● class B</span>
                     </div>
                 </div>
 
@@ -280,11 +280,12 @@ export default function NeuralPlayground({ compact = false }) {
                                 <button
                                     key={d.key}
                                     onClick={() => setDataset(d.key)}
-                                    className={`rounded-full px-3 py-2 text-xs font-medium transition ${
+                                    className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
                                         dataset === d.key
-                                            ? "bg-ink text-paper"
-                                            : "border border-ink/20 text-ink hover:border-ink"
+                                            ? "text-white shadow-lg shadow-plasma/30"
+                                            : "border border-white/10 text-white/70 hover:bg-white/5"
                                     }`}
+                                    style={dataset === d.key ? { backgroundImage: "linear-gradient(100deg,#b302e8,#ff5147)" } : undefined}
                                 >
                                     {d.label}
                                 </button>
@@ -308,17 +309,17 @@ export default function NeuralPlayground({ compact = false }) {
             </div>
 
             {/* Stats bar */}
-            <div className="mt-4 grid grid-cols-3 gap-3 border-t border-ink/12 pt-4">
+            <div className="mt-4 grid grid-cols-3 gap-3 border-t border-white/10 pt-4">
                 <Metric label="Epoch" value={stats.epoch.toLocaleString()} />
                 <Metric label="Loss" value={stats.loss.toFixed(3)} />
                 <Metric label="Accuracy" value={`${(stats.acc * 100).toFixed(1)}%`} highlight />
             </div>
             {!compact && (
-                <p className="mt-4 text-xs leading-relaxed text-ink2">
+                <p className="mt-4 text-xs leading-relaxed text-white/45">
                     A real neural network training in your browser — no server, no libraries. Every
                     frame runs a forward pass and backpropagation in plain JavaScript. Watch the
-                    shaded <span className="text-accent">decision boundary</span> reshape itself to
-                    separate the two classes as the model learns.
+                    shaded <span className="text-gradient font-semibold">decision boundary</span>{" "}
+                    reshape itself to separate the two classes as the model learns.
                 </p>
             )}
         </div>
@@ -330,13 +331,13 @@ function Slider({ label, value, display, min, max, step, onChange }) {
         <div>
             <div className="flex items-center justify-between">
                 <span className="label">{label}</span>
-                <span className="mono text-xs text-accent">{display}</span>
+                <span className="mono text-xs text-[#c76bff]">{display}</span>
             </div>
             <input
                 type="range"
                 min={min} max={max} step={step} value={value}
                 onChange={(e) => onChange(parseFloat(e.target.value))}
-                className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-ink/15 accent-accent"
+                className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-plasma"
             />
         </div>
     );
@@ -344,8 +345,8 @@ function Slider({ label, value, display, min, max, step, onChange }) {
 
 function Metric({ label, value, highlight }) {
     return (
-        <div className="rounded-lg border border-ink/12 px-3 py-2.5 text-center">
-            <div className={`mono text-lg font-semibold ${highlight ? "text-accent" : "text-ink"}`}>{value}</div>
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-center">
+            <div className={`mono text-lg font-semibold ${highlight ? "text-gradient" : "text-white"}`}>{value}</div>
             <div className="label mt-0.5 !text-[10px]">{label}</div>
         </div>
     );

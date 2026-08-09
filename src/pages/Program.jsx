@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal";
-import Magnetic from "../components/Magnetic";
 
 const UNITS = [
     { wk: "01–02", title: "What is intelligence?", text: "AI vs. ML vs. deep learning. Where these systems already shape students' lives — and where they fail." },
@@ -18,47 +17,44 @@ export default function Program() {
     return (
         <div className="container-wide py-16 sm:py-24">
             <Reveal className="max-w-4xl">
-                <div className="flex items-center gap-3">
-                    <span className="index-num">(01)</span>
-                    <span className="label">The program</span>
-                </div>
-                <h1 className="display mt-6 text-5xl text-ink sm:text-7xl">
-                    From <span className="italic text-accent">curious</span> to capable in 12 weeks.
+                <span className="label">The program</span>
+                <h1 className="display mt-5 text-5xl text-white sm:text-7xl">
+                    From <span className="text-gradient">curious</span> to capable in 12 weeks.
                 </h1>
-                <p className="mt-6 max-w-2xl text-lg text-ink2">
+                <p className="mt-6 max-w-2xl text-lg text-white/60">
                     Our curriculum takes a student with zero background and walks them, week by week, to
                     shipping their own AI project. Every unit pairs a plain-language concept primer with
                     a hands-on Colab notebook, a teacher guide, and a check for understanding.
                 </p>
             </Reveal>
 
-            {/* Principles */}
-            <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-ink/15 bg-ink/15 md:grid-cols-3">
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
                 {[
                     { title: "No-code → real-code", text: "Students start by manipulating models visually, then graduate to Python — nobody gets left at the door." },
                     { title: "Ethics woven in", text: "Every unit connects the tech to its human stakes. We train citizens, not just coders." },
                     { title: "Teacher-ready", text: "Answer keys, pacing guides, and slide decks let a non-CS teacher run it with confidence." },
-                ].map((p) => (
-                    <Reveal key={p.title} className="bg-paper p-8">
-                        <h3 className="serif text-xl font-medium text-ink">{p.title}</h3>
-                        <p className="mt-3 text-sm text-ink2">{p.text}</p>
+                ].map((p, i) => (
+                    <Reveal key={p.title} delay={i * 90}>
+                        <div className="panel ring-grad panel-hover h-full p-7">
+                            <h3 className="font-display text-lg font-bold text-white">{p.title}</h3>
+                            <p className="mt-3 text-sm text-white/60">{p.text}</p>
+                        </div>
                     </Reveal>
                 ))}
             </div>
 
-            {/* Timeline */}
             <section className="mt-24">
                 <Reveal>
-                    <h2 className="display text-3xl text-ink sm:text-5xl">The 12-week arc</h2>
-                    <p className="mono mt-3 text-xs uppercase tracking-wider text-ink2">16+ units of Colab notebooks & lesson kits — open-source</p>
+                    <h2 className="display text-3xl text-white sm:text-5xl">The 12-week arc</h2>
+                    <p className="mono mt-3 text-xs uppercase tracking-wider text-white/45">16+ units of Colab notebooks & lesson kits — open-source</p>
                 </Reveal>
-                <div className="mt-12 divide-y divide-ink/15 border-y border-ink/15">
-                    {UNITS.map((u) => (
-                        <Reveal key={u.title}>
-                            <div className="group grid grid-cols-[4rem_1fr] gap-5 py-7 sm:grid-cols-[6rem_1fr_1.5fr] sm:gap-10">
-                                <span className="mono text-sm text-accent">Wk {u.wk}</span>
-                                <h3 className="serif text-xl font-medium text-ink transition-transform duration-300 group-hover:translate-x-2 sm:text-2xl">{u.title}</h3>
-                                <p className="col-span-2 text-sm text-ink2 sm:col-span-1">{u.text}</p>
+                <div className="mt-10 space-y-3">
+                    {UNITS.map((u, i) => (
+                        <Reveal key={u.title} delay={Math.min(i * 40, 240)}>
+                            <div className="panel panel-hover flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:gap-8">
+                                <span className="mono text-sm text-gradient font-semibold sm:w-24">Wk {u.wk}</span>
+                                <h3 className="font-display text-lg font-semibold text-white sm:w-64">{u.title}</h3>
+                                <p className="flex-1 text-sm text-white/55">{u.text}</p>
                             </div>
                         </Reveal>
                     ))}
@@ -66,11 +62,11 @@ export default function Program() {
             </section>
 
             <Reveal className="mt-24 text-center">
-                <h2 className="display text-3xl text-ink sm:text-5xl">Want it for your classroom?</h2>
-                <p className="mx-auto mt-4 max-w-xl text-ink2">It's free and open-source. We'll help you get it running — and train your teachers to deliver it.</p>
+                <h2 className="display text-3xl text-white sm:text-5xl">Want it for your classroom?</h2>
+                <p className="mx-auto mt-4 max-w-xl text-white/60">It's free and open-source. We'll help you get it running — and train your teachers to deliver it.</p>
                 <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                    <Magnetic strength={0.4}><Link to="/contact" className="btn-primary" data-cursor>Bring AIML-LI to your school</Link></Magnetic>
-                    <Magnetic strength={0.4}><Link to="/demo" className="btn-ghost" data-cursor>Try the live demo</Link></Magnetic>
+                    <Link to="/contact" className="btn-primary">Bring AIML-LI to your school</Link>
+                    <Link to="/demo" className="btn-ghost">Try the live demo</Link>
                 </div>
             </Reveal>
         </div>

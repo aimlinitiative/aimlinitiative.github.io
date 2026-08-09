@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Cursor from "./components/Cursor";
+import Particles from "./components/Particles";
 
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -20,12 +20,26 @@ function ScrollToTop() {
     return null;
 }
 
+function Spotlight() {
+    useEffect(() => {
+        const onMove = (e) => {
+            document.documentElement.style.setProperty("--mx", `${e.clientX}px`);
+            document.documentElement.style.setProperty("--my", `${e.clientY}px`);
+        };
+        window.addEventListener("pointermove", onMove);
+        return () => window.removeEventListener("pointermove", onMove);
+    }, []);
+    return <div className="bg-spotlight" aria-hidden="true" />;
+}
+
 export default function App() {
     return (
         <BrowserRouter>
             <ScrollToTop />
-            <div className="grain" aria-hidden="true" />
-            <Cursor />
+            <div className="bg-mesh" aria-hidden="true" />
+            <div className="bg-grid" aria-hidden="true" />
+            <Particles />
+            <Spotlight />
             <div className="flex min-h-screen flex-col">
                 <Navbar />
                 <main className="flex-1">

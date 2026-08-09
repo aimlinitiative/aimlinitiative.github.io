@@ -5,9 +5,9 @@ export default function Marquee({ items, className = "" }) {
         <div className={`group relative flex overflow-hidden ${className}`}>
             <div className="marquee-track flex shrink-0 items-center gap-8 pr-8 group-hover:[animation-play-state:paused]">
                 {row.map((it, i) => (
-                    <span key={i} className="serif flex items-center gap-8 whitespace-nowrap text-2xl font-medium text-ink sm:text-3xl">
+                    <span key={i} className="display flex items-center gap-8 whitespace-nowrap text-xl font-semibold uppercase tracking-tight text-white/70 sm:text-2xl">
                         {it}
-                        <span className="text-accent">✳</span>
+                        <span className="text-gradient">◆</span>
                     </span>
                 ))}
             </div>

@@ -34,13 +34,11 @@ export default function Stat({ value, suffix = "", prefix = "", label, sub, deci
 
     return (
         <div ref={ref}>
-            <div className="serif text-5xl font-medium tracking-tight text-ink sm:text-6xl">
-                {prefix}
-                {shown}
-                <span className="text-accent">{suffix}</span>
+            <div className="display text-5xl font-bold tracking-tight sm:text-6xl">
+                <span className="text-gradient">{prefix}{shown}{suffix}</span>
             </div>
-            <div className="mt-2 text-sm font-semibold text-ink">{label}</div>
-            {sub && <div className="mono mt-0.5 text-[11px] text-ink2">{sub}</div>}
+            <div className="mt-2 text-sm font-semibold text-white">{label}</div>
+            {sub && <div className="mono mt-0.5 text-[11px] text-white/45">{sub}</div>}
         </div>
     );
 }
