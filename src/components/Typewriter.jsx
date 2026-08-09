@@ -25,7 +25,7 @@ export default function Typewriter({ words, className = "" }) {
     return (
         <span className={className}>
             {text}
-            <span className="blink font-normal text-cyan-400">|</span>
+            <span className="font-normal text-brand/50">|</span>
         </span>
     );
 }

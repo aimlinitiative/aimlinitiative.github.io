@@ -1,53 +1,47 @@
-import { Link } from "react-router-dom";
+const EMAIL = "aimlinitiative@gmail.com";
 
-const CONTACT_EMAIL = "aimlinitiative@gmail.com";
+export const SOCIALS = [
+    { label: "Instagram", href: "https://instagram.com/", icon: (
+        <><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></>
+    ) },
+    { label: "LinkedIn", href: "https://linkedin.com/", icon: (
+        <><rect x="2" y="2" width="20" height="20" rx="3" /><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 0 1 4 0v4M11 17v-7" /></>
+    ) },
+    { label: "GitHub", href: "https://github.com/aimlinitiative", icon: (
+        <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6 0C6.7 2.3 5.6 2.6 5.6 2.6a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+    ) },
+];
 
 export default function Footer() {
     return (
-        <footer className="mt-28 border-t border-white/[0.08] bg-ink-950/60">
-            <div className="container-wide py-16">
-                <Link to="/contact" className="group block">
-                    <span className="label">Get involved</span>
-                    <div className="mt-3 display text-4xl text-white sm:text-6xl">
-                        Let's build it <span className="text-gradient">together</span> →
-                    </div>
-                </Link>
-
-                <div className="mt-16 grid gap-10 border-t border-white/[0.08] pt-10 md:grid-cols-[1.6fr_1fr_1fr]">
-                    <div>
-                        <div className="flex items-center gap-2.5">
-                            <img src="/logo.jpg" alt="AIML-LI" className="logo-tile h-9 w-9 object-cover" />
-                            <span className="font-display text-lg font-bold text-white">AIML-LI</span>
+        <footer className="border-t border-line bg-paper2">
+            <div className="container-page py-12">
+                <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-3">
+                        <img src="/logo.jpg" alt="AIML-LI" className="h-9 w-9 rounded-lg object-cover" />
+                        <div>
+                            <div className="font-semibold text-ink">AIML-LI</div>
+                            <div className="text-sm text-muted">AI/ML Literacy Initiative</div>
                         </div>
-                        <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/50">
-                            The AI/ML Literacy Initiative is a nonprofit closing the AI opportunity gap
-                            in public education — open-source curriculum, in real classrooms.
-                        </p>
-                        <a href={`mailto:${CONTACT_EMAIL}`} className="ulink mt-4 inline-block text-sm text-white/80">{CONTACT_EMAIL}</a>
                     </div>
-                    <div>
-                        <span className="label">Explore</span>
-                        <ul className="mt-4 space-y-2.5 text-sm text-white/55">
-                            <li><Link to="/program" className="ulink hover:text-white">Program</Link></li>
-                            <li><Link to="/demo" className="ulink hover:text-white">Playground</Link></li>
-                            <li><Link to="/about" className="ulink hover:text-white">About & Team</Link></li>
-                            <li><Link to="/contact" className="ulink hover:text-white">Partner / Fund</Link></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <span className="label">Get involved</span>
-                        <ul className="mt-4 space-y-2.5 text-sm text-white/55">
-                            <li><a href={`mailto:${CONTACT_EMAIL}?subject=Partnership`} className="ulink hover:text-white">Schools & educators</a></li>
-                            <li><a href={`mailto:${CONTACT_EMAIL}?subject=Funding`} className="ulink hover:text-white">Funders & grants</a></li>
-                            <li><a href={`mailto:${CONTACT_EMAIL}?subject=Volunteer`} className="ulink hover:text-white">Volunteer / mentor</a></li>
-                            <li><a href="https://github.com/aimlinitiative" target="_blank" rel="noreferrer" className="ulink hover:text-white">GitHub ↗</a></li>
-                        </ul>
+
+                    <div className="flex items-center gap-3">
+                        {SOCIALS.map((s) => (
+                            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-ink hover:text-ink">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{s.icon}</svg>
+                            </a>
+                        ))}
+                        <a href={`mailto:${EMAIL}`} aria-label="Email"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-ink hover:text-ink">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+                        </a>
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-white/[0.08] pt-6 text-xs text-white/40 sm:flex-row sm:items-center">
-                    <p>© {new Date().getFullYear()} AI/ML Literacy Initiative — open-source for educators.</p>
-                    <p className="mono">Curriculum: Adrian Erlikhman & Michael Tarekegn · Site: Ibrahim Piri</p>
+                <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center">
+                    <p>© {new Date().getFullYear()} AI/ML Literacy Initiative. Open-source curriculum for educators.</p>
+                    <p>Founded by Adrian Erlikhman & Michael Tarekegn · Los Angeles</p>
                 </div>
             </div>
         </footer>
