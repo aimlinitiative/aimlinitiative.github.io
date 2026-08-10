@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-    color-scheme: dark;
+    color-scheme: light;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -17,28 +17,56 @@ body {
     min-width: 320px;
     min-height: 100vh;
     font-family: "Hanken Grotesk", system-ui, sans-serif;
-    line-height: 1.6;
-    color: #f4f4f3;
-    background-color: #0a0a0b;
-    letter-spacing: -0.01em;
+    font-size: 17px;
+    line-height: 1.65;
+    color: #15151A;
+    background-color: #FAFAF8;
+    letter-spacing: -0.011em;
+    -webkit-tap-highlight-color: transparent;
 }
 
-section[id] { scroll-margin-top: 6rem; }
+::selection { background: #1F5FBF; color: #fff; }
+
+section[id] { scroll-margin-top: 5.5rem; }
 
 @layer components {
     .container-page { @apply mx-auto w-full max-w-6xl px-6 sm:px-8; }
 
-    .display { font-family: "Space Grotesk", system-ui, sans-serif; letter-spacing: -0.03em; }
+    .display { font-family: "Space Grotesk", system-ui, sans-serif; letter-spacing: -0.035em; }
 
-    .eyebrow { @apply font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-accent; }
+    /* Section eyebrow: small mono label with a leading accent tick (Linear-style) */
+    .eyebrow {
+        @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted;
+    }
+    .eyebrow::before {
+        content: "";
+        @apply inline-block h-1.5 w-1.5 rounded-full bg-accent;
+    }
 
-    .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-colors duration-200; }
-    .btn-accent { @apply btn bg-accent text-bg hover:bg-accentdk; }
-    .btn-solid { @apply btn bg-ink text-bg hover:bg-white; }
-    .btn-ghost { @apply btn border border-white/15 text-ink hover:border-white/40 hover:bg-white/5; }
+    /* Buttons */
+    .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[15px] font-medium transition-all duration-200; }
+    .btn-accent { @apply btn bg-accent text-white shadow-soft hover:bg-accentdk hover:shadow-lift; }
+    .btn-ghost { @apply btn border border-line bg-white/60 text-ink hover:border-ink/25 hover:bg-white; }
 
     .link { @apply text-accent underline-offset-4 hover:underline; }
-    .card { @apply rounded-2xl border border-white/10 bg-surface; }
+
+    /* Surface card with hairline border + soft lift on hover */
+    .card {
+        @apply rounded-2xl border border-line bg-white p-6 transition-all duration-300 sm:p-7;
+    }
+    .card-hover { @apply hover:-translate-y-0.5 hover:border-ink/10 hover:shadow-soft; }
+
+    .rule { @apply border-t border-line; }
+}
+
+@layer utilities {
+    .text-balance { text-wrap: balance; }
+    .text-pretty { text-wrap: pretty; }
+    .focusable:focus-visible {
+        outline: 2px solid #1F5FBF;
+        outline-offset: 2px;
+        border-radius: 6px;
+    }
 }
 
 /* Reveal on scroll */
@@ -50,19 +78,13 @@ section[id] { scroll-margin-top: 6rem; }
 }
 .reveal.is-visible { opacity: 1; transform: none; }
 
-/* Marquee (the one spicy element) */
+/* Marquee — refined, quiet keyword ticker */
 .marquee-mask {
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
-.marquee-track { animation: marquee 26s linear infinite; }
+.marquee-track { animation: marquee 40s linear infinite; }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-/* Outlined display text for the marquee */
-.text-outline {
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(246,246,245,0.7);
-}
 
 @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
@@ -71,7 +93,7 @@ section[id] { scroll-margin-top: 6rem; }
     .animate-fade-up { animation: none !important; opacity: 1 !important; }
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #0a0a0b; }
-::-webkit-scrollbar-thumb { background: #26262b; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #35353c; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: #FAFAF8; }
+::-webkit-scrollbar-thumb { background: #d7d6d0; border-radius: 999px; border: 3px solid #FAFAF8; }
+::-webkit-scrollbar-thumb:hover { background: #bdbcb5; }

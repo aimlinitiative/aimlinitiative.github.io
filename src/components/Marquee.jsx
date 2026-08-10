@@ -1,14 +1,13 @@
-/* The one spicy element: a big, outlined, auto-scrolling statement band.
- * Pauses on hover. */
+/* A quiet, refined keyword ticker — small caps, muted, separated by accent dots. */
 export default function Marquee({ items }) {
     const row = [...items, ...items];
     return (
-        <div className="marquee-mask group flex overflow-hidden py-8 sm:py-10">
-            <div className="marquee-track flex shrink-0 items-center gap-10 pr-10 group-hover:[animation-play-state:paused] sm:gap-16 sm:pr-16">
+        <div className="marquee-mask group flex overflow-hidden py-5">
+            <div className="marquee-track flex shrink-0 items-center group-hover:[animation-play-state:paused]">
                 {row.map((it, i) => (
-                    <span key={i} className="flex shrink-0 items-center gap-10 sm:gap-16">
-                        <span className={`display text-4xl font-bold tracking-tight sm:text-6xl ${i % 2 ? "text-outline" : "text-ink"}`}>{it}</span>
-                        <span className="h-2 w-2 shrink-0 rounded-full bg-accent" />
+                    <span key={i} className="flex shrink-0 items-center">
+                        <span className="font-mono text-[13px] font-medium uppercase tracking-[0.14em] text-muted">{it}</span>
+                        <span className="mx-8 h-1 w-1 shrink-0 rounded-full bg-accent sm:mx-10" />
                     </span>
                 ))}
             </div>
