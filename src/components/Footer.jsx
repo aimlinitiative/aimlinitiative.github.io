@@ -40,7 +40,7 @@ export default function Footer() {
                 </div>
 
                 <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-line pt-6 text-xs text-faint sm:flex-row sm:items-center">
-                    <p>© {new Date().getFullYear()} AI/ML Literacy Initiative. Open-source curriculum for educators.</p>
+                    <p>© {new Date().getFullYear()} AI/ML Literacy Initiative. Free, open-source AI curriculum for public schools.</p>
                     <p>Founded by Adrian Erlikhman & Michael Tarekegn · Los Angeles</p>
                 </div>
             </div>

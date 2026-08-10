@@ -7,11 +7,11 @@ import { useState, useRef } from "react";
 
 const UNITS = [
     { r: "1-2",   t: "Foundations",       s: "How machines learn from data.",            k: "data" },
-    { r: "3-4",   t: "Building models",    s: "Train, classify, ship.",                   k: "classify" },
-    { r: "5-6",   t: "Prediction & error", s: "Predict without overfitting.",             k: "fit" },
-    { r: "7-8",   t: "Neural networks",    s: "Deep learning, from scratch.",             k: "net" },
+    { r: "3-4",   t: "Building models",    s: "Your first model that actually works.",    k: "classify" },
+    { r: "5-6",   t: "Prediction & error", s: "Getting predictions right, and honest.",   k: "fit" },
+    { r: "7-8",   t: "Neural networks",    s: "Built from scratch, not magic.",           k: "net" },
     { r: "9-10",  t: "Language & bias",    s: "Where models work, and where they break.", k: "tokens" },
-    { r: "11-12", t: "Capstone",           s: "Design, build, present.",                  k: "ship" },
+    { r: "11-12", t: "Capstone",           s: "Students ship a project of their own.",    k: "ship" },
 ];
 
 const STEPX = 208;  // px between cards
@@ -92,6 +92,7 @@ export default function Curriculum() {
     const [drag, setDrag] = useState(0); // live drag offset in px
     const dragging = useRef(false);
     const startX = useRef(0);
+    const dragPx = useRef(0); // live drag distance (ref, always current for snap)
     const moved = useRef(false);
     const stageRef = useRef(null);
 
@@ -102,12 +103,14 @@ export default function Curriculum() {
     const onDown = (e) => {
         dragging.current = true;
         startX.current = e.clientX;
+        dragPx.current = 0;
         moved.current = false;
-        e.currentTarget.setPointerCapture?.(e.pointerId);
+        try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* no-op */ }
     };
     const onMove = (e) => {
         if (!dragging.current) return;
         const d = e.clientX - startX.current;
+        dragPx.current = d;
         if (Math.abs(d) > 4) moved.current = true;
         setDrag(d);
     };
@@ -115,19 +118,23 @@ export default function Curriculum() {
         if (!dragging.current) return;
         dragging.current = false;
         if (moved.current) {
-            setActive((a) => clamp(a - Math.round(drag / STEPX)));
+            const step = Math.round(dragPx.current / STEPX);
+            setActive((a) => clamp(a - step));
         } else if (stageRef.current) {
             // light click: left half steps back, right half steps forward
             const rect = stageRef.current.getBoundingClientRect();
             const dir = e.clientX < rect.left + rect.width / 2 ? -1 : 1;
             setActive((a) => clamp(a + dir));
         }
+        dragPx.current = 0;
         setDrag(0);
     };
     const onLeave = () => {
         if (!dragging.current) return;
         dragging.current = false;
-        setActive((a) => clamp(a - Math.round(drag / STEPX)));
+        const step = Math.round(dragPx.current / STEPX);
+        setActive((a) => clamp(a - step));
+        dragPx.current = 0;
         setDrag(0);
     };
     const onKey = (e) => {

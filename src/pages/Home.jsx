@@ -6,21 +6,27 @@ import { SOCIALS } from "../components/Footer";
 
 const EMAIL = "aimlinitiative@gmail.com";
 
-// Blue-tint steps for the numbers (deep -> light), sleek single-hue
+// Blue-tint steps for the numbers (deep -> light)
 const WORK_TINT = ["#22508F", "#2C63B0", "#4C82D2"];
 const LOOKING_TINT = ["#22508F", "#2C63B0", "#3D77C9", "#5A8DD6"];
 
 const WORK = [
-    { n: "01", t: "We build the curriculum", d: "A 12-week, standards-aligned course of plain-language lessons and hands-on notebooks, built for high-schoolers with no background." },
-    { n: "02", t: "We bring it to classrooms", d: "We partner directly with public-school teachers to run the program, gather feedback, and improve it. Our first pilot is with LAUSD." },
-    { n: "03", t: "We keep it open and free", d: "The curriculum is open-source and free to any school. Cost should never be the reason a student misses out." },
+    { n: "01", t: "We build the curriculum", d: "A 12-week course for high-schoolers with no background. Plain-language lessons, real notebooks, aligned to state standards." },
+    { n: "02", t: "We run it in classrooms", d: "We work with public-school teachers to teach it for real, then fix whatever doesn't land. Our first pilot is with LAUSD." },
+    { n: "03", t: "We keep it free", d: "Every lesson is open-source. No school pays, and cost never decides who gets to learn this." },
+];
+
+const TEAM = [
+    { name: "Adrian Erlikhman", role: "Co-founder", initials: "AE" },
+    { name: "Michael Tarekegn", role: "Co-founder", initials: "MT" },
+    { name: "Ibrahim Piri", role: "Engineering", initials: "IP" },
 ];
 
 const LOOKING = [
-    { t: "Schools & educators", d: "Bring the curriculum to your classroom for free, with help getting started." },
-    { t: "Funders & grant partners", d: "Help us scale a program that's already reaching students in public schools." },
-    { t: "Mentors & volunteers", d: "Share your expertise: help build lessons, mentor students, or run a workshop." },
-    { t: "Advisors", d: "Guide our curriculum and growth. We're advised by people from Google DeepMind and Y Combinator." },
+    { t: "Schools & educators", d: "Bring the curriculum to your classroom, free, and we'll help you get set up." },
+    { t: "Funders & grant partners", d: "We're already in classrooms. Help us reach a lot more of them." },
+    { t: "Mentors & volunteers", d: "Write a lesson, mentor a student, or come run a workshop." },
+    { t: "Advisors", d: "Help steer the curriculum and where we go next. Our advisors come from Google DeepMind and Y Combinator." },
 ];
 
 export default function Home() {
@@ -33,9 +39,8 @@ export default function Home() {
                         AI literacy for <span className="text-accent">everyone</span>, everywhere.
                     </h1>
                     <p className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted opacity-0 animate-fade-up" style={{ animationDelay: "160ms" }}>
-                        AIML-LI makes open-source AI education free and accessible, not just in
-                        public-school classrooms but anywhere. We're starting with LAUSD, the
-                        nation's second-largest district.
+                        We build free, open-source AI courses and bring them into public schools.
+                        We're starting with LAUSD, the second-largest district in the country.
                     </p>
                     <p className="mt-7 text-base text-muted opacity-0 animate-fade-up" style={{ animationDelay: "220ms" }}>
                         Students learn to{" "}
@@ -46,7 +51,7 @@ export default function Home() {
                         <a href="#about" className="btn-ghost w-full sm:w-auto">Learn more</a>
                     </div>
                     <p className="mt-9 text-[13px] uppercase tracking-[0.14em] text-faint opacity-0 animate-fade-up" style={{ animationDelay: "360ms" }}>
-                        Advised by practitioners from Google&nbsp;DeepMind &amp; Y&nbsp;Combinator
+                        Advised by people from Google&nbsp;DeepMind &amp; Y&nbsp;Combinator
                     </p>
                 </div>
             </section>
@@ -57,27 +62,45 @@ export default function Home() {
                     <Reveal>
                         <SectionLabel n="01">Who we are</SectionLabel>
                         <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem] sm:leading-[1.08]">
-                            A small team closing the AI opportunity gap.
+                            A small team going after a real gap.
                         </h2>
                     </Reveal>
                     <Reveal>
                         <div className="space-y-5 text-lg leading-relaxed text-muted">
                             <p>
-                                AI is changing how most careers work, but good AI education still reaches
-                                the students who need it least. Well-resourced schools offer machine-learning
-                                electives and private tutoring. Most public schools offer nothing.
+                                AI already touches most jobs, but the students who'd gain the most from
+                                understanding it get the least chance to learn it. Well-off schools have
+                                machine-learning electives and private tutors. Most public schools have nothing.
                             </p>
                             <p>
-                                We founded AIML-LI to change that. We build the curriculum, prove it in
-                                real classrooms, and release it free so any school can teach it. We're
-                                advised by practitioners from{" "}
+                                So we started AIML-LI. We write the curriculum, test it in real classrooms,
+                                and give it away for free. People from{" "}
                                 <span className="font-medium text-ink">Google DeepMind</span> and{" "}
-                                <span className="font-medium text-ink">Y Combinator</span>, and we presented
-                                at the LAUSD Innovation Expo.
+                                <span className="font-medium text-ink">Y Combinator</span> advise us, and
+                                we've shown the work at the LAUSD Innovation Expo.
                             </p>
                         </div>
                     </Reveal>
                 </div>
+
+                {/* Team */}
+                <Reveal className="mt-16 border-t border-line pt-10">
+                    <p className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-faint">The team</p>
+                    <div className="mt-7 grid gap-8 sm:grid-cols-3">
+                        {TEAM.map((m) => (
+                            <div key={m.name} className="flex items-center gap-4">
+                                {/* Swap the initials avatar for a headshot / the YC photo when ready */}
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-surface font-mono text-sm font-semibold text-ink">
+                                    {m.initials}
+                                </div>
+                                <div>
+                                    <div className="display text-base font-semibold text-ink">{m.name}</div>
+                                    <div className="text-sm text-muted">{m.role}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Reveal>
             </section>
 
             {/* ===================== WHAT WE DO ===================== */}
@@ -86,17 +109,15 @@ export default function Home() {
                     <Reveal className="max-w-2xl">
                         <SectionLabel n="02">What we do</SectionLabel>
                         <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">
-                            Curriculum, classrooms, and open access.
+                            How it works.
                         </h2>
                     </Reveal>
                     <div className="mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
                         {WORK.map((w, i) => (
                             <Reveal key={w.n} delay={i * 80} className="relative">
-                                {/* horizontal connector (desktop) */}
                                 {i < WORK.length - 1 && (
                                     <div className="absolute left-10 top-5 hidden h-px bg-line md:block" style={{ width: "calc(100% - 0.5rem)" }} />
                                 )}
-                                {/* vertical connector (mobile) */}
                                 {i < WORK.length - 1 && (
                                     <div className="absolute left-5 w-px bg-line md:hidden" style={{ top: "3rem", bottom: "-2.5rem" }} />
                                 )}
@@ -116,40 +137,22 @@ export default function Home() {
                 <Reveal className="mx-auto max-w-2xl text-center">
                     <SectionLabel n="03" className="justify-center">The curriculum</SectionLabel>
                     <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">
-                        Twelve weeks. Six units. One capstone.
+                        Six units over twelve weeks.
                     </h2>
                     <p className="mt-4 text-lg text-muted">
-                        A deliberate arc from first principles to a project you ship. Drag to explore.
+                        It starts from the basics and ends with a project students ship. Drag to look through it.
                     </p>
                 </Reveal>
                 <Curriculum />
-            </section>
-
-            {/* ===================== GALLERY ===================== */}
-            <section className="container-page border-t border-line py-24 sm:py-32">
-                <Reveal className="max-w-2xl">
-                    <SectionLabel n="04">In the classroom</SectionLabel>
-                    <h2 className="display mt-5 text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">Photos from our workshops.</h2>
-                    <p className="mt-4 text-lg text-muted">Snapshots from AIML-LI sessions with students and educators.</p>
-                </Reveal>
-                <div className="mt-12 grid gap-6 sm:grid-cols-3">
-                    {[0, 1, 2].map((i) => (
-                        <Reveal key={i}>
-                            <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-line bg-surface">
-                                <img src="/logo.jpg" alt="" className="h-12 w-12 rounded-xl object-cover opacity-25" />
-                            </div>
-                        </Reveal>
-                    ))}
-                </div>
             </section>
 
             {/* ===================== GET INVOLVED ===================== */}
             <section id="involved" className="border-y border-line bg-surface">
                 <div className="container-page py-24 sm:py-32">
                     <Reveal className="max-w-2xl">
-                        <SectionLabel n="05">Get involved</SectionLabel>
+                        <SectionLabel n="04">Get involved</SectionLabel>
                         <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">What we're looking for.</h2>
-                        <p className="mt-4 text-lg text-muted">We're growing, and we'd love your help. Here's who we're hoping to hear from.</p>
+                        <p className="mt-4 text-lg text-muted">We're growing. Here's who we want to hear from.</p>
                     </Reveal>
                     <div className="mt-14 border-t border-line">
                         {LOOKING.map((l, i) => (
@@ -172,15 +175,15 @@ export default function Home() {
             {/* ===================== CONTACT ===================== */}
             <section id="contact" className="container-page py-28 text-center sm:py-36">
                 <Reveal>
-                    <SectionLabel n="06" className="justify-center">Contact</SectionLabel>
+                    <SectionLabel n="05" className="justify-center">Contact</SectionLabel>
                     <h2 className="display mx-auto mt-5 max-w-2xl text-balance text-4xl font-bold tracking-tightest text-ink sm:text-5xl">
-                        Let's make AI literacy universal.
+                        Let's talk.
                     </h2>
                     <p className="mx-auto mt-5 max-w-lg text-lg text-muted">
-                        Partner, fund, teach, or just say hello. We reply to every message.
+                        Partner, fund, teach, or just say hi. We answer every message.
                     </p>
                     <div className="mt-10 flex justify-center">
-                        <a href={`mailto:${EMAIL}`} className="btn-accent text-base">{EMAIL}</a>
+                        <a href={`mailto:${EMAIL}`} className="btn-accent text-base">Contact us</a>
                     </div>
                     <div className="mt-10 flex items-center justify-center gap-3">
                         {SOCIALS.map((s) => (

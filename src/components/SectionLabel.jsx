@@ -9,7 +9,7 @@ export default function SectionLabel({ n, children, className = "" }) {
     return (
         <div className={`flex items-center gap-2.5 ${className}`}>
             <span className="font-mono text-[13px] font-bold tabular-nums" style={{ color: BLUE[idx] }}>{n}</span>
-            <span className="display text-[12px] font-semibold uppercase tracking-[0.22em] text-ink/75">{children}</span>
+            <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.22em] text-ink/75">{children}</span>
         </div>
     );
 }
