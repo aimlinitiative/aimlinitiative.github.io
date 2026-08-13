@@ -111,12 +111,34 @@ section[id] { scroll-margin-top: 5.5rem; }
 .viz-bar     { transform-box: fill-box; transform-origin: bottom; animation: viz-bar 2.2s ease-in-out infinite; }
 .viz-bob     { transform-box: fill-box; animation: viz-bob 1.8s ease-in-out infinite; }
 
+/* Subtle film grain over the whole page (technical-dossier texture) */
+.grain {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Signature hero mark: draws itself once on load, then rests */
+.hero-curve {
+    stroke-dasharray: 640;
+    stroke-dashoffset: 640;
+    animation: hero-draw 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+}
+@keyframes hero-draw { to { stroke-dashoffset: 0; } }
+.hero-dot { opacity: 0; animation: hero-pop 0.5s ease 2.35s forwards; }
+@keyframes hero-pop { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }
+
 @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
     .marquee-track { animation: none; }
     html { scroll-behavior: auto; }
     .animate-fade-up { animation: none !important; opacity: 1 !important; }
     .caret, .viz-twinkle, .viz-march, .viz-draw, .viz-pulse, .viz-bar, .viz-bob { animation: none !important; }
+    .hero-curve { animation: none !important; stroke-dashoffset: 0; }
+    .hero-dot { animation: none !important; opacity: 1; }
 }
 
 ::-webkit-scrollbar { width: 11px; height: 11px; }
