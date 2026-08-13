@@ -2,7 +2,6 @@ import Reveal from "../components/Reveal";
 import Typewriter from "../components/Typewriter";
 import Curriculum from "../components/Curriculum";
 import SectionLabel from "../components/SectionLabel";
-import HeroMark from "../components/HeroMark";
 import { SOCIALS } from "../components/Footer";
 
 const EMAIL = "aimlinitiative@gmail.com";
@@ -54,9 +53,6 @@ export default function Home() {
                     <p className="mt-9 text-[13px] uppercase tracking-[0.14em] text-faint opacity-0 animate-fade-up" style={{ animationDelay: "360ms" }}>
                         Advised by people from Google&nbsp;DeepMind &amp; Y&nbsp;Combinator
                     </p>
-                    <div className="mx-auto mt-16 max-w-md opacity-0 animate-fade-up" style={{ animationDelay: "440ms" }}>
-                        <HeroMark />
-                    </div>
                 </div>
             </section>
 
