@@ -44,7 +44,7 @@ export default function Home() {
                     </p>
                     <p className="mt-7 text-base text-muted opacity-0 animate-fade-up" style={{ animationDelay: "220ms" }}>
                         Students learn to{" "}
-                        <Typewriter className="display font-semibold text-accent" words={["train their first model", "build an image classifier", "talk to an LLM", "spot AI bias", "question the algorithm", "ship their own AI"]} />
+                        <Typewriter className="display font-semibold text-accent" words={["train their first model", "question the tools they use", "explain how an LLM works", "spot AI bias", "build a working classifier", "solve a real-world problem"]} />
                     </p>
                     <div className="mt-10 flex flex-col items-center justify-center gap-3 opacity-0 animate-fade-up sm:flex-row" style={{ animationDelay: "300ms" }}>
                         <a href="#involved" className="btn-accent w-full sm:w-auto">Get involved</a>
