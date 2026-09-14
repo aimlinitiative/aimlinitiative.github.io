@@ -39,8 +39,11 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-line pt-6 text-xs text-faint sm:flex-row sm:items-center">
-                    <p>© {new Date().getFullYear()} AI/ML Literacy Initiative. Free, open-source AI curriculum for public schools.</p>
+                <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-line pt-6 text-xs text-faint sm:flex-row sm:items-end">
+                    <div className="space-y-1">
+                        <p>© {new Date().getFullYear()} AI/ML Literacy Initiative. Free, open-source AI curriculum for public schools.</p>
+                        <p>Fiscally sponsored by The Hack Foundation (Hack Club), a 501(c)(3) nonprofit, EIN 81-2908499.</p>
+                    </div>
                     <p>Founded by Adrian Erlikhman & Michael Tarekegn · Los Angeles</p>
                 </div>
             </div>
