@@ -1,6 +1,8 @@
 import Reveal from "../components/Reveal";
 import Typewriter from "../components/Typewriter";
 import Curriculum from "../components/Curriculum";
+import Summit from "../components/Summit";
+import Supporters from "../components/Supporters";
 import SectionLabel from "../components/SectionLabel";
 import { SOCIALS } from "../components/Footer";
 
@@ -8,7 +10,7 @@ const EMAIL = "aimlinitiative@gmail.com";
 
 // Blue-tint steps for the numbers (deep -> light)
 const WORK_TINT = ["#22508F", "#2C63B0", "#4C82D2"];
-const LOOKING_TINT = ["#22508F", "#2C63B0", "#3D77C9", "#5A8DD6"];
+const LOOKING_TINT = ["#1B3F73", "#22508F", "#2C63B0", "#3D77C9", "#5A8DD6"];
 
 const WORK = [
     { n: "01", t: "We build the curriculum", d: "A 12-week course for high-schoolers with no background. Plain-language lessons, real notebooks, aligned to state standards." },
@@ -23,18 +25,27 @@ const TEAM = [
 ];
 
 const LOOKING = [
-    { t: "Schools & educators", d: "Bring the curriculum to your classroom, free, and we'll help you get set up." },
-    { t: "Funders & grant partners", d: "We're already in classrooms. Help us reach a lot more of them." },
-    { t: "Mentors & volunteers", d: "Write a lesson, mentor a student, or come run a workshop." },
-    { t: "Advisors", d: "Help steer the curriculum and where we go next. Our advisors come from Google DeepMind and Y Combinator." },
+    { t: "A venue for the summit", tag: "Most needed", d: "One Saturday, 8am to 8pm, with room for at least 200 students plus mentors, tables and chairs, power, and Wi-Fi that holds a few hundred devices. It's our biggest open item, and it unlocks the date." },
+    { t: "Speakers, judges, demos & mentors", d: "Twenty minutes on what you build, aimed at a 15-year-old. An hour judging pitches. A demo students can get their hands on, hardware especially. Or an afternoon mentoring a table. Each takes a half-day or less." },
+    { t: "Sponsors & funders", d: "Cash or in kind: hardware, platform credits, swag, or a prize track in your area. Every dollar runs through our 501(c)(3) fiscal sponsor, with a receipt for every expense." },
+    { t: "Schools & educators", d: "Want to bring students to the summit, or teach the free course in your classroom? Tell us and we'll help you get set up." },
+    { t: "Introductions", d: "Venue operators, community and education giving teams, and anyone who should be in the room. Warm intros have been worth far more to us than cold email." },
 ];
 
 export default function Home() {
     return (
         <div id="top">
             {/* ===================== HERO ===================== */}
-            <section className="container-page pt-28 pb-20 sm:pt-36 sm:pb-28">
+            <section className="container-page pt-20 pb-20 sm:pt-28 sm:pb-28">
                 <div className="mx-auto max-w-3xl text-center">
+                    <a href="#summit" className="focusable group mb-8 inline-flex max-w-full items-center gap-2.5 rounded-full border border-line bg-white/70 py-1 pl-1 pr-3.5 text-[13px] font-medium text-muted opacity-0 animate-fade-up transition-colors hover:border-ink/15 hover:text-ink sm:text-sm" style={{ animationDelay: "0ms" }}>
+                        <span className="shrink-0 rounded-full bg-accentsoft px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">Late 2026</span>
+                        <span className="min-w-0 truncate">
+                            <span className="sm:hidden">LA Student AI Summit</span>
+                            <span className="hidden sm:inline">LA Student AI Summit and Hackathon</span>
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </a>
                     <h1 className="display text-balance text-[2.6rem] font-bold leading-[1.02] tracking-tightest text-ink opacity-0 animate-fade-up sm:text-6xl" style={{ animationDelay: "60ms" }}>
                         AI literacy for <span className="text-accent">everyone</span>, everywhere.
                     </h1>
@@ -146,13 +157,50 @@ export default function Home() {
                 <Curriculum />
             </section>
 
+            {/* ===================== SUMMIT ===================== */}
+            <section id="summit" className="border-y border-line bg-surface">
+                <div className="container-page py-24 sm:py-32">
+                    <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+                        <Reveal>
+                            <SectionLabel n="04">The summit</SectionLabel>
+                            <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem] sm:leading-[1.08]">
+                                LA Student AI Summit and Hackathon
+                            </h2>
+                        </Reveal>
+                        <Reveal>
+                            <p className="text-lg leading-relaxed text-muted">
+                                Most students use AI outside school every day, but few are taught how it works or where it
+                                fails. The summit is one free, supervised day where Los Angeles public school students hear
+                                from people who build AI, see how the tools they already use actually work, and build
+                                something of their own.
+                            </p>
+                        </Reveal>
+                    </div>
+                    <Summit />
+                </div>
+            </section>
+
+            {/* ===================== SUPPORTERS ===================== */}
+            <section id="supporters" className="container-page py-24 sm:py-32">
+                <Reveal className="max-w-2xl">
+                    <SectionLabel n="05">Supporters</SectionLabel>
+                    <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">
+                        Who's already in.
+                    </h2>
+                    <p className="mt-4 text-lg text-muted">
+                        Eight companies have committed to the summit so far.
+                    </p>
+                </Reveal>
+                <Supporters />
+            </section>
+
             {/* ===================== GET INVOLVED ===================== */}
             <section id="involved" className="border-y border-line bg-surface">
                 <div className="container-page py-24 sm:py-32">
                     <Reveal className="max-w-2xl">
-                        <SectionLabel n="04">Get involved</SectionLabel>
+                        <SectionLabel n="06">Get involved</SectionLabel>
                         <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">What we're looking for.</h2>
-                        <p className="mt-4 text-lg text-muted">We're growing. Here's who we want to hear from.</p>
+                        <p className="mt-4 text-lg text-muted">The summit is planned for late November or early December. Here's what would help most right now.</p>
                     </Reveal>
                     <div className="mt-14 border-t border-line">
                         {LOOKING.map((l, i) => (
@@ -164,7 +212,12 @@ export default function Home() {
                                 <span className="font-mono text-sm font-bold tabular-nums" style={{ color: LOOKING_TINT[i] }}>
                                     {String(i + 1).padStart(2, "0")}
                                 </span>
-                                <h3 className="display text-xl font-semibold tracking-tight text-ink">{l.t}</h3>
+                                <div>
+                                    <h3 className="display text-xl font-semibold tracking-tight text-ink">{l.t}</h3>
+                                    {l.tag && (
+                                        <span className="mt-2 inline-block rounded-full bg-accentsoft px-2.5 py-0.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-accent">{l.tag}</span>
+                                    )}
+                                </div>
                                 <p className="max-w-xl leading-relaxed text-muted">{l.d}</p>
                             </Reveal>
                         ))}
@@ -175,7 +228,7 @@ export default function Home() {
             {/* ===================== CONTACT ===================== */}
             <section id="contact" className="container-page py-28 text-center sm:py-36">
                 <Reveal>
-                    <SectionLabel n="05" className="justify-center">Contact</SectionLabel>
+                    <SectionLabel n="07" className="justify-center">Contact</SectionLabel>
                     <h2 className="display mx-auto mt-5 max-w-2xl text-balance text-4xl font-bold tracking-tightest text-ink sm:text-5xl">
                         Let's talk.
                     </h2>
