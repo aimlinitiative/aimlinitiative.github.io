@@ -9,9 +9,10 @@ import janestreet from "../assets/supporters/janestreet.png";
 import discovery from "../assets/supporters/discovery.png";
 
 /* Companies committed to the LA Student AI Summit, in the order the partner
- * brief lists them. Logos are one-color versions of each mark, and `h` is the
- * CSS height that gives the marks about the same visual weight. Companies still
- * in conversation stay off this list until they commit. */
+ * brief lists them. Logos are each company's color mark with the background
+ * made transparent, and `h` is the CSS height that gives the marks about the
+ * same visual weight. Companies still in conversation stay off this list until
+ * they commit. */
 const PARTNERS = [
     { name: "Google DeepMind", logo: deepmind, h: 21, role: "Speaker", what: "Keynote" },
     { name: "Microsoft", logo: microsoft, h: 25, role: "Speaker", what: "Keynote" },
@@ -40,11 +41,11 @@ export default function Supporters() {
                             <div className="flex h-24 items-center justify-center px-4 sm:h-28 sm:px-6">
                                 {p.label ? (
                                     <span className="flex items-center gap-2">
-                                        <img src={p.logo} alt="" style={{ height: p.h }} className="w-auto opacity-90" loading="lazy" decoding="async" />
-                                        <span className="display whitespace-nowrap text-[15px] font-bold tracking-tight text-ink/90 sm:text-[17px]">{p.label}</span>
+                                        <img src={p.logo} alt="" style={{ height: p.h }} className="w-auto" loading="lazy" decoding="async" />
+                                        <span className="display whitespace-nowrap text-[15px] font-bold tracking-tight text-ink sm:text-[17px]">{p.label}</span>
                                     </span>
                                 ) : (
-                                    <img src={p.logo} alt={p.name} style={{ height: p.h }} className="w-auto max-w-full object-contain opacity-90" loading="lazy" decoding="async" />
+                                    <img src={p.logo} alt={p.name} style={{ height: p.h }} className="w-auto max-w-full object-contain" loading="lazy" decoding="async" />
                                 )}
                             </div>
                             <div className="flex-1 border-t border-line px-4 py-4 sm:px-6">
