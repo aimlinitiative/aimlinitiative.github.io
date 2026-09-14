@@ -7,11 +7,13 @@ import mongodb from "../assets/supporters/mongodb.png";
 import confluent from "../assets/supporters/confluent.png";
 import janestreet from "../assets/supporters/janestreet.png";
 import discovery from "../assets/supporters/discovery.png";
+import hackerfund from "../assets/supporters/hackerfund.png";
 
-/* Companies committed to the LA Student AI Summit, in the order the partner
- * brief lists them. Logos are one-color versions of each mark, and `h` is the
- * CSS height that gives the marks about the same visual weight. Companies still
- * in conversation stay off this list until they commit. */
+/* Partners committed to the LA Student AI Summit, in the order the partner
+ * brief lists them, then anyone who committed after it (Hacker Fund, 14 Sept).
+ * Logos are each partner's color mark with the background made transparent,
+ * and `h` is the CSS height that gives the marks about the same visual weight.
+ * Partners still in conversation stay off this list until they commit. */
 const PARTNERS = [
     { name: "Google DeepMind", logo: deepmind, h: 21, role: "Speaker", what: "Keynote" },
     { name: "Microsoft", logo: microsoft, h: 25, role: "Speaker", what: "Keynote" },
@@ -21,6 +23,7 @@ const PARTNERS = [
     { name: "Confluent", logo: confluent, h: 22, role: "Speaker · Mentors", what: "A speaker and hackathon mentors" },
     { name: "Jane Street", logo: janestreet, h: 33, role: "Sponsor", what: "Prizes for the top five teams" },
     { name: "Discovery Education", logo: discovery, h: 26, role: "Event partner", what: "Co-branding, promotion to LA teachers, a speaker, and prizes" },
+    { name: "Hacker Fund", logo: hackerfund, h: 20, role: "Sponsor", what: "In-kind support for the hackathon" },
 ];
 
 const BACKERS = [
@@ -33,18 +36,19 @@ const BACKERS = [
 export default function Supporters() {
     return (
         <>
-            <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {/* Flex instead of grid, so a row that isn't full sits centered. */}
+            <div className="mt-14 flex flex-wrap justify-center gap-3 sm:gap-4">
                 {PARTNERS.map((p, i) => (
-                    <Reveal key={p.name} delay={(i % 4) * 60} className="h-full">
+                    <Reveal key={p.name} delay={(i % 3) * 60} className="w-[calc(50%_-_0.375rem)] sm:w-[calc(50%_-_0.5rem)] md:w-[calc((100%_-_2rem)/3)]">
                         <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white">
                             <div className="flex h-24 items-center justify-center px-4 sm:h-28 sm:px-6">
                                 {p.label ? (
                                     <span className="flex items-center gap-2">
-                                        <img src={p.logo} alt="" style={{ height: p.h }} className="w-auto opacity-90" loading="lazy" decoding="async" />
-                                        <span className="display whitespace-nowrap text-[15px] font-bold tracking-tight text-ink/90 sm:text-[17px]">{p.label}</span>
+                                        <img src={p.logo} alt="" style={{ height: p.h }} className="w-auto" loading="lazy" decoding="async" />
+                                        <span className="display whitespace-nowrap text-[15px] font-bold tracking-tight text-ink sm:text-[17px]">{p.label}</span>
                                     </span>
                                 ) : (
-                                    <img src={p.logo} alt={p.name} style={{ height: p.h }} className="w-auto max-w-full object-contain opacity-90" loading="lazy" decoding="async" />
+                                    <img src={p.logo} alt={p.name} style={{ height: p.h }} className="w-auto max-w-full object-contain" loading="lazy" decoding="async" />
                                 )}
                             </div>
                             <div className="flex-1 border-t border-line px-4 py-4 sm:px-6">

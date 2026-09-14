@@ -188,7 +188,7 @@ export default function Home() {
                         Who's already in.
                     </h2>
                     <p className="mt-4 text-lg text-muted">
-                        Eight companies have committed to the summit so far.
+                        Nine partners have committed to the summit so far.
                     </p>
                 </Reveal>
                 <Supporters />
