@@ -6,8 +6,10 @@ export default function SummitSection() {
     return (
         <>
             {/* ===================== SUMMIT ===================== */}
-            <section id="summit" className="border-y border-line bg-surface">
-                <div className="container-page py-24 sm:py-32">
+            {/* Summit lays out its own containers: the day timeline runs full-bleed
+                (and pins on desktop), so no ancestor here may clip overflow. */}
+            <section id="summit" className="border-y border-line bg-surface py-24 sm:py-32">
+                <div className="container-page">
                     <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
                         <Reveal>
                             <SectionLabel n="04">The summit</SectionLabel>
@@ -24,8 +26,8 @@ export default function SummitSection() {
                             </p>
                         </Reveal>
                     </div>
-                    <Summit />
                 </div>
+                <Summit />
             </section>
         </>
     );
