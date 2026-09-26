@@ -82,17 +82,19 @@ export default function Hero() {
                             initial={initial}
                             animate="show"
                             variants={pill}
-                            className="focusable group relative mb-8 inline-flex max-w-full overflow-hidden rounded-full p-px text-[13px] font-medium text-muted shadow-[0_1px_2px_rgba(21,21,26,0.04)] transition-[color,box-shadow] duration-300 hover:text-ink hover:shadow-soft sm:text-sm"
+                            className="focusable group relative mb-8 inline-flex max-w-full rounded-full p-px text-[13px] font-medium text-muted shadow-[0_1px_2px_rgba(21,21,26,0.04)] transition-[color,box-shadow] duration-300 hover:text-ink hover:shadow-soft sm:text-sm"
                         >
-                            <span aria-hidden="true" className="hero-pill-ring" />
-                            <span className="relative inline-flex min-w-0 items-center gap-2.5 rounded-full bg-white/90 py-1 pl-1 pr-3.5 backdrop-blur-sm">
-                                <span className="shrink-0 rounded-full bg-accentsoft px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">Late 2026</span>
-                                <span className="min-w-0 truncate">
+                            <span aria-hidden="true" className="hero-pill-clip">
+                                <span className="hero-pill-ring" />
+                            </span>
+                            <span className="relative inline-flex min-w-0 items-center gap-2.5 rounded-full bg-white py-1 pl-1 pr-3.5">
+                                <span aria-hidden="true" className="hero-pill-sheen" />
+                                <span className="relative shrink-0 rounded-full bg-accentsoft px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">Late 2026</span>
+                                <span className="relative min-w-0 truncate">
                                     <span className="sm:hidden">LA Student AI Summit</span>
                                     <span className="hidden sm:inline">LA Student AI Summit and Hackathon</span>
                                 </span>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform duration-300 group-hover:translate-x-0.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                                <span aria-hidden="true" className="hero-pill-sheen" />
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="relative shrink-0 transition-transform duration-300 group-hover:translate-x-0.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                             </span>
                         </MA>
 

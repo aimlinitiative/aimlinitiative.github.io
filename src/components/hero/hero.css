@@ -1,5 +1,16 @@
 /* Hero-only styles (kept out of index.css, which another area owns). */
 
+/* Clip for the ring. clip-path (not just overflow + radius) so the rotating,
+ * composited layer can never leak past the pill's rounded edge. */
+.hero-pill-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    overflow: hidden;
+    clip-path: inset(0 round 9999px);
+    pointer-events: none;
+}
+
 /* Summit pill: a slow light arc travelling around a hairline border.
  * The conic gradient sits on an oversized square that only rotates, so the
  * animation stays on the compositor (transform only). */
@@ -20,7 +31,6 @@
         rgba(21, 21, 26, 0.09) 360deg
     );
     animation: hero-pill-spin 6s linear infinite;
-    will-change: transform;
     pointer-events: none;
 }
 @keyframes hero-pill-spin { to { transform: rotate(360deg); } }
@@ -31,6 +41,7 @@
     inset: 0;
     border-radius: inherit;
     overflow: hidden;
+    clip-path: inset(0 round 9999px);
     pointer-events: none;
 }
 .hero-pill-sheen::after {
