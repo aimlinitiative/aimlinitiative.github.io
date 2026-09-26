@@ -31,6 +31,10 @@ export default {
                 soft: "0 1px 2px rgba(21,21,26,0.04), 0 10px 30px -14px rgba(21,21,26,0.14)",
                 lift: "0 2px 4px rgba(21,21,26,0.05), 0 18px 44px -18px rgba(21,21,26,0.22)",
             },
+            transitionTimingFunction: {
+                "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",   // EASE.out in src/lib/motion.js
+                "in-out-soft": "cubic-bezier(0.65, 0, 0.35, 1)", // EASE.inOut
+            },
             keyframes: {
                 "fade-up": {
                     "0%": { opacity: "0", transform: "translateY(16px)" },
