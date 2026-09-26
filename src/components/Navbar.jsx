@@ -35,6 +35,16 @@ function currentSection() {
     return found;
 }
 
+// True while the bar's midline sits over a section marked data-nav-theme="dark".
+function overDark() {
+    const y = 32;
+    for (const el of document.querySelectorAll('[data-nav-theme="dark"]')) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= y && r.bottom > y) return true;
+    }
+    return false;
+}
+
 const listVariants = {
     hidden: {},
     show: { transition: { staggerChildren: 0.06, delayChildren: 0.18 } },
@@ -58,6 +68,7 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [active, setActive] = useState(null);
+    const [dark, setDark] = useState(false);
     const { scrollY } = useScroll();
     const dir = useRef({ last: 0, anchor: 0, sign: 0 });
 
@@ -72,6 +83,7 @@ export default function Navbar() {
         else if (d.sign > 0 && y - d.anchor > 28) setHidden(true);
         else if (d.sign < 0 && d.anchor - y > 12) setHidden(false);
         setActive(currentSection());
+        setDark(overDark());
     }, []);
 
     useMotionValueEvent(scrollY, "change", sync);
@@ -96,13 +108,14 @@ export default function Navbar() {
     }, [open]);
 
     const frosted = scrolled && !open;
+    const onDark = dark && !open; // the full-screen menu is light
     const reduce = useReducedMotion();
     const concealed = hidden && !open && !reduce; // no sliding chrome for reduced motion
 
     return (
         <>
             <Header
-                className={`sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${frosted ? "border-line bg-bg/80 backdrop-blur-xl backdrop-saturate-150" : "border-transparent bg-transparent"}`}
+                className={`sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${frosted ? (onDark ? "border-white/10 bg-stage/60 backdrop-blur-xl backdrop-saturate-150" : "border-line bg-bg/80 backdrop-blur-xl backdrop-saturate-150") : "border-transparent bg-transparent"}`}
                 initial={false}
                 animate={{ y: concealed ? "-100%" : "0%", opacity: concealed ? 0 : 1 }}
                 transition={{ duration: concealed ? 0.45 : 0.55, ease: concealed ? EASE.inOut : EASE.out }}
@@ -110,8 +123,8 @@ export default function Navbar() {
             >
                 <nav className="container-page flex h-16 items-center justify-between" aria-label="Main">
                     <a href="#top" className="focusable group flex items-center gap-2.5">
-                        <img src="/logo.jpg" alt="AIML-LI" className="h-8 w-8 rounded-lg object-cover ring-1 ring-line transition-transform duration-500 ease-out-expo group-hover:scale-[1.04]" />
-                        <span className="display text-[15px] font-semibold tracking-tight text-ink">AIML-LI</span>
+                        <img src="/logo.jpg" alt="AIML-LI" className={`h-8 w-8 rounded-lg object-cover ring-1 ${onDark ? "ring-white/15" : "ring-line"} transition-transform duration-500 ease-out-expo group-hover:scale-[1.04]`} />
+                        <span className={`display text-[15px] font-semibold tracking-tight transition-colors duration-500 ${onDark ? "text-white" : "text-ink"}`}>AIML-LI</span>
                     </a>
 
                     <LayoutGroup id="nav">
@@ -120,7 +133,7 @@ export default function Navbar() {
                                 const isActive = active === l.href.slice(1);
                                 return (
                                     <a key={l.href} href={l.href} data-active={isActive} aria-current={isActive ? "true" : undefined}
-                                        className={`focusable relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-300 ${isActive ? "text-ink" : "text-muted hover:text-ink"}`}>
+                                        className={`focusable relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-300 ${isActive ? "text-ink" : onDark ? "text-white/70 hover:text-white" : "text-muted hover:text-ink"}`}>
                                         <AnimatePresence>
                                             {isActive && (
                                                 <Pill layoutId="nav-pill" aria-hidden="true"
@@ -138,7 +151,7 @@ export default function Navbar() {
                     </LayoutGroup>
 
                     <button type="button"
-                        className="focusable relative flex h-10 w-10 items-center justify-center rounded-lg border border-line text-ink transition-colors hover:border-ink/20 lg:hidden"
+                        className={`focusable relative flex h-10 w-10 items-center justify-center rounded-lg border transition-colors duration-500 lg:hidden ${onDark ? "border-white/15 text-white hover:border-white/30" : "border-line text-ink hover:border-ink/20"}`}
                         onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open} aria-controls="mobile-menu">
                         <span className="relative block h-3.5 w-[18px]" aria-hidden="true">
                             {[-1, 0, 1].map((k) => (
