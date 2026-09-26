@@ -1,0 +1,77 @@
+/* Hero-only styles (kept out of index.css, which another area owns). */
+
+/* Summit pill: a slow light arc travelling around a hairline border.
+ * The conic gradient sits on an oversized square that only rotates, so the
+ * animation stays on the compositor (transform only). */
+.hero-pill-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(200%, 16rem);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(21, 21, 26, 0.09) 0deg,
+        rgba(21, 21, 26, 0.09) 200deg,
+        rgba(132, 169, 224, 0.55) 250deg,
+        #1f5fbf 290deg,
+        rgba(132, 169, 224, 0.55) 320deg,
+        rgba(21, 21, 26, 0.09) 360deg
+    );
+    animation: hero-pill-spin 6s linear infinite;
+    will-change: transform;
+    pointer-events: none;
+}
+@keyframes hero-pill-spin { to { transform: rotate(360deg); } }
+
+/* Soft sheen that sweeps across the pill once in a while. */
+.hero-pill-sheen {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+}
+.hero-pill-sheen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+    transform: translateX(-120%);
+    animation: hero-pill-sweep 7s cubic-bezier(0.65, 0, 0.35, 1) 2.2s infinite;
+}
+@keyframes hero-pill-sweep {
+    0% { transform: translateX(-120%); }
+    22%, 100% { transform: translateX(320%); }
+}
+
+/* Backdrop mask: fade the 3D scene out behind the copy and at the bottom edge,
+ * independent of whatever background colour sits underneath. */
+.hero-backdrop-mask {
+    -webkit-mask-image:
+        radial-gradient(ellipse 46% 40% at 50% 47%, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.42) 55%, #000 100%),
+        linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+        radial-gradient(ellipse 46% 40% at 50% 47%, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.42) 55%, #000 100%),
+        linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+    mask-composite: intersect;
+}
+@media (max-width: 640px) {
+    .hero-backdrop-mask {
+        -webkit-mask-image:
+            radial-gradient(ellipse 70% 38% at 50% 50%, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.4) 60%, #000 100%),
+            linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+        mask-image:
+            radial-gradient(ellipse 70% 38% at 50% 50%, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.4) 60%, #000 100%),
+            linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-pill-ring, .hero-pill-sheen::after { animation: none; }
+}
