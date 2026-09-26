@@ -10,7 +10,19 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-html { scroll-behavior: smooth; }
+/* Smooth scrolling is driven by Lenis (src/components/chrome/SmoothScroll.jsx).
+ * CSS smooth scrolling is only a fallback for when Lenis isn't running, and
+ * never for people who prefer reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+    html:not(.lenis) { scroll-behavior: smooth; }
+}
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* Anchor targets receive focus after a jump; no ring on the whole section. */
+[tabindex="-1"]:focus { outline: none; }
 
 body {
     margin: 0;
@@ -114,7 +126,6 @@ section[id] { scroll-margin-top: 5.5rem; }
 @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
     .marquee-track { animation: none; }
-    html { scroll-behavior: auto; }
     .animate-fade-up { animation: none !important; opacity: 1 !important; }
     .caret, .viz-twinkle, .viz-march, .viz-draw, .viz-pulse, .viz-bar, .viz-bob { animation: none !important; }
 }
