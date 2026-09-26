@@ -2,13 +2,13 @@ import Reveal from "../components/Reveal";
 import SectionLabel from "../components/SectionLabel";
 import Curriculum from "../components/Curriculum";
 import ScrubText from "../components/viz/ScrubText";
-import { GLOW, STAGE } from "../components/viz/palette";
+import { GLOW } from "../components/viz/palette";
 
 export default function CurriculumSection() {
     return (
         <>
             {/* ===================== CURRICULUM ===================== */}
-            <section id="curriculum" className="relative isolate overflow-hidden text-white" style={{ backgroundColor: STAGE }}>
+            <section id="curriculum" className="relative isolate overflow-hidden bg-stage text-white">
                 {/* stage lighting: soft colored glows + a faint grid that fades out at the edges */}
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
                     <div className="absolute inset-0" style={{ background: `radial-gradient(60% 45% at 50% 62%, ${GLOW.blue}24, transparent 70%), radial-gradient(40% 35% at 18% 20%, ${GLOW.violet}1f, transparent 70%), radial-gradient(35% 30% at 85% 30%, ${GLOW.cyan}14, transparent 70%)` }} />

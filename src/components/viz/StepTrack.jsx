@@ -55,8 +55,8 @@ export default function StepTrack({ points, progress, onReach, reduced }) {
                     <stop offset="1" stopColor={BLUES[2]} />
                 </linearGradient>
                 <radialGradient id={`st-h-${gid}`}>
-                    <stop offset="0" stopColor="#5A8DD6" stopOpacity="0.6" />
-                    <stop offset="1" stopColor="#5A8DD6" stopOpacity="0" />
+                    <stop offset="0" stopColor="#7C5CFF" stopOpacity="0.55" />
+                    <stop offset="1" stopColor="#7C5CFF" stopOpacity="0" />
                 </radialGradient>
             </defs>
             {/* the full route, quiet */}
@@ -73,7 +73,7 @@ export default function StepTrack({ points, progress, onReach, reduced }) {
             {!reduced && (
                 <Motion.g style={{ x: tipX, y: tipY, opacity: tipO }}>
                     <circle r="14" fill={`url(#st-h-${gid})`} />
-                    <circle r="3" fill="#fff" stroke="#2C63B0" strokeWidth="1.5" />
+                    <circle r="3" fill="#fff" stroke="#2F6BFF" strokeWidth="1.5" />
                 </Motion.g>
             )}
         </svg>
