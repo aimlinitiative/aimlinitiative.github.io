@@ -15,7 +15,7 @@ export default function App() {
             <MotionConfig reducedMotion="user">
                 <SmoothScroll />
                 <ScrollProgress />
-                <div className="flex min-h-screen flex-col bg-white">
+                <div className="flex min-h-screen flex-col bg-bg">
                     <Navbar />
                     <main className="flex-1">
                         <Routes>
