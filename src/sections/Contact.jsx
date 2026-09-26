@@ -71,12 +71,12 @@ export default function Contact() {
         <>
             {/* ===================== CONTACT ===================== */}
             {/* A dark "stage" finale: drifting aurora, huge gradient headline. */}
-            <section id="contact" className="relative isolate overflow-hidden text-center text-white" style={{ backgroundColor: C.stage }}>
+            <section id="contact" data-nav-theme="dark" className="relative isolate overflow-hidden bg-stage text-center text-white">
                 <Aurora />
                 <span aria-hidden className="absolute inset-x-0 top-0 h-px opacity-60" style={{ background: `linear-gradient(90deg, transparent, ${C.accent}, ${C.violet}, ${C.cyan}, transparent)` }} />
                 <Stagger each={0.12} amount={0.3} className="container-page py-32 sm:py-44">
                     <Item>
-                        <SectionLabel n="07" className="justify-center [&>span:first-child]:!text-[#8FB0FF] [&>span:last-child]:!text-white/70">Contact</SectionLabel>
+                        <SectionLabel n="07" className="justify-center [&>span:first-child>span]:!text-[#8FB0FF] [&>span:last-child]:!text-white/70 [&>span:nth-child(2)]:!bg-[#8FB0FF]">Contact</SectionLabel>
                     </Item>
                     <Headline />
                     <Item as="p" className="mx-auto mt-8 max-w-lg text-lg text-white/65">
