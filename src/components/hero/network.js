@@ -61,7 +61,7 @@ export function buildNetwork({ layers, waves = 3, startsPerWave = 3, dust = 120,
             const r = radius * Math.sqrt((k + 0.5) / count);
             const a = k * 2.399963 + li * 0.9;
             nodes.push({
-                x: x + (rnd() - 0.5) * 0.6,
+                x: x + (rnd() - 0.5) * 0.3,
                 y: r * Math.cos(a) + (rnd() - 0.5) * 0.24,
                 z: r * Math.sin(a) + (rnd() - 0.5) * 0.24,
                 layer: li,

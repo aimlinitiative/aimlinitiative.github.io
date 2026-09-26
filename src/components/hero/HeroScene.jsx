@@ -13,7 +13,7 @@ import * as S from "./shaders";
 const FOV = 38;
 const CAM_START = 15;
 const CAM_END = 2.4;
-const YAW_START = -1.05; // radians from the view axis: side-on with perspective
+const YAW_START = -0.9; // radians from the view axis: side-on with perspective
 const YAW_END = -0.08; // nearly end-on: we fly down the network
 const VEC3 = new Set(["position", "aColor", "aWaves", "aEnd"]);
 
@@ -146,10 +146,10 @@ function Network({ small, reduced, progress, onFirstFrame }) {
         u.uVeilSize.value[0] = portrait ? 1.05 : 0.5;
         u.uVeilSize.value[1] = portrait ? 0.46 : 0.5;
 
-        orient.current.rotation.z = portrait ? Math.PI / 2 - 0.3 : 0.2;
+        orient.current.rotation.z = portrait ? Math.PI / 2 - 0.3 : 0.12;
         orient.current.scale.setScalar(fit);
         view.current.rotation.y = lerp(YAW_START, YAW_END, turn);
-        view.current.rotation.x = lerp(0.34, 0.05, turn);
+        view.current.rotation.x = lerp(0.24, 0.05, turn);
         spin.current.rotation.x = s.t * 0.05 + fly * 0.9;
 
         parallax.current.rotation.y = s.px * 0.14;
