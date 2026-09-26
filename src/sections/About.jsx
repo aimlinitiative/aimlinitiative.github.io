@@ -77,7 +77,7 @@ export default function About() {
     return (
         <>
             {/* ===================== ABOUT ===================== */}
-            <section id="about" className="container-page border-t border-line py-24 sm:py-36">
+            <section id="about" className="container-page py-24 sm:py-36">
                 <SectionLabel n="01">Who we are</SectionLabel>
 
                 <M.h2 className="display mt-6 max-w-4xl text-balance text-[2.6rem] font-bold leading-[1.02] tracking-tightest text-ink sm:text-6xl lg:text-7xl"
