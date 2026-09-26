@@ -10,7 +10,7 @@ import { BLUES } from "./palette";
  * soft glowing dot riding the tip. `onReach(i)` fires as the tip passes anchor i. */
 
 export default function StepTrack({ points, progress, onReach, reduced }) {
-    const gid = useId().replace(/:/g, "");
+    const gid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
 
     const geo = useMemo(() => {
         if (points.length < 2) return null;
