@@ -35,12 +35,12 @@ function currentSection() {
     return found;
 }
 
-// True while the bar's midline sits over a section marked data-nav-theme="dark".
+// True while a dark element (data-nav-theme="dark") sits under the whole bar.
+// The rect includes transforms, so the hero stage shrinking away counts.
 function overDark() {
-    const y = 32;
     for (const el of document.querySelectorAll('[data-nav-theme="dark"]')) {
         const r = el.getBoundingClientRect();
-        if (r.top <= y && r.bottom > y) return true;
+        if (r.top <= 32 && r.bottom >= 64) return true;
     }
     return false;
 }

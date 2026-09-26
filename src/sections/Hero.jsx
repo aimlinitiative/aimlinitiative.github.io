@@ -102,12 +102,12 @@ export default function Hero() {
             {/* ===================== HERO ===================== */}
             <section
                 ref={ref}
-                data-nav-theme="dark"
                 aria-label="Introduction"
                 style={{ marginTop: -navH }}
                 className={`relative ${reduce ? "" : "h-[170svh] sm:h-[200svh]"}`}
             >
                 <MDiv
+                    data-nav-theme="dark"
                     className="sticky top-0 isolate flex min-h-[100svh] items-center overflow-hidden text-white"
                     style={reduce ? { backgroundColor: STAGE } : { backgroundColor: STAGE, scale: stageScale, borderRadius: stageRadius }}
                 >
