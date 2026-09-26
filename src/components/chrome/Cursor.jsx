@@ -76,7 +76,7 @@ function CursorLayer() {
                     scale: ringScale,
                     opacity: visible && !text ? 1 : 0,
                     backgroundColor: hover ? "rgba(47,107,255,0.12)" : "rgba(47,107,255,0)",
-                    borderColor: hover ? "rgba(47,107,255,0.55)" : "rgba(11,13,18,0.28)",
+                    borderColor: hover ? "rgba(47,107,255,0.6)" : "rgba(138,146,165,0.6)", // mid-gray reads on light and dark stages
                 }}
                 transition={{ scale: ease, opacity: { duration: 0.25 }, default: { duration: 0.35 } }}
             />
