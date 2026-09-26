@@ -307,7 +307,7 @@ function DayPinned() {
     });
 
     return (
-        <div ref={outerRef} className="relative -mb-16 -mt-24" style={{ height: `calc(130vh + ${Math.round(travel * 1.35)}px)` }}>
+        <div ref={outerRef} className="relative -mb-24 -mt-40" style={{ height: `calc(130vh + ${Math.round(travel * 1.35)}px)` }}>
             <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden pt-16">
                 <div className="container-page flex items-end justify-between">
                     <Kicker>The day</Kicker>

@@ -14,7 +14,7 @@ const EDGE_MASK = "linear-gradient(90deg, transparent, #000 12%, #000 88%, trans
  *   gap        px between items, also used between the two copies (56)
  *   className  classes on the outer band (it clips and fades its edges)
  *   children   ONE copy of the row's items; it is rendered twice to loop
- * Only runs while on screen. Reduced motion: a static, centered, wrapping row.
+ * Only runs while on screen. Reduced motion: the band holds still.
  * The duplicate copy is aria-hidden. */
 export default function VelocityMarquee({ speed = 40, boost = 4, skew = 5, gap = 56, className = "", children }) {
     const reduce = useReducedMotion();
@@ -36,7 +36,7 @@ export default function VelocityMarquee({ speed = 40, boost = 4, skew = 5, gap =
         const ro = new ResizeObserver(measure);
         ro.observe(el);
         return () => ro.disconnect();
-    }, [reduce]);
+    }, []);
 
     useAnimationFrame((_, delta) => {
         if (reduce || !w || !inView) return;
@@ -47,17 +47,9 @@ export default function VelocityMarquee({ speed = 40, boost = 4, skew = 5, gap =
         x.set(next);
     });
 
-    if (reduce) {
-        return (
-            <div className={className}>
-                <div className="flex flex-wrap items-center justify-center px-6" style={{ gap: `24px ${gap}px` }}>{children}</div>
-            </div>
-        );
-    }
-
     return (
         <div ref={band} className={`overflow-hidden ${className}`} style={{ WebkitMaskImage: EDGE_MASK, maskImage: EDGE_MASK }}>
-            <Motion.div className="flex w-max" style={{ x, skewX }}>
+            <Motion.div className="flex w-max" style={reduce ? undefined : { x, skewX }}>
                 <div ref={copy} className="flex shrink-0 items-center" style={{ gap, paddingRight: gap }}>{children}</div>
                 <div aria-hidden className="flex shrink-0 items-center" style={{ gap, paddingRight: gap }}>{children}</div>
             </Motion.div>
