@@ -116,6 +116,11 @@ export default function Hero() {
                     <MDiv
                         className="container-page relative z-10 origin-center pb-20 pt-32 sm:pb-24 sm:pt-36"
                         style={reduce ? undefined : { scale: copyScale, y: copyY, opacity: copyOpacity, filter: copyFilter, pointerEvents: copyPointer }}
+                        // Keyboard users tabbing into the copy mid-flight: bring it back into view.
+                        onFocusCapture={() => {
+                            if (reduce || scrollYProgress.get() < 0.08 || !ref.current) return;
+                            window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.scrollY, behavior: "auto" });
+                        }}
                     >
                         <MDiv className="mx-auto max-w-3xl text-center" initial={initial} animate="show" variants={cascade}>
                             <MA
