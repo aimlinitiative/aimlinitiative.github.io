@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { EASE, SPRING } from "../lib/motion";
 
@@ -35,14 +35,22 @@ function currentSection() {
     return found;
 }
 
-// True while a dark element (data-nav-theme="dark") sits under the whole bar.
-// The rect includes transforms, so the hero stage shrinking away counts.
-function overDark() {
-    for (const el of document.querySelectorAll('[data-nav-theme="dark"]')) {
-        const r = el.getBoundingClientRect();
-        if (r.top <= 32 && r.bottom >= 64) return true;
+/* Light or dark content under the bar? Sections can say so explicitly with
+ * data-nav-theme="dark|light"; otherwise the first opaque background up the
+ * tree decides. Chrome layers are pointer-events: none, so hit-testing skips them. */
+function themeUnderNav() {
+    const els = document.elementsFromPoint(window.innerWidth / 2, 40);
+    const el = els.find((e) => !e.closest("header, #mobile-menu"));
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
+        const t = n.getAttribute("data-nav-theme");
+        if (t) return t;
+        const m = getComputedStyle(n).backgroundColor.match(/[\d.]+/g);
+        if (m && (m[3] === undefined || +m[3] > 0.5)) {
+            const lum = (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255;
+            return lum < 0.4 ? "dark" : "light";
+        }
     }
-    return false;
+    return "light";
 }
 
 const listVariants = {
@@ -68,7 +76,8 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [active, setActive] = useState(null);
-    const [dark, setDark] = useState(false);
+    const [tone, setTone] = useState("light");
+    const toneAt = useRef(0);
     const { scrollY } = useScroll();
     const dir = useRef({ last: 0, anchor: 0, sign: 0 });
 
@@ -83,11 +92,18 @@ export default function Navbar() {
         else if (d.sign > 0 && y - d.anchor > 28) setHidden(true);
         else if (d.sign < 0 && d.anchor - y > 12) setHidden(false);
         setActive(currentSection());
-        setDark(overDark());
+        const now = performance.now();
+        if (now - toneAt.current > 90) { toneAt.current = now; setTone(themeUnderNav()); }
     }, []);
 
     useMotionValueEvent(scrollY, "change", sync);
-    useEffect(() => { sync(window.scrollY); }, [sync]);
+    useLayoutEffect(() => { sync(window.scrollY); }, [sync]);
+    // Trailing check so the tone is right once scrolling settles.
+    useMotionValueEvent(scrollY, "change", () => {
+        clearTimeout(toneAt.timer);
+        toneAt.timer = setTimeout(() => setTone(themeUnderNav()), 140);
+    });
+    useEffect(() => () => clearTimeout(toneAt.timer), []);
 
     // Close the mobile menu on Escape or when the viewport grows past the breakpoint.
     useEffect(() => {
@@ -108,14 +124,14 @@ export default function Navbar() {
     }, [open]);
 
     const frosted = scrolled && !open;
-    const onDark = dark && !open; // the full-screen menu is light
+    const dark = tone === "dark" && !open;
     const reduce = useReducedMotion();
     const concealed = hidden && !open && !reduce; // no sliding chrome for reduced motion
 
     return (
         <>
             <Header
-                className={`sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${frosted ? (onDark ? "border-white/10 bg-stage/60 backdrop-blur-xl backdrop-saturate-150" : "border-line bg-bg/80 backdrop-blur-xl backdrop-saturate-150") : "border-transparent bg-transparent"}`}
+                className={`sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${frosted ? (dark ? "border-stageline bg-stage/60 backdrop-blur-xl backdrop-saturate-150" : "border-line bg-bg/80 backdrop-blur-xl backdrop-saturate-150") : "border-transparent bg-transparent"}`}
                 initial={false}
                 animate={{ y: concealed ? "-100%" : "0%", opacity: concealed ? 0 : 1 }}
                 transition={{ duration: concealed ? 0.45 : 0.55, ease: concealed ? EASE.inOut : EASE.out }}
@@ -123,8 +139,8 @@ export default function Navbar() {
             >
                 <nav className="container-page flex h-16 items-center justify-between" aria-label="Main">
                     <a href="#top" className="focusable group flex items-center gap-2.5">
-                        <img src="/logo.jpg" alt="AIML-LI" className={`h-8 w-8 rounded-lg object-cover ring-1 ${onDark ? "ring-white/15" : "ring-line"} transition-transform duration-500 ease-out-expo group-hover:scale-[1.04]`} />
-                        <span className={`display text-[15px] font-semibold tracking-tight transition-colors duration-500 ${onDark ? "text-white" : "text-ink"}`}>AIML-LI</span>
+                        <img src="/logo.jpg" alt="AIML-LI" className={`h-8 w-8 rounded-lg object-cover ring-1 transition-transform duration-500 ease-out-expo group-hover:scale-[1.04] ${dark ? "ring-white/15" : "ring-line"}`} />
+                        <span className={`display text-[15px] font-semibold tracking-tight transition-colors duration-500 ${dark ? "text-white" : "text-ink"}`}>AIML-LI</span>
                     </a>
 
                     <LayoutGroup id="nav">
@@ -133,11 +149,11 @@ export default function Navbar() {
                                 const isActive = active === l.href.slice(1);
                                 return (
                                     <a key={l.href} href={l.href} data-active={isActive} aria-current={isActive ? "true" : undefined}
-                                        className={`focusable relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-300 ${isActive ? "text-ink" : onDark ? "text-white/70 hover:text-white" : "text-muted hover:text-ink"}`}>
+                                        className={`focusable relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-300 ${dark ? (isActive ? "text-white" : "text-white/60 hover:text-white") : (isActive ? "text-ink" : "text-muted hover:text-ink")}`}>
                                         <AnimatePresence>
                                             {isActive && (
                                                 <Pill layoutId="nav-pill" aria-hidden="true"
-                                                    className="absolute inset-0 rounded-full bg-white shadow-[0_1px_2px_rgba(11,13,18,0.06),0_6px_18px_-8px_rgba(47,107,255,0.45)] ring-1 ring-inset ring-ink/[0.06]"
+                                                    className={`absolute inset-0 rounded-full ring-1 ring-inset transition-colors duration-500 ${dark ? "bg-white/10 shadow-[0_0_24px_-6px_rgba(47,107,255,0.7)] ring-white/15" : "bg-white shadow-[0_1px_2px_rgba(11,13,18,0.06),0_6px_18px_-8px_rgba(47,107,255,0.45)] ring-ink/[0.06]"}`}
                                                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                                     transition={{ ...SPRING.snappy, opacity: { duration: 0.3 } }} />
                                             )}
@@ -151,7 +167,7 @@ export default function Navbar() {
                     </LayoutGroup>
 
                     <button type="button"
-                        className={`focusable relative flex h-10 w-10 items-center justify-center rounded-lg border transition-colors duration-500 lg:hidden ${onDark ? "border-white/15 text-white hover:border-white/30" : "border-line text-ink hover:border-ink/20"}`}
+                        className={`focusable relative flex h-10 w-10 items-center justify-center rounded-lg border transition-colors duration-500 lg:hidden ${dark ? "border-white/15 text-white hover:border-white/30" : "border-line text-ink hover:border-ink/20"}`}
                         onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open} aria-controls="mobile-menu">
                         <span className="relative block h-3.5 w-[18px]" aria-hidden="true">
                             {[-1, 0, 1].map((k) => (
