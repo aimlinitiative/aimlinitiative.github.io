@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SmoothScroll from "./components/chrome/SmoothScroll";
 import ScrollProgress from "./components/chrome/ScrollProgress";
+import Cursor from "./components/chrome/Cursor";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 
@@ -15,6 +16,7 @@ export default function App() {
             <MotionConfig reducedMotion="user">
                 <SmoothScroll />
                 <ScrollProgress />
+                <Cursor />
                 <div className="flex min-h-screen flex-col bg-bg">
                     <Navbar />
                     <main className="flex-1">
