@@ -1,6 +1,17 @@
 /* Hero-only styles (kept out of index.css, which another area owns). */
 
-/* Summit pill: a slow light arc travelling around a hairline border.
+/* Clip for the ring. clip-path (not just overflow + radius) so the rotating,
+ * composited layer can never leak past the pill's rounded edge. */
+.hero-pill-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    overflow: hidden;
+    clip-path: inset(0 round 9999px);
+    pointer-events: none;
+}
+
+/* Summit pill: a comet of light travelling around a hairline border.
  * The conic gradient sits on an oversized square that only rotates, so the
  * animation stays on the compositor (transform only). */
 .hero-pill-ring {
@@ -12,25 +23,25 @@
     translate: -50% -50%;
     background: conic-gradient(
         from 0deg,
-        rgba(21, 21, 26, 0.09) 0deg,
-        rgba(21, 21, 26, 0.09) 200deg,
-        rgba(132, 169, 224, 0.55) 250deg,
-        #1f5fbf 290deg,
-        rgba(132, 169, 224, 0.55) 320deg,
-        rgba(21, 21, 26, 0.09) 360deg
+        rgba(255, 255, 255, 0.12) 0deg,
+        rgba(255, 255, 255, 0.12) 190deg,
+        rgba(124, 92, 255, 0.7) 240deg,
+        #2f6bff 280deg,
+        #22d3ee 318deg,
+        rgba(255, 255, 255, 0.12) 360deg
     );
-    animation: hero-pill-spin 6s linear infinite;
-    will-change: transform;
+    animation: hero-pill-spin 5s linear infinite;
     pointer-events: none;
 }
 @keyframes hero-pill-spin { to { transform: rotate(360deg); } }
 
-/* Soft sheen that sweeps across the pill once in a while. */
+/* Soft sheen that sweeps across the pill once in a while (under the label). */
 .hero-pill-sheen {
     position: absolute;
     inset: 0;
     border-radius: inherit;
     overflow: hidden;
+    clip-path: inset(0 round 9999px);
     pointer-events: none;
 }
 .hero-pill-sheen::after {
@@ -40,7 +51,7 @@
     bottom: 0;
     left: 0;
     width: 40%;
-    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+    background: linear-gradient(100deg, transparent, rgba(120, 160, 255, 0.22), transparent);
     transform: translateX(-120%);
     animation: hero-pill-sweep 7s cubic-bezier(0.65, 0, 0.35, 1) 2.2s infinite;
 }
@@ -49,29 +60,19 @@
     22%, 100% { transform: translateX(320%); }
 }
 
-/* Backdrop mask: fade the 3D scene out behind the copy and at the bottom edge,
- * independent of whatever background colour sits underneath. */
-.hero-backdrop-mask {
-    -webkit-mask-image:
-        radial-gradient(ellipse 46% 40% at 50% 47%, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.42) 55%, #000 100%),
-        linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image:
-        radial-gradient(ellipse 46% 40% at 50% 47%, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.42) 55%, #000 100%),
-        linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
-    mask-composite: intersect;
+/* "everyone": blue -> violet -> cyan, drifting slowly through the word. */
+.hero-gradient-text {
+    background-image: linear-gradient(100deg, #4d82ff 0%, #8b6bff 28%, #22d3ee 52%, #6d8dff 76%, #4d82ff 100%);
+    background-size: 220% 100%;
+    background-position: 0% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: hero-gradient-drift 9s ease-in-out infinite alternate;
 }
-@media (max-width: 640px) {
-    .hero-backdrop-mask {
-        -webkit-mask-image:
-            radial-gradient(ellipse 70% 38% at 50% 50%, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.4) 60%, #000 100%),
-            linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
-        mask-image:
-            radial-gradient(ellipse 70% 38% at 50% 50%, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.4) 60%, #000 100%),
-            linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
-    }
-}
+@keyframes hero-gradient-drift { to { background-position: 100% 50%; } }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero-pill-ring, .hero-pill-sheen::after { animation: none; }
+    .hero-pill-ring, .hero-pill-sheen::after, .hero-gradient-text { animation: none; }
 }
