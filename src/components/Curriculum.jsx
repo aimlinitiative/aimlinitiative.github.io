@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { animate, motion as Motion, useInView, useMotionValue, useReducedMotion, useTransform } from "motion/react";
+import { animate, motion as Motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import UnitViz from "./viz/UnitViz";
-import useMediaQuery from "./fx/useMediaQuery";
+import useMediaQuery, { FINE_POINTER } from "./fx/useMediaQuery";
 import { GLOW } from "./viz/palette";
 
 /* Horizontal curved-arc coverflow on the dark stage: the active card faces you,
@@ -29,14 +29,16 @@ const LIFT = 10;    // px the active card rises
 const SNAP = { type: "spring", stiffness: 190, damping: 27, mass: 1 };
 const DOT = 22;     // px between indicator dots
 
-function Card({ u, i, n, pos, active, play, soften }) {
+function Card({ u, i, n, pos, spread, tiltX, tiltY, active, play, soften }) {
     const o = useTransform(pos, (p) => i - p);
     const ao = useTransform(o, (v) => Math.abs(v));
     const near = useTransform(ao, (a) => Math.max(0, 1 - a * 1.6)); // 1 = dead center
-    const x = useTransform(o, (v) => v * STEPX);
-    const y = useTransform(ao, (a) => a * ARCY - LIFT * Math.max(0, 1 - a * 1.6));
+    // `spread` fans the deck out along the arc (0 = stacked, 1 = full arc).
+    const x = useTransform([o, spread], ([v, s]) => v * STEPX * s);
+    const y = useTransform([ao, spread, near], ([a, s, nr]) => a * ARCY * s - LIFT * nr);
     const z = useTransform(ao, (a) => -a * DEPTH);
-    const rotateY = useTransform(o, (v) => -v * ANGLE);
+    const rotateY = useTransform([o, spread, tiltY, near], ([v, s, t, nr]) => -v * ANGLE * s + t * nr);
+    const rotateX = useTransform([tiltX, near], ([t, nr]) => t * nr);
     const scale = useTransform(ao, (a) => Math.max(0.8, 1 - a * 0.06));
     const opacity = useTransform(ao, (a) => (a > 2.7 ? 0 : Math.max(0, 1 - a * 0.3)));
     const zIndex = useTransform(ao, (a) => 100 - Math.round(a * 10));
@@ -46,7 +48,7 @@ function Card({ u, i, n, pos, active, play, soften }) {
     return (
         <Motion.div
             className="absolute left-1/2 top-1/2 w-[min(80vw,19rem)]"
-            style={{ x, y, z, rotateY, scale, opacity, zIndex, filter, pointerEvents: "none" }}
+            style={{ x, y, z, rotateX, rotateY, scale, opacity, zIndex, filter, pointerEvents: "none" }}
             transformTemplate={(_, t) => `translate(-50%, -50%) ${t}`}
             role="option"
             aria-selected={active}
@@ -83,6 +85,28 @@ export default function Curriculum() {
     const anim = useRef(null);
     const stageRef = useRef(null);
     const inView = useInView(stageRef, { amount: 0.35 });
+    const fine = useMediaQuery(FINE_POINTER) && !reduced;
+
+    // Entrance: the deck deals out from a stack the first time it comes into view.
+    const spread = useMotionValue(reduced ? 1 : 0);
+    useEffect(() => {
+        if (!inView || spread.get() === 1) return;
+        const c = animate(spread, 1, { type: "spring", stiffness: 60, damping: 16, mass: 1.1, delay: 0.15 });
+        return () => c.stop();
+    }, [inView, spread]);
+
+    // Hover tilt for the active card (fine pointers only).
+    const tiltX = useSpring(0, { stiffness: 150, damping: 18 });
+    const tiltY = useSpring(0, { stiffness: 150, damping: 18 });
+    const onHover = (e) => {
+        if (!fine || drag.current.on || !stageRef.current) return;
+        const r = stageRef.current.getBoundingClientRect();
+        const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 180));
+        const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / 140));
+        tiltY.set(nx * 9);
+        tiltX.set(-ny * 7);
+    };
+    const onHoverEnd = () => { tiltX.set(0); tiltY.set(0); };
     const drag = useRef({ on: false, x: 0, p: 0, moved: false });
 
     const clamp = (v) => Math.max(0, Math.min(n - 1, v));
@@ -98,16 +122,17 @@ export default function Curriculum() {
 
     // Indicator: follows `pos` continuously and stretches with speed.
     const dotX = useTransform(pos, (p) => clamp(p) * DOT);
-    const dotStretch = useTransform(pos, () => 1 + Math.min(0.9, Math.abs(pos.getVelocity()) * 0.12));
+    const dotStretch = useTransform(pos, () => (reduced ? 1 : 1 + Math.min(0.9, Math.abs(pos.getVelocity()) * 0.12)));
 
     const onDown = (e) => {
         anim.current?.stop();
+        onHoverEnd();
         drag.current = { on: true, x: e.clientX, p: pos.get(), moved: false };
         try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* no-op */ }
     };
     const onMove = (e) => {
         const d = drag.current;
-        if (!d.on) return;
+        if (!d.on) return onHover(e);
         const dx = e.clientX - d.x;
         if (Math.abs(dx) > 4) d.moved = true;
         let p = d.p - dx / STEPX;
@@ -151,6 +176,7 @@ export default function Curriculum() {
                     onPointerMove={onMove}
                     onPointerUp={(e) => release(e, false)}
                     onPointerCancel={(e) => release(e, true)}
+                    onPointerLeave={onHoverEnd}
                     onLostPointerCapture={(e) => release(e, true)}
                     onKeyDown={onKey}
                     tabIndex={0}
@@ -159,7 +185,7 @@ export default function Curriculum() {
                 >
                     <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
                         {UNITS.map((u, i) => (
-                            <Card key={u.k} u={u} i={i} n={n} pos={pos} active={i === active}
+                            <Card key={u.k} u={u} i={i} n={n} pos={pos} spread={spread} tiltX={tiltX} tiltY={tiltY} active={i === active}
                                 play={i === active && inView && !reduced} soften={soften} />
                         ))}
                     </div>
