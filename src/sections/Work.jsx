@@ -82,7 +82,7 @@ function Pinned() {
     const anchorRefs = useRef([]);
     const counter = useRef(null);
     const points = useAnchors(rowRef, anchorRefs);
-    const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end end"] });
+    const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start 0.35", "end end"] });
     const p = useSpring(scrollYProgress, { stiffness: 220, damping: 40, restDelta: 0.0005 });
     const rail = useTransform(p, [AT[0] - 0.08, AT[2]], [0, 1]);
     const glowX = useTransform(p, AT, ["0%", "100%", "200%"]);
