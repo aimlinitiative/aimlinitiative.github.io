@@ -9,5 +9,3 @@ export const CARD = "#FFFFFF";
 export const ACCENT = "#1F5C45";
 export const ACCENT_SOFT = "#E6F0EA";
 
-// Legacy: StepTrack.jsx and Work.jsx still import BLUES. Mapped onto Pine so they keep building.
-export const BLUES = [ACCENT, INK2, INK3];

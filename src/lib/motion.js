@@ -62,14 +62,3 @@ export const lineUp = {
 
 // Fire once, as soon as a sliver is on screen.
 export const VIEWPORT = { once: true, amount: "some", margin: "0px 0px -10% 0px" };
-
-/* --- Legacy aliases, kept only so files not yet redesigned still build.
- * Remove once nothing imports them. --- */
-export const css = cssEase;
-export const stagger = (each = 0.08, delay = 0) => group(each, delay);
-export const VIEWPORT_ANY = VIEWPORT;
-export const scrollEase = (t) => (t < 0.5 ? 8 * t ** 4 : 1 - (-2 * t + 2) ** 4 / 2);
-EASE.snappy = EASE.out;
-SPRING.soft = SPRING.gentle;
-SPRING.snappy = SPRING.ui;
-DUR.draw = 1.2;

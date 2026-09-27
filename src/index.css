@@ -58,11 +58,6 @@ section[id] { scroll-margin-top: 4.5rem; }
 
     .link { @apply text-accent underline decoration-accent/30 underline-offset-4 transition-colors duration-base hover:decoration-accent; }
 
-    /* Legacy names kept while sections are rebuilt. Remove when unused. */
-    .btn-accent { @apply btn-primary; }
-    .btn-ghost { @apply btn-secondary; }
-    .display { letter-spacing: -0.025em; }
-    .focusable:focus-visible { outline: 2px solid #1F5C45; outline-offset: 2px; border-radius: 6px; }
 }
 
 @layer utilities {
