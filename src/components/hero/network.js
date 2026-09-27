@@ -7,15 +7,16 @@
  * arrives. All animation happens in the shaders from these static attributes,
  * so nothing is rebuilt per frame. */
 
+import { dim, mix, SPOT, WHITE } from "./color";
+
 export const NET_LENGTH = 12;
 
-// sRGB 0..1, passed to the shaders unmanaged so they match the CSS colours.
-export const hex = (h) => [((h >> 16) & 255) / 255, ((h >> 8) & 255) / 255, (h & 255) / 255];
-
-// Node base colours: mostly electric blue, some periwinkle / violet, a little cyan.
-const NODE_COLORS = [0x3b76ff, 0x2f6bff, 0x5b8cff, 0x7d9dff, 0x8b7bff, 0x7c5cff, 0x5fd4f0].map(hex);
-const NODE_WEIGHTS = [3, 3, 3, 2, 1.5, 1.5, 1];
-const DUST_COLORS = [0x3b5fb8, 0x4a4aa8, 0x2a7f98].map(hex);
+// Node base colours from the spotlight family: blue carries the network (with
+// a couple of lighter tints for depth); violet and cyan are rare accents.
+const NODE_COLORS = [SPOT.blue, mix(SPOT.blue, WHITE, 0.22), mix(SPOT.blue, WHITE, 0.45), mix(SPOT.blue, SPOT.violet, 0.4), SPOT.violet, SPOT.cyan];
+const NODE_WEIGHTS = [5, 3, 1.2, 1.4, 1, 0.7];
+// Dust sits far back: the same hues, dimmed.
+const DUST_COLORS = [dim(SPOT.blue, 0.5), dim(SPOT.blue, 0.36), dim(SPOT.violet, 0.45), dim(SPOT.cyan, 0.32)];
 
 function rng(seed) {
     let a = seed >>> 0;
@@ -123,7 +124,7 @@ export function buildNetwork({ layers, waves = 3, startsPerWave = 3, dust = 120,
     nodes.forEach((n, i) => {
         nodePos.set([n.x, n.y, n.z], i * 3);
         nodeColor.set(weighted(NODE_COLORS, NODE_WEIGHTS, rnd), i * 3);
-        nodeSize[i] = 20 + rnd() * 16;
+        nodeSize[i] = 16 + rnd() * 14;
         nodeLayer[i] = n.layer;
         nodeWaves.set(n.waves, i * 3);
         nodeSeed[i] = rnd();
@@ -134,7 +135,7 @@ export function buildNetwork({ layers, waves = 3, startsPerWave = 3, dust = 120,
         const i = nodes.length + d;
         nodePos.set([(rnd() - 0.5) * NET_LENGTH * 1.9, (rnd() - 0.5) * 11, (rnd() - 0.5) * 11], i * 3);
         nodeColor.set(DUST_COLORS[Math.floor(rnd() * DUST_COLORS.length)], i * 3);
-        nodeSize[i] = 6 + rnd() * 7;
+        nodeSize[i] = 5 + rnd() * 6;
         nodeLayer[i] = -99;
         nodeSeed[i] = rnd();
     }
