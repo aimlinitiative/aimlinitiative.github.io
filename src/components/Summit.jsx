@@ -3,18 +3,17 @@ import {
     motion as Motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform,
 } from "motion/react";
 import { EASE, stagger } from "../lib/motion";
-import SpotlightCard from "./fx/SpotlightCard";
 import DecodeText from "./fx/DecodeText";
 import { Item, Stagger } from "./fx/Stagger";
 import { DRAW_X, POP, RISE, STILL } from "./fx/variants";
-import { C, GRADIENT } from "./fx/palette";
 import useMediaQuery, { DESKTOP } from "./fx/useMediaQuery";
 
 const EMAIL = "aimlinitiative@gmail.com";
 
 /* The LA Student AI Summit and Hackathon: key facts, how the day runs, and how
  * safety and money work. Wording follows the partner brief (14 Sept 2026), so
- * update it here once the date and venue are set. */
+ * update it here once the date and venue are set. Looks follow DESIGN.md:
+ * parchment panels on the canvas ground, one accent for the timeline. */
 
 const FACTS = [
     { k: "When", v: "A Saturday in late November or early December 2026", wide: true },
@@ -28,7 +27,6 @@ const DAY = [
     {
         when: "Morning · 3 hours",
         t: "Talks, a panel, and demos",
-        tint: C.accent,
         wide: true,
         items: [
             "Keynotes from Google DeepMind, Microsoft, Google, and Snap",
@@ -39,13 +37,11 @@ const DAY = [
     {
         when: "Midday",
         t: "Lunch",
-        tint: C.violet,
         items: ["Free for students", "Partner tables around the room"],
     },
     {
         when: "Afternoon · 3 hours",
         t: "Hackathon",
-        tint: C.cyan,
         wide: true,
         items: [
             "Teams of 3 or 4 pick a problem from their own school or neighborhood",
@@ -63,10 +59,15 @@ const SAFETY = [
 
 const TOOLS = ["Teachable Machine", "Google Colab", "GitHub Student Developer Pack", "MongoDB Atlas", "Google Forms", "Devpost"];
 
-const CARD = "rounded-2xl border border-line bg-white p-6 sm:p-7";
+// The day pins only where it fits: desktop width and enough height for the cards.
+const TALL = "(min-height: 600px)";
+// Space between the key facts and "The day" (and between the day and what follows) on desktop.
+const GAP = 128;
+
+const pad2 = (n) => String(n).padStart(2, "0");
 
 function Kicker({ children, className = "" }) {
-    return <p className={`font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-faint ${className}`}>{children}</p>;
+    return <p className={`eyebrow ${className}`}>{children}</p>;
 }
 
 const BULLET = {
@@ -80,7 +81,7 @@ const TICK = {
 
 // Bullet rows. `play` hands control to a parent (the timeline); without it the
 // list staggers in on its own when scrolled into view.
-function Bullets({ items, play, className = "mt-4" }) {
+function Bullets({ items, play, className = "mt-6" }) {
     const reduce = useReducedMotion();
     const trigger = play === undefined
         ? { initial: "hidden", whileInView: "show", viewport: { once: true, amount: 0.4 } }
@@ -88,9 +89,9 @@ function Bullets({ items, play, className = "mt-4" }) {
     return (
         <Motion.ul className={`space-y-2.5 ${className}`} variants={stagger(0.09, 0.05)} {...trigger}>
             {items.map((it) => (
-                <Motion.li key={it} variants={reduce ? STILL : BULLET} className="flex gap-3 text-[15px] leading-relaxed text-muted">
-                    <Motion.span variants={reduce ? STILL : TICK} className="mt-[0.8em] h-px w-3 shrink-0 origin-left bg-ink/30" />
-                    <span>{it}</span>
+                <Motion.li key={it} variants={reduce ? STILL : BULLET} className="flex gap-3 text-body-sm text-muted">
+                    <Motion.span variants={reduce ? STILL : TICK} className="mt-[0.75em] h-px w-3 shrink-0 origin-left bg-ink/25" />
+                    <span className="text-pretty">{it}</span>
                 </Motion.li>
             ))}
         </Motion.ul>
@@ -99,34 +100,32 @@ function Bullets({ items, play, className = "mt-4" }) {
 
 /* ---------- The day ---------- */
 
-// A timeline node: ignites (tinted core, glow, one ping) when the line reaches it.
-function Node({ lit, tint, nodeRef }) {
+// A timeline node: a hollow dot that fills with the accent (and sends out one
+// thin ring) when the line reaches it.
+function Node({ lit, nodeRef }) {
     const reduce = useReducedMotion();
     const t = reduce ? { duration: 0 } : { duration: 0.6, ease: EASE.out };
     return (
-        <span ref={nodeRef} aria-hidden className="relative block h-[15px] w-[15px]">
-            <Motion.span
-                className="absolute -inset-[7px] rounded-full"
-                style={{ background: `radial-gradient(circle, ${tint}55, transparent 70%)` }}
-                initial={false}
-                animate={{ opacity: lit ? 1 : 0, scale: lit ? 1 : 0.3 }}
-                transition={t}
-            />
+        <span ref={nodeRef} aria-hidden className="relative block h-[13px] w-[13px]">
             {!reduce && (
                 <Motion.span
-                    className="absolute inset-0 rounded-full border-2"
-                    style={{ borderColor: tint }}
+                    className="absolute inset-0 rounded-full border border-accent"
                     initial={false}
-                    animate={lit ? { opacity: [0.7, 0], scale: [1, 3] } : { opacity: 0, scale: 1 }}
-                    transition={{ duration: 1.3, ease: EASE.out }}
+                    animate={lit ? { opacity: [0.6, 0], scale: [1, 2.6] } : { opacity: 0, scale: 1 }}
+                    transition={{ duration: 1.2, ease: EASE.out }}
                 />
             )}
-            <span className="absolute inset-0 rounded-full border border-ink/15 bg-white" />
+            <span className="absolute inset-0 rounded-full border border-linestrong bg-canvas" />
             <Motion.span
-                className="absolute inset-[3px] rounded-full"
-                style={{ backgroundColor: tint, boxShadow: `0 0 12px 2px ${tint}` }}
+                className="absolute inset-0 rounded-full border border-accent"
                 initial={false}
-                animate={{ scale: lit ? 1 : 0, opacity: lit ? 1 : 0 }}
+                animate={{ opacity: lit ? 1 : 0 }}
+                transition={t}
+            />
+            <Motion.span
+                className="absolute inset-[3px] rounded-full bg-accent"
+                initial={false}
+                animate={{ scale: lit ? 1 : 0 }}
                 transition={t}
             />
         </span>
@@ -151,69 +150,70 @@ function useLit(progress, frac) {
     return [lit, reached];
 }
 
-// Fractions along the track where each node sits, kept up to date on resize.
-function useNodeFracs(trackRef, nodeRefs, horizontal, deps = []) {
-    const [fracs, setFracs] = useState([0, 0.4, 0.7]);
+// Layout offset of `el` inside `root`. Offsets ignore transforms, so the
+// entrance animations can't skew the measurement.
+function offsetIn(el, root) {
+    let x = 0;
+    let y = 0;
+    for (let n = el; n && n !== root; n = n.offsetParent) {
+        x += n.offsetLeft;
+        y += n.offsetTop;
+    }
+    return { x, y };
+}
+
+// The track's length and where each node sits along it (0-1), kept up to date on resize.
+function useTrack(trackRef, nodeRefs, horizontal, size) {
+    const [track, setTrack] = useState({ fracs: [0, 0.4, 0.7], length: 0 });
     useLayoutEffect(() => {
-        const track = trackRef.current;
-        if (!track) return;
+        const el = trackRef.current;
+        if (!el) return;
         const measure = () => {
-            const t = track.getBoundingClientRect();
-            const next = nodeRefs.current.map((n) => {
-                if (!n) return 0;
-                const r = n.getBoundingClientRect();
-                const f = horizontal
-                    ? (r.left + r.width / 2 - t.left) / t.width
-                    : (r.top + r.height / 2 - t.top) / t.height;
-                return Math.max(0, Math.min(1, Math.round(f * 1000) / 1000));
+            const root = el.offsetParent;
+            const length = horizontal ? el.offsetWidth : el.offsetHeight;
+            const start = horizontal ? el.offsetLeft : el.offsetTop;
+            const fracs = nodeRefs.current.map((n) => {
+                if (!n || !length) return 0;
+                const o = offsetIn(n, root);
+                const mid = horizontal ? o.x + n.offsetWidth / 2 : o.y + n.offsetHeight / 2;
+                return Math.max(0, Math.min(1, Math.round(((mid - start) / length) * 1000) / 1000));
             });
-            setFracs((prev) => (prev.join() === next.join() ? prev : next));
+            setTrack((prev) => (prev.length === length && prev.fracs.join() === fracs.join() ? prev : { fracs, length }));
         };
         measure();
         const ro = new ResizeObserver(measure);
-        ro.observe(track);
+        ro.observe(el);
         return () => ro.disconnect();
-    }, [trackRef, nodeRefs, horizontal, ...deps]); // eslint-disable-line react-hooks/exhaustive-deps
-    return fracs;
+    }, [trackRef, nodeRefs, horizontal, size]);
+    return track;
 }
 
-function DayCard({ b, i, reached, big = false, className = "" }) {
+function DayCard({ b, i, reached, className = "" }) {
     return (
-        <SpotlightCard glow="gradient" className={`overflow-hidden ${CARD} ${big ? "sm:p-9" : ""} ${className}`}>
-            <span
-                aria-hidden
-                className={`display pointer-events-none absolute right-5 top-2 -z-10 select-none font-bold leading-none text-transparent ${big ? "text-[7.5rem]" : "text-[3.5rem] sm:text-[4.5rem]"}`}
-                style={{ WebkitTextStroke: `1px ${b.tint}40` }}
-            >
-                {String(i + 1).padStart(2, "0")}
-            </span>
-            <div className="flex items-center gap-2.5">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: b.tint, boxShadow: `0 0 10px ${b.tint}` }} />
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-faint">{b.when}</span>
+        <div className={`card-muted ${className}`}>
+            <div className="flex items-center justify-between gap-4">
+                <Kicker>{b.when}</Kicker>
+                <span aria-hidden className="font-mono text-[12px] font-medium leading-none tabular-nums text-faint">{pad2(i + 1)}</span>
             </div>
-            <h3 className={`display mt-4 font-semibold tracking-tight text-ink ${big ? "text-3xl xl:text-[2.1rem]" : "text-xl"}`}>{b.t}</h3>
-            <Bullets items={b.items} play={reached} className={big ? "mt-6" : "mt-4"} />
-        </SpotlightCard>
+            <h3 className="display mt-5 text-balance text-display-md text-ink">{b.t}</h3>
+            <Bullets items={b.items} play={reached} />
+        </div>
     );
 }
 
-// The drawn line: a crisp gradient hairline, a blurred copy for glow, a bright tip.
-function GlowLine({ progress, horizontal, length }) {
-    const tipX = useTransform(progress, (v) => v * length);
+// The drawn line: a solid accent hairline with a small accent tip riding its end.
+function Line({ progress, horizontal, length }) {
+    const tip = useTransform(progress, (v) => v * length);
     return (
         <>
             <Motion.div
-                className={`absolute inset-0 ${horizontal ? "origin-left" : "origin-top"}`}
-                style={{ background: horizontal ? GRADIENT : GRADIENT.replace("90deg", "180deg"), ...(horizontal ? { scaleX: progress } : { scaleY: progress }) }}
+                className={`absolute inset-0 bg-accent ${horizontal ? "origin-left" : "origin-top"}`}
+                style={horizontal ? { scaleX: progress } : { scaleY: progress }}
             />
-            <Motion.div
-                className={`absolute ${horizontal ? "-inset-y-[3px] inset-x-0 origin-left" : "-inset-x-[3px] inset-y-0 origin-top"} opacity-70 blur-[6px]`}
-                style={{ background: horizontal ? GRADIENT : GRADIENT.replace("90deg", "180deg"), ...(horizontal ? { scaleX: progress } : { scaleY: progress }) }}
-            />
-            {horizontal && length > 0 && (
+            {length > 0 && (
                 <Motion.span
-                    className="absolute -top-[4px] left-0 h-[9px] w-[9px] -translate-x-1/2 rounded-full bg-white"
-                    style={{ x: tipX, boxShadow: `0 0 0 2px ${C.violet}66, 0 0 18px 4px ${C.accent}` }}
+                    className={`absolute h-[7px] w-[7px] rounded-full bg-accent ring-[3px] ring-canvas ${horizontal ? "-left-[3.5px] -top-[3px]" : "-left-[3px] -top-[3.5px]"}`}
+                    style={horizontal ? { x: tip } : { y: tip }}
                 />
             )}
         </>
@@ -221,12 +221,12 @@ function GlowLine({ progress, horizontal, length }) {
 }
 
 // Mobile / tablet / reduced motion: the blocks stack (or sit in a row on lg),
-// and a line draws down (or across) them as you scroll.
+// and the line draws down (or across) them as you scroll.
 function DayStatic({ horizontal }) {
     const reduce = useReducedMotion();
     const trackRef = useRef(null);
     const nodeRefs = useRef([]);
-    const fracs = useNodeFracs(trackRef, nodeRefs, horizontal);
+    const { fracs, length } = useTrack(trackRef, nodeRefs, horizontal);
 
     const { scrollYProgress } = useScroll({
         target: trackRef,
@@ -236,16 +236,17 @@ function DayStatic({ horizontal }) {
     const full = useMotionValue(1);
     const progress = reduce ? full : smooth;
 
+    // The track starts at the first node's center (see Node and StaticBlock).
     const trackCls = horizontal
-        ? "left-[32px] right-0 top-[7px] h-px"
-        : "left-[7px] top-[33px] bottom-0 w-px sm:top-[37px]";
+        ? "left-[38.5px] right-0 top-[6px] h-px"
+        : "bottom-0 left-[6px] top-[30px] w-px sm:top-[38px]";
 
     return (
-        <div className="container-page">
+        <div className="container-page mt-24 lg:mt-32">
             <Kicker>The day</Kicker>
-            <Stagger className="relative mt-7 grid gap-4 lg:grid-cols-[1fr_0.7fr_1fr]" amount={0.1}>
-                <div ref={trackRef} aria-hidden className={`pointer-events-none absolute bg-ink/10 ${trackCls}`}>
-                    <GlowLine progress={progress} horizontal={horizontal} length={0} />
+            <Stagger className="relative mt-8 grid gap-4 lg:grid-cols-[1fr_0.7fr_1fr]" amount={0.1}>
+                <div ref={trackRef} aria-hidden className={`pointer-events-none absolute bg-line ${trackCls}`}>
+                    <Line progress={progress} horizontal={horizontal} length={reduce ? 0 : length} />
                 </div>
                 {DAY.map((b, i) => (
                     <StaticBlock key={b.t} b={b} i={i} progress={progress} frac={fracs[i]} nodeRef={(el) => { nodeRefs.current[i] = el; }} />
@@ -258,44 +259,85 @@ function DayStatic({ horizontal }) {
 function StaticBlock({ b, i, progress, frac, nodeRef }) {
     const [lit, reached] = useLit(progress, frac);
     return (
-        <Item className="relative h-full pl-9 lg:pl-0">
-            <div className="absolute left-0 top-[26px] sm:top-[30px] lg:static lg:mb-6 lg:ml-[24.5px] lg:w-[15px]">
-                <Node lit={lit} tint={b.tint} nodeRef={nodeRef} />
+        <Item className="relative h-full pl-8 lg:pl-0">
+            {/* The node lines up with the card's kicker (card padding + half the kicker). */}
+            <div className="absolute left-0 top-[23.5px] sm:top-[31.5px] lg:static lg:mb-8 lg:ml-8 lg:w-[13px]">
+                <Node lit={lit} nodeRef={nodeRef} />
             </div>
-            <DayCard b={b} i={i} reached={reached} className="h-full lg:h-[calc(100%-39px)]" />
+            <DayCard b={b} i={i} reached={reached} className="h-full lg:h-[calc(100%-45px)]" />
         </Item>
     );
 }
 
-/* Desktop: the section pins, and vertical scroll slides the three blocks
- * sideways while a glowing line draws through them and each node ignites. */
+// "01 —— 03": which block the line has reached, with a bar for the whole run.
+function Counter({ active, bar }) {
+    return (
+        <div aria-hidden className="flex items-center gap-4 font-mono text-[12px] font-medium leading-none tabular-nums text-faint">
+            <span className="relative inline-block h-[1.2em] w-[2ch] overflow-hidden text-ink">
+                {DAY.map((_, i) => (
+                    <Motion.span
+                        key={i}
+                        className="absolute inset-0 flex items-center"
+                        initial={false}
+                        animate={{ y: `${(i - active) * 110}%`, opacity: i === active ? 1 : 0 }}
+                        transition={{ duration: 0.6, ease: EASE.out }}
+                    >
+                        {pad2(i + 1)}
+                    </Motion.span>
+                ))}
+            </span>
+            <span className="relative h-px w-24 bg-line">
+                <Motion.span className="absolute inset-0 origin-left bg-accent" style={{ scaleX: bar }} />
+            </span>
+            <span>{pad2(DAY.length)}</span>
+        </div>
+    );
+}
+
+/* Desktop: the day pins, and vertical scroll slides the three blocks sideways
+ * while the accent line draws through them and each node fills. The pinned
+ * layer is a full screen tall with its content centered, so its margins are
+ * measured to keep a GAP-sized space to the blocks around it. */
 function DayPinned() {
     const outerRef = useRef(null);
+    const stickyRef = useRef(null);
+    const contentRef = useRef(null);
     const stripRef = useRef(null);
     const trackRef = useRef(null);
     const nodeRefs = useRef([]);
-    const [travel, setTravel] = useState(0);
-    const [lineW, setLineW] = useState(0);
+    const [box, setBox] = useState({ travel: 0, lineW: 0, above: 0, below: 0 });
 
     useLayoutEffect(() => {
         const strip = stripRef.current;
         const track = trackRef.current;
-        if (!strip || !track) return;
+        const sticky = stickyRef.current;
+        const content = contentRef.current;
+        if (!strip || !track || !sticky || !content) return;
         const measure = () => {
-            setTravel(Math.max(0, strip.scrollWidth - document.documentElement.clientWidth));
-            setLineW(track.offsetWidth);
+            const next = {
+                travel: Math.max(0, strip.scrollWidth - document.documentElement.clientWidth),
+                lineW: track.offsetWidth,
+                above: content.offsetTop,
+                below: Math.max(0, sticky.clientHeight - content.offsetTop - content.offsetHeight),
+            };
+            setBox((prev) => (Object.keys(next).every((k) => prev[k] === next[k]) ? prev : next));
         };
         measure();
         const ro = new ResizeObserver(measure);
         ro.observe(strip);
+        ro.observe(content);
         ro.observe(document.documentElement);
-        return () => ro.disconnect();
+        window.addEventListener("resize", measure);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener("resize", measure);
+        };
     }, []);
-    const fracs = useNodeFracs(trackRef, nodeRefs, true, [lineW]);
+    const { fracs } = useTrack(trackRef, nodeRefs, true, box.lineW);
 
     const { scrollYProgress } = useScroll({ target: outerRef, offset: ["start start", "end end"] });
     const p = useSpring(scrollYProgress, { stiffness: 220, damping: 40, restDelta: 0.0002 });
-    const x = useTransform(p, [0.1, 0.9], [0, -travel]);
+    const x = useTransform(p, [0.1, 0.9], [0, -box.travel]);
     const line = useTransform(p, [0.02, 0.86], [0, 1]);
     const bar = useTransform(p, [0.1, 0.9], [0, 1]);
 
@@ -307,52 +349,46 @@ function DayPinned() {
     });
 
     return (
-        <div ref={outerRef} className="relative -mb-24 -mt-40" style={{ height: `calc(130vh + ${Math.round(travel * 1.35)}px)` }}>
-            <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden pt-16">
-                <div className="container-page flex items-end justify-between">
-                    <Kicker>The day</Kicker>
-                    <div aria-hidden className="flex items-center gap-4 font-mono text-[12px] font-semibold tabular-nums text-faint">
-                        <span className="relative inline-block h-[1.2em] w-[2ch] overflow-hidden text-ink">
-                            {DAY.map((_, i) => (
-                                <Motion.span
-                                    key={i}
-                                    className="absolute inset-0"
-                                    initial={false}
-                                    animate={{ y: `${(i - active) * 110}%`, opacity: i === active ? 1 : 0 }}
-                                    transition={{ duration: 0.6, ease: EASE.out }}
-                                >
-                                    {String(i + 1).padStart(2, "0")}
-                                </Motion.span>
-                            ))}
-                        </span>
-                        <span className="relative h-px w-24 bg-ink/10">
-                            <Motion.span className="absolute inset-0 origin-left" style={{ background: GRADIENT, scaleX: bar }} />
-                        </span>
-                        <span>{String(DAY.length).padStart(2, "0")}</span>
+        // Transparent to the pointer: its margins overlap the blocks around it.
+        <div
+            ref={outerRef}
+            className="pointer-events-none relative"
+            style={{
+                height: `calc(130vh + ${Math.round(box.travel * 1.35)}px)`,
+                marginTop: GAP - box.above,
+                marginBottom: -box.below,
+            }}
+        >
+            <div ref={stickyRef} className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden pt-16">
+                <div ref={contentRef} className="pointer-events-auto">
+                    <div className="container-page flex items-center justify-between">
+                        <Kicker>The day</Kicker>
+                        <Counter active={active} bar={bar} />
                     </div>
-                </div>
 
-                <Motion.div
-                    ref={stripRef}
-                    className="mt-10 flex w-max pl-[max(2rem,calc((100vw-72rem)/2+2rem))] pr-[max(2rem,calc((100vw-72rem)/2+2rem))]"
-                    style={{ x }}
-                >
-                    <div className="relative flex gap-8">
-                        <div ref={trackRef} aria-hidden className="pointer-events-none absolute left-[32px] right-0 top-[7px] h-px bg-ink/10">
-                            <GlowLine progress={line} horizontal length={lineW} />
+                    {/* Side padding lines the first and last card up with the page container. */}
+                    <Motion.div
+                        ref={stripRef}
+                        className="mt-10 flex w-max px-[max(2.5rem,calc((100%-75rem)/2+2.5rem))]"
+                        style={{ x }}
+                    >
+                        <div className="relative flex gap-8">
+                            <div ref={trackRef} aria-hidden className="pointer-events-none absolute left-[38.5px] right-0 top-[6px] h-px bg-line">
+                                <Line progress={line} horizontal length={box.lineW} />
+                            </div>
+                            {DAY.map((b, i) => (
+                                <PinnedBlock
+                                    key={b.t}
+                                    b={b}
+                                    i={i}
+                                    progress={line}
+                                    frac={fracs[i]}
+                                    nodeRef={(el) => { nodeRefs.current[i] = el; }}
+                                />
+                            ))}
                         </div>
-                        {DAY.map((b, i) => (
-                            <PinnedBlock
-                                key={b.t}
-                                b={b}
-                                i={i}
-                                progress={line}
-                                frac={fracs[i]}
-                                nodeRef={(el) => { nodeRefs.current[i] = el; }}
-                            />
-                        ))}
-                    </div>
-                </Motion.div>
+                    </Motion.div>
+                </div>
             </div>
         </div>
     );
@@ -362,16 +398,16 @@ function PinnedBlock({ b, i, progress, frac, nodeRef }) {
     const [lit, reached] = useLit(progress, frac);
     return (
         <div className={`flex flex-col ${b.wide ? "w-[min(36rem,44vw)]" : "w-[min(24rem,30vw)]"}`}>
-            <div className="mb-8 ml-[32.5px]">
-                <Node lit={lit} tint={b.tint} nodeRef={nodeRef} />
+            <div className="mb-8 ml-8">
+                <Node lit={lit} nodeRef={nodeRef} />
             </div>
             <Motion.div
                 className="flex-1"
                 initial={false}
-                animate={{ opacity: lit ? 1 : 0.4, scale: lit ? 1 : 0.96, y: lit ? 0 : 12 }}
+                animate={{ opacity: lit ? 1 : 0.45, scale: lit ? 1 : 0.97, y: lit ? 0 : 10 }}
                 transition={{ duration: 0.9, ease: EASE.out }}
             >
-                <DayCard b={b} i={i} reached={reached} big className="h-full" />
+                <DayCard b={b} i={i} reached={reached} className="h-full" />
             </Motion.div>
         </div>
     );
@@ -379,73 +415,87 @@ function PinnedBlock({ b, i, progress, frac, nodeRef }) {
 
 function SummitDay() {
     const desktop = useMediaQuery(DESKTOP);
+    const tall = useMediaQuery(TALL);
     const reduce = useReducedMotion();
-    if (desktop && !reduce) return <DayPinned />;
-    return <div className="py-16"><DayStatic key={desktop ? "h" : "v"} horizontal={desktop} /></div>;
+    if (desktop && tall && !reduce) return <DayPinned />;
+    return <DayStatic key={desktop ? "h" : "v"} horizontal={desktop} />;
 }
 
 export default function Summit() {
     return (
         <>
-            {/* Key facts: cells hold the hairline grid; their contents decode in sequence. */}
-            <div className="container-page">
-                <Stagger each={0.09} className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line lg:grid-cols-[1.4fr_1.15fr_1.15fr_0.9fr_1fr]">
-                    {FACTS.map((f, i) => (
-                        <div key={f.k} className={`bg-white p-5 sm:p-6 ${f.wide ? "col-span-2 lg:col-span-1" : ""}`}>
-                            <Item>
-                                <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-faint">{f.k}</p>
-                                <DecodeText
-                                    text={f.v}
-                                    delay={0.15 + i * 0.12}
-                                    duration={0.9 + f.v.length * 0.012}
-                                    className="display mt-2 text-base font-semibold leading-snug tracking-tight text-ink sm:text-[17px]"
-                                />
-                            </Item>
-                        </div>
-                    ))}
-                </Stagger>
+            {/* Key facts: one parchment spec panel with hairline dividers (the grid's
+                -1px margin tucks the outer cell borders under the panel's own border).
+                Values decode in sequence. */}
+            <div className="container-page mt-16 lg:mt-24">
+                <div className="overflow-hidden rounded-card border border-line bg-parchment">
+                    <Stagger as="dl" each={0.06} className="-m-px grid sm:grid-cols-2 lg:grid-cols-3">
+                        {FACTS.map((f, i) => (
+                            <div key={f.k} className={`border-l border-t border-line p-6 sm:p-8 ${f.wide ? "sm:col-span-2" : ""}`}>
+                                <Item as="dt" className="eyebrow">{f.k}</Item>
+                                <Item as="dd" className="mt-3">
+                                    <DecodeText
+                                        text={f.v}
+                                        delay={0.2 + i * 0.1}
+                                        duration={0.9 + f.v.length * 0.012}
+                                        className="display text-title text-ink"
+                                    />
+                                </Item>
+                            </div>
+                        ))}
+                    </Stagger>
+                </div>
             </div>
 
             <SummitDay />
 
-            <div className="container-page">
+            <div className="container-page mt-24 lg:mt-32">
                 {/* Safety and money */}
                 <Kicker>Safety and money</Kicker>
-                <Stagger each={0.1} amount={0.15} className="mt-7 grid gap-4 md:grid-cols-2">
+                <Stagger each={0.1} amount={0.15} className="mt-8 grid gap-4 md:grid-cols-2">
                     <Item className="h-full">
-                        <SpotlightCard glow="gradient" className={`h-full ${CARD}`}>
-                            <h3 className="display text-xl font-semibold text-ink">Student safety</h3>
+                        <div className="card-muted h-full">
+                            <h3 className="display text-display-md text-ink">Student safety</h3>
                             <Bullets items={SAFETY} />
-                            <p className="mt-5 text-[15px] leading-relaxed text-muted">
+                            <p className="mt-6 text-pretty text-body-sm text-muted">
                                 Students use a short, fixed list of browser tools, submitted for review with each participating school:
                             </p>
-                            <Stagger each={0.06} delay={0.1} amount={0.5} className="mt-3 flex flex-wrap gap-2">
+                            <Stagger as="ul" each={0.06} delay={0.1} amount={0.5} className="mt-4 flex flex-wrap gap-2">
                                 {TOOLS.map((t) => (
-                                    <Item as="span" key={t} variants={POP} className="rounded-full border border-line bg-surface px-3 py-1 text-[13px] font-medium text-ink/80">{t}</Item>
+                                    <Item as="li" key={t} variants={POP} className="rounded-full border border-line bg-canvas px-3 py-1.5 text-caption text-ink">
+                                        {t}
+                                    </Item>
                                 ))}
                             </Stagger>
-                        </SpotlightCard>
+                        </div>
                     </Item>
                     <Item className="h-full">
-                        <SpotlightCard glow="gradient" className={`flex h-full flex-col ${CARD}`}>
-                            <h3 className="display text-xl font-semibold text-ink">Money</h3>
-                            <p className="mt-4 text-[15px] leading-relaxed text-muted">
-                                All sponsorship goes to <span className="font-medium text-ink">The Hack Foundation (Hack Club)</span>, a 501(c)(3)
-                                nonprofit and our fiscal sponsor. It holds the funds and pays for lunch, printing, and prizes directly, with a
-                                receipt for every expense.
+                        <div className="card-muted flex h-full flex-col">
+                            <h3 className="display text-display-md text-ink">Money</h3>
+                            <p className="mt-6 text-pretty text-body-sm text-muted">
+                                All sponsorship goes to <span className="font-medium text-ink">The Hack Foundation (Hack Club)</span>, a{" "}
+                                <span className="whitespace-nowrap">501(c)(3)</span> nonprofit and our fiscal sponsor. It holds the funds and
+                                pays for lunch, printing, and prizes directly, with a receipt for every expense.
                             </p>
-                            <p className="mt-3 text-[15px] leading-relaxed text-muted">Students pay nothing, and no student handles money.</p>
-                            <p className="mt-5 font-mono text-[12px] text-faint">EIN 81-2908499</p>
-                        </SpotlightCard>
+                            <p className="mt-3 text-pretty text-body-sm text-muted">Students pay nothing, and no student handles money.</p>
+                            {/* The EIN as a spec row, pinned to the card's foot. */}
+                            <div className="mt-auto pt-8">
+                                <p className="flex items-baseline justify-between gap-4 border-t border-line pt-5">
+                                    <span className="eyebrow">EIN</span>{" "}
+                                    <span className="font-mono text-[13px] tabular-nums tracking-[0.02em] text-ink">81-2908499</span>
+                                </p>
+                            </div>
+                        </div>
                     </Item>
                 </Stagger>
 
                 {/* What comes after */}
-                <Stagger each={0.12} className="relative mt-16 flex flex-col gap-8 pt-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+                <Stagger each={0.12} className="relative mt-20 flex flex-col gap-8 pt-10 lg:mt-24 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
                     <Item variants={DRAW_X} aria-hidden className="absolute inset-x-0 top-0 h-px origin-left bg-line" />
-                    <Item as="p" variants={RISE} className="max-w-2xl text-lg leading-relaxed text-muted">
-                        <span className="font-medium text-ink">The summit is one day. The course is the durable part.</span>{" "}
-                        We've taught the 4-week version at LACES and built a 12-week version, and our goal is for them to become the
+                    <Item as="p" variants={RISE} className="max-w-[44rem] text-pretty text-lead text-muted">
+                        <span className="text-ink">The summit is one day. The course is the durable part.</span>{" "}
+                        We've taught the <span className="whitespace-nowrap">4-week</span> version at LACES and built
+                        a <span className="whitespace-nowrap">12-week</span> version, and our goal is for them to become the
                         foundation of a standing LAUSD AI literacy elective.
                     </Item>
                     <Item className="flex shrink-0 flex-col gap-3 sm:flex-row">
