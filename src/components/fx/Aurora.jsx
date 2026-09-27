@@ -9,7 +9,7 @@ import "./fx.css";
 const FIELDS = [
     { rgb: RGB.blue, x: "10%", y: "8%", k: 1.05, a: 0.62 },
     { rgb: RGB.violet, x: "92%", y: "30%", k: 0.95, a: 0.58 },
-    { rgb: RGB.cyan, x: "34%", y: "104%", k: 0.85, a: 0.42 },
+    { rgb: RGB.cyan, x: "62%", y: "100%", k: 0.85, a: 0.5 },
 ];
 
 /* Aurora: a slow, drifting mesh of blue / violet / cyan light. It absolutely
