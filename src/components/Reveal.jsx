@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
-import { fadeUp, VIEWPORT_ANY } from "../lib/motion";
+import { fadeUp, VIEWPORT } from "../lib/motion";
 
-/* Wraps children and lets them rise, un-blur and fade in once they scroll into
+/* Wraps children and lets them rise and fade in once they scroll into
  * view. `delay` is in ms; `as` picks the element (a tag name or a component).
  * Reduced motion: renders visible immediately, no transition. */
 
@@ -24,7 +24,7 @@ export default function Reveal({ children, delay = 0, as = "div", className = ""
     };
 
     return (
-        <Tag className={className} variants={variants} initial="hidden" whileInView="show" viewport={VIEWPORT_ANY}>
+        <Tag className={className} variants={variants} initial="hidden" whileInView="show" viewport={VIEWPORT}>
             {children}
         </Tag>
     );

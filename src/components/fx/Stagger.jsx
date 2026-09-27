@@ -1,23 +1,23 @@
 import { motion as Motion, useReducedMotion } from "motion/react";
-import { stagger, VIEWPORT } from "../../lib/motion";
+import { group, VIEWPORT } from "../../lib/motion";
 import { RISE, STILL } from "./variants";
 
 /* Stagger: a container that reveals its <Item> descendants in sequence when it
  * scrolls into view (once).
  *   as        element tag, default "div" (any motion tag: "ul", "section"...)
- *   each      seconds between children (0.08)
+ *   each      seconds between children (0.06)
  *   delay     seconds before the first child (0)
  *   amount    how much must be visible to trigger (VIEWPORT.amount)
  *   inherit   true: don't self-trigger, follow a parent Stagger instead
  *   ...rest   any motion/DOM props (className, style...)
  * Items can sit at any depth below it; variant state flows through plain elements. */
-export function Stagger({ as = "div", each = 0.08, delay = 0, amount, inherit = false, children, ...rest }) {
+export function Stagger({ as = "div", each = 0.06, delay = 0, amount, inherit = false, children, ...rest }) {
     const M = Motion[as] ?? Motion.div;
     const trigger = inherit
         ? {}
         : { initial: "hidden", whileInView: "show", viewport: amount ? { ...VIEWPORT, amount } : VIEWPORT };
     return (
-        <M variants={stagger(each, delay)} {...trigger} {...rest}>
+        <M variants={group(each, delay)} {...trigger} {...rest}>
             {children}
         </M>
     );

@@ -1,44 +1,75 @@
-/* Shared motion tokens. Every animation on the site should pull its easing and
- * timing from here so the whole page moves like one system (Apple / Framer feel:
- * fast start, long soft settle, no bounce on content). */
+/* One motion system for the whole site. Every animation pulls its curve,
+ * timing and distance from here. Ease-out for anything entering or reacting,
+ * in-out only for things moving between two resting spots, springs for
+ * anything the user can interrupt. See DESIGN.md "Motion". */
+import { stagger as mStagger } from "motion/react";
 
-// Cubic-bezier curves, usable by motion (`ease: EASE.out`) and CSS (`cubic-bezier(...)`).
 export const EASE = {
-    out: [0.16, 1, 0.3, 1],       // default for entrances: quick start, long glide
-    inOut: [0.65, 0, 0.35, 1],    // for things that move between two resting states
-    snappy: [0.2, 0.9, 0.1, 1],   // small UI (hover, pills, indicators)
+    out: [0.22, 1, 0.36, 1],      // default for entrances and UI
+    outExpo: [0.16, 1, 0.3, 1],   // longer glide, hero only
+    drawer: [0.32, 0.72, 0, 1],   // iOS sheet curve: mobile menu, sheets
+    inOut: [0.65, 0, 0.35, 1],    // between two resting states
+    in: [0.55, 0, 1, 0.45],       // short exits only
 };
 
-export const css = (e) => `cubic-bezier(${e.join(",")})`;
+export const cssEase = (e) => `cubic-bezier(${e.join(",")})`;
 
-export const DUR = { fast: 0.25, base: 0.6, slow: 0.9, draw: 1.4 };
+export const DUR = {
+    instant: 0.12, // press, hover color
+    fast: 0.2,     // small fades, exits
+    base: 0.32,    // popovers, accordions, tabs
+    slow: 0.6,     // section content
+    hero: 0.9,     // hero lines, the longest thing on the page
+};
 
-// Gentle springs for interactive things (tilt, magnetic hover, nav indicator).
 export const SPRING = {
-    soft: { type: "spring", stiffness: 140, damping: 22, mass: 0.9 },
-    snappy: { type: "spring", stiffness: 380, damping: 32 },
+    press: { type: "spring", visualDuration: 0.18, bounce: 0 },
+    ui: { type: "spring", visualDuration: 0.3, bounce: 0.1 },
+    layout: { type: "spring", visualDuration: 0.4, bounce: 0 },
+    gentle: { type: "spring", visualDuration: 0.6, bounce: 0 },
 };
 
-// Standard entrance: rise + un-blur + fade.
-export const fadeUp = {
-    hidden: { opacity: 0, y: 24, filter: "blur(8px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: DUR.slow, ease: EASE.out } },
-};
+export const DIST = { rise: 12, riseHero: 20, press: 0.98, hover: 1.015 };
 
-export const stagger = (each = 0.08, delay = 0) => ({
-    hidden: {},
-    show: { transition: { staggerChildren: each, delayChildren: delay } },
+export const STAGGER = { tight: 0.04, base: 0.06, loose: 0.1 };
+
+// Container transition that staggers its children (staggerChildren is deprecated).
+export const staggerChildren = (each = STAGGER.base, startDelay = 0) => ({
+    delayChildren: mStagger(each, { startDelay }),
 });
 
-// Default viewport trigger for whileInView.
-export const VIEWPORT = { once: true, amount: 0.2, margin: "0px 0px -8% 0px" };
+export const group = (each = STAGGER.base, startDelay = 0) => ({
+    hidden: {},
+    show: { transition: staggerChildren(each, startDelay) },
+});
 
-// Viewport trigger for blocks of any height: fires as soon as a sliver is on
-// screen (a fixed `amount` can never be reached by blocks taller than the viewport).
-export const VIEWPORT_ANY = { once: true, amount: "some", margin: "0px 0px -10% 0px" };
+// No blur on reveals: animated blur is the most expensive thing on integrated GPUs.
+export const fadeUp = {
+    hidden: { opacity: 0, y: DIST.rise },
+    show: { opacity: 1, y: 0, transition: { duration: DUR.slow, ease: EASE.out } },
+};
 
-// Sticky-nav clearance for anchor jumps; matches `scroll-margin-top: 5.5rem`.
-export const NAV_OFFSET = 88;
+export const fade = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: DUR.slow, ease: EASE.out } },
+};
 
-// Long, soft in-out curve for programmatic scrolls (anchor jumps).
+// Masked line: the parent needs overflow-hidden (and a little bottom padding for descenders).
+export const lineUp = {
+    hidden: { y: "105%" },
+    show: { y: "0%", transition: { duration: DUR.hero, ease: EASE.outExpo } },
+};
+
+// Fire once, as soon as a sliver is on screen.
+export const VIEWPORT = { once: true, amount: "some", margin: "0px 0px -10% 0px" };
+
+/* --- Legacy aliases, kept only so files not yet redesigned still build.
+ * Remove once nothing imports them. --- */
+export const css = cssEase;
+export const stagger = (each = 0.08, delay = 0) => group(each, delay);
+export const VIEWPORT_ANY = VIEWPORT;
 export const scrollEase = (t) => (t < 0.5 ? 8 * t ** 4 : 1 - (-2 * t + 2) ** 4 / 2);
+EASE.snappy = EASE.out;
+SPRING.soft = SPRING.gentle;
+SPRING.snappy = SPRING.ui;
+DUR.draw = 1.2;

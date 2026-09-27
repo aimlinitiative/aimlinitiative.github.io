@@ -1,63 +1,48 @@
 import { useReducedMotion } from "motion/react";
-import { EASE, DUR, SPRING } from "../../lib/motion";
+import { EASE, DUR, DIST, SPRING } from "../../lib/motion";
 
 /* Entrance presets for motion `variants` (states "hidden" -> "show").
- * Each `show` accepts an optional `custom` delay in seconds; without one, a
- * parent's staggerChildren decides the timing. Blur is cleared to `none` at
- * the end so finished elements don't keep a filter layer around. */
+ * Each `show` takes an optional `custom` delay in seconds; without one, the
+ * parent's stagger decides the timing. No blur: it's costly on integrated GPUs. */
 
 const withDelay = (t, d) => (d ? { ...t, delay: d } : t);
 
-// Rise + un-blur + fade: the default content entrance.
+// Short rise + fade: the default content entrance.
 export const RISE = {
-    hidden: { opacity: 0, y: 18, filter: "blur(8px)" },
-    show: (d) => ({
-        opacity: 1, y: 0, filter: "blur(0px)",
-        transition: withDelay({ duration: DUR.slow, ease: EASE.out }, d),
-        transitionEnd: { filter: "none" },
-    }),
+    hidden: { opacity: 0, y: DIST.rise },
+    show: (d) => ({ opacity: 1, y: 0, transition: withDelay({ duration: DUR.slow, ease: EASE.out }, d) }),
 };
 
-// Soft pop for small things (chips, pills, icons): scale 0.92 -> 1.
+// Small things (chips, pills): scale 0.96 -> 1.
 export const POP = {
-    hidden: { opacity: 0, scale: 0.92, filter: "blur(4px)" },
-    show: (d) => ({
-        opacity: 1, scale: 1, filter: "blur(0px)",
-        transition: withDelay({ duration: DUR.base, ease: EASE.out }, d),
-        transitionEnd: { filter: "none" },
-    }),
+    hidden: { opacity: 0, scale: 0.96 },
+    show: (d) => ({ opacity: 1, scale: 1, transition: withDelay({ duration: DUR.base, ease: EASE.out }, d) }),
 };
 
-// Spring in for cards: scale 0.96 -> 1 on a no-bounce spring, blur -> sharp.
+// Cards: settle in on a no-bounce spring.
 export const SPRING_IN = {
-    hidden: { opacity: 0, scale: 0.96, y: 14, filter: "blur(8px)" },
+    hidden: { opacity: 0, y: DIST.rise, scale: 0.98 },
     show: (d) => ({
-        opacity: 1, scale: 1, y: 0, filter: "blur(0px)",
-        transition: withDelay({
-            ...SPRING.soft,
-            opacity: withDelay({ duration: DUR.slow, ease: EASE.out }, d),
-            filter: withDelay({ duration: DUR.slow, ease: EASE.out }, d),
-        }, d),
-        transitionEnd: { filter: "none" },
+        opacity: 1, y: 0, scale: 1,
+        transition: withDelay({ ...SPRING.gentle, opacity: withDelay({ duration: DUR.slow, ease: EASE.out }, d) }, d),
     }),
 };
 
 // Masked line: text slides up from behind an overflow-hidden parent.
 export const LINE = {
-    hidden: { y: "110%" },
-    show: (d) => ({ y: "0%", transition: withDelay({ duration: 1.1, ease: EASE.out }, d) }),
+    hidden: { y: "105%" },
+    show: (d) => ({ y: "0%", transition: withDelay({ duration: DUR.hero, ease: EASE.outExpo }, d) }),
 };
 
-// Hairline that draws left -> right (pair with an origin-left class).
+// Hairline that draws left -> right (pair with origin-left).
 export const DRAW_X = {
     hidden: { scaleX: 0 },
-    show: (d) => ({ scaleX: 1, transition: withDelay({ duration: DUR.draw, ease: EASE.out }, d) }),
+    show: (d) => ({ scaleX: 1, transition: withDelay({ duration: 1, ease: EASE.out }, d) }),
 };
 
 // Reduced motion: both states identical, so everything simply renders.
 export const STILL = { hidden: {}, show: {} };
 
-/* useVariants(v): returns `v`, or STILL when the user prefers reduced motion. */
 export function useVariants(v) {
     return useReducedMotion() ? STILL : v;
 }
