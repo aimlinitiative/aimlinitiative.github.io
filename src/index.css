@@ -111,10 +111,10 @@ section[id] { scroll-margin-top: 5.5rem; }
     }
     .text-balance { text-wrap: balance; }
     .text-pretty { text-wrap: pretty; }
+    /* The outline follows each element's own radius, so pills stay pills. */
     .focusable:focus-visible {
         outline: 2px solid #0071E3;
         outline-offset: 2px;
-        border-radius: 6px;
     }
 }
 
