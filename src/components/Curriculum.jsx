@@ -1,217 +1,155 @@
-import { useEffect, useRef, useState } from "react";
-import { animate, motion as Motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import { useEffect, useId, useRef, useState } from "react";
+import { AnimatePresence, motion as Motion, useInView, useReducedMotion } from "motion/react";
 import UnitViz from "./viz/UnitViz";
-import useMediaQuery, { FINE_POINTER } from "./fx/useMediaQuery";
-import { GLOW } from "./viz/palette";
+import { DIST, DUR, EASE, SPRING } from "../lib/motion";
 
-/* Horizontal curved-arc coverflow on the dark stage: the active card faces you,
- * lifted and glowing; neighbors rotate on the Y-axis, recede in Z, dip along an
- * arc and soften with distance. Everything hangs off one spring-driven motion
- * value (`pos`, a fractional card index), so dragging, momentum, snapping,
- * arrows, dots and keys all move the same physical system.
- * Drag left/right (flick for momentum), click the left/right side to step,
- * arrows/dots, or the keyboard. Each unit carries its own live mini-chart. */
+/* Unit explorer: a tab list of the six units and one panel showing the
+ * selected unit with its diagram. Desktop: list left, panel right. Mobile: a
+ * horizontal scroll-snap row of units above the panel. The selected tab is
+ * marked by a shared-layout pill; the panel content swaps with a short fade
+ * and slide, and the diagram draws itself in once per selection. */
 
 const UNITS = [
-    { r: "1-2",   t: "Foundations",       s: "How machines learn from data.",            k: "data" },
-    { r: "3-4",   t: "Building models",    s: "Your first model that actually works.",    k: "classify" },
-    { r: "5-6",   t: "Prediction & error", s: "Getting predictions right, and honest.",   k: "fit" },
-    { r: "7-8",   t: "Neural networks",    s: "Built from scratch, not magic.",           k: "net" },
-    { r: "9-10",  t: "Language & bias",    s: "Where models work, and where they break.", k: "tokens" },
-    { r: "11-12", t: "Capstone",           s: "Students ship a project of their own.",    k: "ship" },
+    {
+        weeks: "1–2", title: "Foundations", k: "data",
+        line: "How machines learn from data.",
+        fig: "A new point takes the label most of its three nearest neighbors share.",
+    },
+    {
+        weeks: "3–4", title: "Building models", k: "classify",
+        line: "Students build their first model that works.",
+        fig: "The model learns where one group ends and the other begins.",
+    },
+    {
+        weeks: "5–6", title: "Prediction & error", k: "fit",
+        line: "Getting predictions right, and being honest about error.",
+        fig: "The line is the prediction. The gaps are the error, and students learn to measure them.",
+    },
+    {
+        weeks: "7–8", title: "Neural networks", k: "net",
+        line: "Students build one from scratch, one piece at a time.",
+        fig: "A small network. Training is watching the loss go down.",
+    },
+    {
+        weeks: "9–10", title: "Language & bias", k: "tokens",
+        line: "Where language models work, and where they break.",
+        fig: "How much the word “sat” pays attention to each other word in the sentence.",
+    },
+    {
+        weeks: "11–12", title: "Capstone", k: "ship",
+        line: "Students build a project of their own.",
+        fig: "Ten weeks of skills, then two weeks to build something that is theirs.",
+    },
 ];
 
-const STEPX = 208;  // px between cards
-const ANGLE = 42;   // deg of Y-rotation per step
-const DEPTH = 150;  // px pushed back per step
-const ARCY = 26;    // px arc dip per step
-const LIFT = 10;    // px the active card rises
-const SNAP = { type: "spring", stiffness: 190, damping: 27, mass: 1 };
-const DOT = 22;     // px between indicator dots
-
-function Card({ u, i, n, pos, spread, tiltX, tiltY, active, play, soften }) {
-    const o = useTransform(pos, (p) => i - p);
-    const ao = useTransform(o, (v) => Math.abs(v));
-    const near = useTransform(ao, (a) => Math.max(0, 1 - a * 1.6)); // 1 = dead center
-    // `spread` fans the deck out along the arc (0 = stacked, 1 = full arc).
-    const x = useTransform([o, spread], ([v, s]) => v * STEPX * s);
-    const y = useTransform([ao, spread, near], ([a, s, nr]) => a * ARCY * s - LIFT * nr);
-    const z = useTransform(ao, (a) => -a * DEPTH);
-    const rotateY = useTransform([o, spread, tiltY, near], ([v, s, t, nr]) => -v * ANGLE * s + t * nr);
-    const rotateX = useTransform([tiltX, near], ([t, nr]) => t * nr);
-    const scale = useTransform(ao, (a) => Math.max(0.8, 1 - a * 0.06));
-    const opacity = useTransform(ao, (a) => (a > 2.7 ? 0 : Math.max(0, 1 - a * 0.3)));
-    const zIndex = useTransform(ao, (a) => 100 - Math.round(a * 10));
-    const filter = useTransform(ao, (a) => (soften ? `blur(${Math.min(2.2, Math.max(0, a - 0.5) * 1.2).toFixed(2)}px)` : "none"));
-    const dimText = useTransform(near, (v) => 0.55 + v * 0.45);
-
-    return (
-        <Motion.div
-            className="absolute left-1/2 top-1/2 w-[min(80vw,19rem)]"
-            style={{ x, y, z, rotateX, rotateY, scale, opacity, zIndex, filter, pointerEvents: "none" }}
-            transformTemplate={(_, t) => `translate(-50%, -50%) ${t}`}
-            role="option"
-            aria-selected={active}
-        >
-            {/* glow behind the active card */}
-            <Motion.div aria-hidden="true" className="absolute -inset-6 rounded-[2.25rem]"
-                style={{ opacity: near, background: `radial-gradient(60% 55% at 50% 45%, ${GLOW.violet}55, ${GLOW.blue}22 55%, transparent 75%)` }} />
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0D0F17] text-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
-                {/* luminous hairline + top sheen, fades in as the card centers */}
-                <Motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-2xl"
-                    style={{ opacity: near, boxShadow: `inset 0 0 0 1px ${GLOW.violet}66`, background: `radial-gradient(120% 70% at 50% 0%, ${GLOW.blue}26, transparent 60%)` }} />
-                <div className="relative h-32 border-b border-white/[0.07] bg-white/[0.02] px-3 pb-1.5 pt-3">
-                    <UnitViz k={u.k} play={play} />
-                </div>
-                <Motion.div className="relative px-6 py-5" style={{ opacity: dimText }}>
-                    <div className="flex items-center justify-between">
-                        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white/45">Weeks {u.r}</span>
-                        <span className="font-mono text-[11px] text-white/40">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</span>
-                    </div>
-                    <h3 className="display mt-3 text-xl font-bold tracking-tight">{u.t}</h3>
-                    <p className="mt-1.5 text-[15px] text-white/65">{u.s}</p>
-                </Motion.div>
-            </div>
-        </Motion.div>
-    );
-}
-
 export default function Curriculum() {
-    const n = UNITS.length;
-    const reduced = useReducedMotion();
-    const soften = useMediaQuery("(min-width: 768px)") && !reduced;
     const [active, setActive] = useState(0);
-    const pos = useMotionValue(0);
-    const anim = useRef(null);
-    const stageRef = useRef(null);
-    const inView = useInView(stageRef, { amount: 0.35 });
-    const fine = useMediaQuery(FINE_POINTER) && !reduced;
+    const tabs = useRef([]);
+    const listRef = useRef(null);
+    const panelRef = useRef(null);
+    const reduce = useReducedMotion();
+    const seen = useInView(panelRef, { once: true, amount: 0.35 });
+    const id = useId();
+    const n = UNITS.length;
+    const u = UNITS[active];
 
-    // Entrance: the deck deals out from a stack the first time it comes into view.
-    const spread = useMotionValue(reduced ? 1 : 0);
+    // Mobile: keep the selected chip in view inside the horizontal row (never scrolls the page).
     useEffect(() => {
-        if (!inView || spread.get() === 1) return;
-        const c = animate(spread, 1, { type: "spring", stiffness: 60, damping: 16, mass: 1.1, delay: 0.15 });
-        return () => c.stop();
-    }, [inView, spread]);
+        const list = listRef.current, tab = tabs.current[active];
+        if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
+        const pad = parseFloat(getComputedStyle(list).paddingLeft) || 0;
+        list.scrollTo({ left: tab.offsetLeft - pad, behavior: reduce ? "auto" : "smooth" });
+    }, [active, reduce]);
 
-    // Hover tilt for the active card (fine pointers only).
-    const tiltX = useSpring(0, { stiffness: 150, damping: 18 });
-    const tiltY = useSpring(0, { stiffness: 150, damping: 18 });
-    const onHover = (e) => {
-        if (!fine || drag.current.on || !stageRef.current) return;
-        const r = stageRef.current.getBoundingClientRect();
-        const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 180));
-        const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / 140));
-        tiltY.set(nx * 9);
-        tiltX.set(-ny * 7);
+    const select = (i) => {
+        const next = (i + n) % n;
+        setActive(next);
+        tabs.current[next]?.focus();
     };
-    const onHoverEnd = () => { tiltX.set(0); tiltY.set(0); };
-    const drag = useRef({ on: false, x: 0, p: 0, moved: false });
 
-    const clamp = (v) => Math.max(0, Math.min(n - 1, v));
-
-    const settle = (target, velocity = pos.getVelocity()) => {
-        const t = clamp(target);
-        setActive(t);
-        anim.current?.stop();
-        anim.current = reduced ? (pos.set(t), null) : animate(pos, t, { ...SNAP, velocity });
-    };
-    const go = (dir) => settle(active + dir);
-    useEffect(() => () => anim.current?.stop(), []);
-
-    // Indicator: follows `pos` continuously and stretches with speed.
-    const dotX = useTransform(pos, (p) => clamp(p) * DOT);
-    const dotStretch = useTransform(pos, () => (reduced ? 1 : 1 + Math.min(0.9, Math.abs(pos.getVelocity()) * 0.12)));
-
-    const onDown = (e) => {
-        anim.current?.stop();
-        onHoverEnd();
-        drag.current = { on: true, x: e.clientX, p: pos.get(), moved: false };
-        try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* no-op */ }
-    };
-    const onMove = (e) => {
-        const d = drag.current;
-        if (!d.on) return onHover(e);
-        const dx = e.clientX - d.x;
-        if (Math.abs(dx) > 4) d.moved = true;
-        let p = d.p - dx / STEPX;
-        if (p < 0) p *= 0.3; // rubber-band past the ends
-        if (p > n - 1) p = n - 1 + (p - (n - 1)) * 0.3;
-        pos.set(p);
-    };
-    const release = (e, cancelled) => {
-        const d = drag.current;
-        if (!d.on) return;
-        d.on = false;
-        if (d.moved) {
-            const v = pos.getVelocity(); // cards per second
-            settle(Math.round(pos.get() + v * 0.22), v);
-        } else if (!cancelled && stageRef.current) {
-            // light click: left half steps back, right half steps forward
-            const rect = stageRef.current.getBoundingClientRect();
-            go(e.clientX < rect.left + rect.width / 2 ? -1 : 1);
-        } else {
-            settle(Math.round(pos.get()));
-        }
-    };
     const onKey = (e) => {
-        if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(1); }
-        if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(-1); }
-        if (e.key === "Home") { e.preventDefault(); settle(0); }
-        if (e.key === "End") { e.preventDefault(); settle(n - 1); }
+        const keys = {
+            ArrowDown: active + 1, ArrowRight: active + 1,
+            ArrowUp: active - 1, ArrowLeft: active - 1,
+            Home: 0, End: n - 1,
+        };
+        if (!(e.key in keys)) return;
+        e.preventDefault();
+        select(keys[e.key]);
     };
 
     return (
-        <div className="mt-12 flex flex-col items-center">
-            <div className="relative w-full">
-                {/* floor glow under the active card */}
-                <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[88%] h-24 w-[min(90vw,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-[50%]"
-                    style={{ background: `radial-gradient(50% 50% at 50% 50%, ${GLOW.blue}40, ${GLOW.violet}18 50%, transparent 72%)` }} />
-                <div
-                    ref={stageRef}
-                    className="focusable relative w-full cursor-grab select-none overflow-hidden active:cursor-grabbing"
-                    style={{ height: 390, perspective: "1500px", touchAction: "pan-y", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)" }}
-                    onPointerDown={onDown}
-                    onPointerMove={onMove}
-                    onPointerUp={(e) => release(e, false)}
-                    onPointerCancel={(e) => release(e, true)}
-                    onPointerLeave={onHoverEnd}
-                    onLostPointerCapture={(e) => release(e, true)}
-                    onKeyDown={onKey}
-                    tabIndex={0}
-                    role="listbox"
-                    aria-label="Curriculum units"
-                >
-                    <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
-                        {UNITS.map((u, i) => (
-                            <Card key={u.k} u={u} i={i} n={n} pos={pos} spread={spread} tiltX={tiltX} tiltY={tiltY} active={i === active}
-                                play={i === active && inView && !reduced} soften={soften} />
-                        ))}
-                    </div>
-                </div>
+        <div className="grid gap-5 md:grid-cols-[minmax(0,5fr)_minmax(0,8fr)] md:gap-8 lg:gap-12">
+            <div
+                ref={listRef}
+                role="tablist"
+                aria-label="Curriculum units"
+                aria-orientation="vertical"
+                onKeyDown={onKey}
+                className="relative -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-1.5 overflow-x-auto px-5 py-1 [scrollbar-width:none] sm:-mx-8 sm:scroll-px-8 sm:px-8 md:mx-0 md:flex-col md:gap-1 md:overflow-visible md:px-0 md:py-0 [&::-webkit-scrollbar]:hidden"
+            >
+                {UNITS.map((x, i) => {
+                    const on = i === active;
+                    return (
+                        <Motion.button
+                            key={x.k}
+                            ref={(el) => { tabs.current[i] = el; }}
+                            type="button"
+                            role="tab"
+                            id={`${id}-tab-${i}`}
+                            aria-selected={on}
+                            aria-controls={`${id}-panel`}
+                            tabIndex={on ? 0 : -1}
+                            onClick={() => setActive(i)}
+                            whileTap={{ scale: DIST.press }}
+                            transition={SPRING.press}
+                            className={`relative flex min-h-[44px] shrink-0 snap-start flex-col items-start justify-center rounded-lg md:w-full md:justify-start px-4 py-2.5 text-left transition-colors duration-base md:flex-row md:items-baseline md:gap-4 md:px-5 md:py-4 ${on ? "" : "hover:bg-card/60"}`}
+                        >
+                            {on && (
+                                <Motion.span
+                                    layoutId={`${id}-pill`}
+                                    transition={SPRING.ui}
+                                    aria-hidden="true"
+                                    className="absolute inset-0 rounded-lg bg-card shadow-float"
+                                />
+                            )}
+                            <span className="relative whitespace-nowrap text-caption text-ink3 tabular md:w-24 md:shrink-0 md:text-sm">
+                                Weeks {x.weeks}
+                            </span>
+                            <span className="relative whitespace-nowrap text-sm font-medium text-ink md:text-base">{x.title}</span>
+                        </Motion.button>
+                    );
+                })}
             </div>
 
-            {/* Controls */}
-            <div className="mt-6 flex items-center gap-5">
-                <button onClick={() => go(-1)} disabled={active === 0} aria-label="Previous unit"
-                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:border-white/40 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
-                </button>
-                <div className="relative flex items-center">
-                    <Motion.span aria-hidden="true" className="pointer-events-none absolute left-0 top-1/2 -mt-[3px] h-1.5 w-5 rounded-full"
-                        style={{ x: dotX, scaleX: dotStretch, background: `linear-gradient(90deg, ${GLOW.blue}, ${GLOW.violet}, ${GLOW.cyan})`, boxShadow: `0 0 12px ${GLOW.violet}99`, marginLeft: 1 }} />
-                    {UNITS.map((u, i) => (
-                        <button key={i} onClick={() => settle(i)} aria-label={`Unit ${i + 1}`} aria-current={i === active ? "true" : undefined}
-                            className="focusable group flex h-6 items-center justify-center" style={{ width: DOT }}>
-                            <span className="block h-1.5 w-1.5 rounded-full bg-white/20 transition-colors group-hover:bg-white/45" />
-                        </button>
-                    ))}
-                </div>
-                <button onClick={() => go(1)} disabled={active === n - 1} aria-label="Next unit"
-                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:border-white/40 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
-                </button>
+            <div
+                ref={panelRef}
+                role="tabpanel"
+                id={`${id}-panel`}
+                aria-labelledby={`${id}-tab-${active}`}
+                tabIndex={0}
+                className="overflow-hidden rounded-xl bg-card p-5 sm:p-8 lg:p-10"
+            >
+                <AnimatePresence mode="wait" initial={false}>
+                    <Motion.div
+                        key={active}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0, transition: { duration: DUR.base, ease: EASE.out } }}
+                        exit={{ opacity: 0, y: -8, transition: { duration: DUR.fast, ease: EASE.in } }}
+                    >
+                        <p className="text-caption text-ink3 tabular">
+                            Unit {active + 1} of {n} · Weeks {u.weeks}
+                        </p>
+                        <h3 className="mt-2 text-h4 md:text-h3">{u.title}</h3>
+                        <p className="mt-2 max-w-prose text-base text-ink2 md:text-lead">{u.line}</p>
+                        <figure className="mt-6 border-t border-line pt-6 md:mt-8 md:pt-8">
+                            <div className="mx-auto max-w-[34rem]">
+                                <UnitViz k={u.k} play={seen} />
+                            </div>
+                            <figcaption className="mt-4 text-sm text-ink3">{u.fig}</figcaption>
+                        </figure>
+                    </Motion.div>
+                </AnimatePresence>
             </div>
         </div>
     );

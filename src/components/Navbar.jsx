@@ -1,26 +1,15 @@
-import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
-import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { EASE, SPRING } from "../lib/motion";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { AnimatePresence, motion as Motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
+import { DIST, DUR, EASE, SPRING, STAGGER, group } from "../lib/motion";
+import { NAV } from "../content/site";
 
-const LINKS = [
-    { href: "#about", label: "Who we are" },
-    { href: "#curriculum", label: "Curriculum" },
-    { href: "#summit", label: "Summit" },
-    { href: "#supporters", label: "Supporters" },
-    { href: "#involved", label: "Get involved" },
-    { href: "#contact", label: "Contact" },
-];
-const IDS = LINKS.map((l) => l.href.slice(1));
+// "Get involved" is the button, so it isn't repeated as a text link.
+const CTA = { id: "involved", label: "Get involved" };
+const LINKS = NAV.filter((l) => l.id !== CTA.id);
+const IDS = NAV.map((l) => l.id);
 
-const Header = motion.header;
-const Pill = motion.span;
-const Line = motion.span;
-const Overlay = motion.div;
-const List = motion.div;
-const Item = motion.a;
-const Wrap = motion.div;
-
-// Which linked section sits under a reading line ~35% down the viewport.
+// Which linked section spans a reading line ~35% down the viewport.
 function currentSection() {
     const line = window.innerHeight * 0.35;
     const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
@@ -35,85 +24,92 @@ function currentSection() {
     return found;
 }
 
-/* Light or dark content under the bar? Sections can say so explicitly with
- * data-nav-theme="dark|light"; otherwise the first opaque background up the
- * tree decides. Chrome layers are pointer-events: none, so hit-testing skips them. */
-function themeUnderNav() {
-    const els = document.elementsFromPoint(window.innerWidth / 2, 40);
-    const el = els.find((e) => !e.closest("header, #mobile-menu"));
-    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
-        const t = n.getAttribute("data-nav-theme");
-        if (t) return t;
-        const m = getComputedStyle(n).backgroundColor.match(/[\d.]+/g);
-        if (m && (m[3] === undefined || +m[3] > 0.5)) {
-            const lum = (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255;
-            return lum < 0.4 ? "dark" : "light";
-        }
+// Only the Summit band opts into a dark nav, via data-nav-theme="dark".
+function toneUnderNav() {
+    for (const el of document.elementsFromPoint(window.innerWidth / 2, 28)) {
+        if (el.closest("header, #mobile-menu")) continue;
+        return el.closest('[data-nav-theme="dark"]') ? "dark" : "light";
     }
     return "light";
 }
 
-const listVariants = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.06, delayChildren: 0.18 } },
-    exit: { transition: { staggerChildren: 0.03, staggerDirection: -1 } },
+const sheet = {
+    hidden: { y: "-100%" },
+    show: { y: "0%", transition: { duration: 0.5, ease: EASE.drawer } },
+    exit: { y: "-100%", transition: { duration: DUR.base, ease: EASE.drawer } },
 };
-const itemVariants = {
-    hidden: { opacity: 0, y: "60%", filter: "blur(10px)" },
-    show: { opacity: 1, y: "0%", filter: "blur(0px)", transition: { duration: 0.9, ease: EASE.out } },
-    exit: { opacity: 0, y: "-30%", filter: "blur(6px)", transition: { duration: 0.25, ease: EASE.inOut } },
-};
-// The overlay opens as a circle growing out of the menu button (top right).
-const ORIGIN = "calc(100% - 44px) 32px";
-const overlayVariants = {
-    hidden: { clipPath: `circle(0px at ${ORIGIN})` },
-    show: { clipPath: `circle(150% at ${ORIGIN})`, transition: { duration: 0.9, ease: EASE.inOut } },
-    exit: { clipPath: `circle(0px at ${ORIGIN})`, transition: { duration: 0.6, ease: EASE.inOut, delay: 0.12 } },
+const sheetList = group(STAGGER.base, 0.12);
+const sheetItem = {
+    hidden: { opacity: 0, y: DIST.rise },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE.out } },
 };
 
 export default function Navbar() {
+    const { pathname } = useLocation();
+    const base = pathname === "/" ? "" : "/"; // off the home page, anchors go back home first
+    const reduce = useReducedMotion();
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [active, setActive] = useState(null);
     const [tone, setTone] = useState("light");
-    const toneAt = useRef(0);
-    const { scrollY } = useScroll();
     const dir = useRef({ last: 0, anchor: 0, sign: 0 });
+    const frame = useRef(0);
+    const headerRef = useRef(null);
+    const btnRef = useRef(null);
+    const sheetRef = useRef(null);
+    const { scrollY } = useScroll();
 
-    const sync = useCallback((y) => {
+    // Layout reads (active section, tone) at most once per frame.
+    const measure = useCallback(() => {
+        if (frame.current) return;
+        frame.current = requestAnimationFrame(() => {
+            frame.current = 0;
+            setActive(currentSection());
+            setTone(toneUnderNav());
+        });
+    }, []);
+
+    const onScroll = useCallback((y) => {
         const d = dir.current;
         const sign = Math.sign(y - d.last);
         if (sign && sign !== d.sign) { d.sign = sign; d.anchor = d.last; }
         d.last = y;
         setScrolled(y > 8);
-        // Hide after a deliberate scroll down past the hero, reveal on any real scroll up.
+        // Hide after a deliberate scroll down past the top, reveal on any real scroll up.
         if (y < 140) setHidden(false);
         else if (d.sign > 0 && y - d.anchor > 28) setHidden(true);
         else if (d.sign < 0 && d.anchor - y > 12) setHidden(false);
-        setActive(currentSection());
-        const now = performance.now();
-        if (now - toneAt.current > 90) { toneAt.current = now; setTone(themeUnderNav()); }
-    }, []);
+        measure();
+    }, [measure]);
 
-    useMotionValueEvent(scrollY, "change", sync);
-    useLayoutEffect(() => { sync(window.scrollY); }, [sync]);
-    // Trailing check so the tone is right once scrolling settles.
-    useMotionValueEvent(scrollY, "change", () => {
-        clearTimeout(toneAt.timer);
-        toneAt.timer = setTimeout(() => setTone(themeUnderNav()), 140);
-    });
-    useEffect(() => () => clearTimeout(toneAt.timer), []);
+    useMotionValueEvent(scrollY, "change", onScroll);
+    useLayoutEffect(() => { onScroll(window.scrollY); }, [onScroll, pathname]);
+    useEffect(() => {
+        window.addEventListener("resize", measure);
+        return () => { window.removeEventListener("resize", measure); cancelAnimationFrame(frame.current); };
+    }, [measure]);
 
-    // Close the mobile menu on Escape or when the viewport grows past the breakpoint.
+    // Open menu: lock scroll, move focus in, trap Tab, close on Escape or on growing past the breakpoint.
     useEffect(() => {
         if (!open) return;
-        const onKey = (e) => e.key === "Escape" && setOpen(false);
-        const mq = window.matchMedia("(min-width: 1024px)");
-        const onMq = () => mq.matches && setOpen(false);
         const root = document.documentElement;
         const prevOverflow = root.style.overflow;
-        root.style.overflow = "hidden"; // page behind the full-screen menu stays put
+        root.style.overflow = "hidden";
+        sheetRef.current?.querySelector("a")?.focus({ preventScroll: true });
+
+        const focusables = () => [...headerRef.current.querySelectorAll("a, button"), ...(sheetRef.current?.querySelectorAll("a, button") ?? [])]
+            .filter((el) => el.offsetParent !== null);
+        const onKey = (e) => {
+            if (e.key === "Escape") { setOpen(false); btnRef.current?.focus(); return; }
+            if (e.key !== "Tab") return;
+            const items = focusables();
+            const i = items.indexOf(document.activeElement);
+            if (e.shiftKey && i <= 0) { e.preventDefault(); items.at(-1)?.focus(); }
+            else if (!e.shiftKey && (i === -1 || i === items.length - 1)) { e.preventDefault(); items[0]?.focus(); }
+        };
+        const mq = window.matchMedia("(min-width: 1024px)");
+        const onMq = () => mq.matches && setOpen(false);
         window.addEventListener("keydown", onKey);
         mq.addEventListener("change", onMq);
         return () => {
@@ -123,94 +119,106 @@ export default function Navbar() {
         };
     }, [open]);
 
-    const frosted = scrolled && !open;
     const dark = tone === "dark" && !open;
-    const reduce = useReducedMotion();
-    const concealed = hidden && !open && !reduce; // no sliding chrome for reduced motion
+    const concealed = hidden && !open && !reduce;
+    const surface = open
+        ? "border-transparent bg-bg"
+        : scrolled
+            ? dark ? "border-dark-line bg-dark/80 backdrop-blur-md" : "border-line bg-bg/80 backdrop-blur-md"
+            : "border-transparent bg-transparent";
+    // Links are 36px to sit quietly in a 56px bar; the ::before stretches the hit area to 44px.
+    const hit = "relative before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']";
 
     return (
         <>
-            <Header
-                className={`sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${frosted ? (dark ? "border-stageline bg-stage/60 backdrop-blur-xl backdrop-saturate-150" : "border-line bg-bg/80 backdrop-blur-xl backdrop-saturate-150") : "border-transparent bg-transparent"}`}
+            <Motion.header
+                ref={headerRef}
+                className={`sticky top-0 z-50 border-b transition-[background-color,border-color] duration-base ease-out ${surface}`}
                 initial={false}
-                animate={{ y: concealed ? "-100%" : "0%", opacity: concealed ? 0 : 1 }}
-                transition={{ duration: concealed ? 0.45 : 0.55, ease: concealed ? EASE.inOut : EASE.out }}
+                animate={{ y: concealed ? "-100%" : "0%" }}
+                transition={{ duration: 0.3, ease: EASE.out }}
                 onFocusCapture={() => setHidden(false)}
             >
-                <nav className="container-page flex h-16 items-center justify-between" aria-label="Main">
-                    <a href="#top" className="focusable group flex items-center gap-2.5">
-                        <img src="/logo.jpg" alt="AIML-LI" className={`h-8 w-8 rounded-lg object-cover ring-1 transition-transform duration-500 ease-out-expo group-hover:scale-[1.04] ${dark ? "ring-white/15" : "ring-line"}`} />
-                        <span className={`display text-[15px] font-semibold tracking-tight transition-colors duration-500 ${dark ? "text-white" : "text-ink"}`}>AIML-LI</span>
+                <nav className="container-page flex h-14 items-center justify-between gap-6" aria-label="Main">
+                    <a href={`${base}#top`} onClick={() => setOpen(false)}
+                        className={`-mx-2 inline-flex min-h-[44px] items-center px-2 text-[17px] font-semibold transition-colors duration-base ${dark ? "text-dark-ink" : "text-ink"}`}>
+                        AIML-LI
                     </a>
 
-                    <LayoutGroup id="nav">
-                        <div className="hidden items-center gap-2 lg:flex">
+                    <div className="hidden items-center gap-1 lg:flex">
+                        <ul className="flex items-center gap-1">
                             {LINKS.map((l) => {
-                                const isActive = active === l.href.slice(1);
+                                const isActive = active === l.id;
                                 return (
-                                    <a key={l.href} href={l.href} data-active={isActive} aria-current={isActive ? "true" : undefined}
-                                        className={`focusable relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-300 ${dark ? (isActive ? "text-white" : "text-white/60 hover:text-white") : (isActive ? "text-ink" : "text-muted hover:text-ink")}`}>
-                                        <AnimatePresence>
-                                            {isActive && (
-                                                <Pill layoutId="nav-pill" aria-hidden="true"
-                                                    className={`absolute inset-0 rounded-full ring-1 ring-inset transition-colors duration-500 ${dark ? "bg-white/10 shadow-[0_0_24px_-6px_rgba(47,107,255,0.7)] ring-white/15" : "bg-white shadow-[0_1px_2px_rgba(11,13,18,0.06),0_6px_18px_-8px_rgba(47,107,255,0.45)] ring-ink/[0.06]"}`}
-                                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                                    transition={{ ...SPRING.snappy, opacity: { duration: 0.3 } }} />
-                                            )}
-                                        </AnimatePresence>
-                                        <span className="relative">{l.label}</span>
-                                    </a>
+                                    <li key={l.id}>
+                                        <a href={`${base}#${l.id}`} aria-current={isActive ? "location" : undefined}
+                                            className={`${hit} flex h-9 items-center rounded-pill px-3.5 text-[15px] font-medium transition-colors duration-base ${dark
+                                                ? isActive ? "text-dark-ink" : "text-dark-ink2 hover:text-dark-ink"
+                                                : isActive ? "text-ink" : "text-ink2 hover:text-ink"}`}>
+                                            <AnimatePresence initial={false}>
+                                                {isActive && (
+                                                    <Motion.span layoutId="nav-pill" aria-hidden="true"
+                                                        className={`absolute inset-0 rounded-pill transition-colors duration-base ${dark ? "bg-white/10" : "bg-ink/5"}`}
+                                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                                        transition={{ ...SPRING.ui, opacity: { duration: DUR.fast } }} />
+                                                )}
+                                            </AnimatePresence>
+                                            <span className="relative">{l.label}</span>
+                                        </a>
+                                    </li>
                                 );
                             })}
-                            <a href="#involved" className="btn-accent ml-4 !px-4 !py-2 text-sm">Partner with us</a>
-                        </div>
-                    </LayoutGroup>
+                        </ul>
+                        <a href={`${base}#${CTA.id}`} className={`${dark ? "btn-ondark" : "btn-primary"} ${hit} ml-3 !min-h-[36px] !px-4`}>
+                            {CTA.label}
+                        </a>
+                    </div>
 
-                    <button type="button"
-                        className={`focusable relative flex h-10 w-10 items-center justify-center rounded-lg border transition-colors duration-500 lg:hidden ${dark ? "border-white/15 text-white hover:border-white/30" : "border-line text-ink hover:border-ink/20"}`}
-                        onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open} aria-controls="mobile-menu">
-                        <span className="relative block h-3.5 w-[18px]" aria-hidden="true">
-                            {[-1, 0, 1].map((k) => (
-                                <Line key={k} className="absolute left-0 top-1/2 -mt-[0.75px] h-[1.5px] w-full rounded-full bg-current"
+                    <button ref={btnRef} type="button"
+                        className={`-mr-2.5 flex h-11 w-11 items-center justify-center rounded-pill transition-colors duration-base lg:hidden ${dark ? "text-dark-ink hover:bg-white/10" : "text-ink hover:bg-ink/5"}`}
+                        onClick={() => setOpen((v) => !v)}
+                        aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu">
+                        <span className="relative block h-4 w-[18px]" aria-hidden="true">
+                            {[-1, 1].map((k) => (
+                                <Motion.span key={k}
+                                    className="absolute left-0 top-1/2 -mt-[0.75px] h-[1.5px] w-full rounded-full bg-current"
                                     initial={false}
-                                    animate={open
-                                        ? { y: 0, rotate: k * 45, opacity: k === 0 ? 0 : 1, scaleX: k === 0 ? 0.4 : 1 }
-                                        : { y: k * 6, rotate: 0, opacity: 1, scaleX: 1 }}
-                                    transition={{ duration: 0.42, ease: EASE.inOut }} />
+                                    animate={open ? { y: 0, rotate: k * 45 } : { y: k * 3.5, rotate: 0 }}
+                                    transition={SPRING.ui} />
                             ))}
                         </span>
                     </button>
                 </nav>
-            </Header>
+            </Motion.header>
 
             <AnimatePresence>
                 {open && (
-                    <Overlay key="menu" id="mobile-menu" data-lenis-prevent
-                        className="fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-bg/[0.98] backdrop-blur-2xl lg:hidden"
-                        variants={overlayVariants} initial="hidden" animate="show" exit="exit">
-                        {/* soft signature glow in the corner the menu grows from */}
-                        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(47,107,255,0.22),rgba(124,92,255,0.12),transparent)]" />
-                        <List className="container-page relative flex flex-1 flex-col justify-center pb-10 pt-24" variants={listVariants} initial="hidden" animate="show" exit="exit">
-                            {LINKS.map((l, i) => {
-                                const isActive = active === l.href.slice(1);
-                                return (
-                                    <div key={l.href} className="overflow-hidden border-b border-line py-1 last:border-0">
-                                        <Item href={l.href} variants={itemVariants} onClick={() => setOpen(false)}
-                                            aria-current={isActive ? "true" : undefined}
-                                            className="focusable group flex items-baseline gap-4 py-2.5">
-                                            <span className="w-6 font-mono text-[11px] font-semibold tabular-nums text-faint">{String(i + 1).padStart(2, "0")}</span>
-                                            <span className={`display text-[2.1rem] font-semibold leading-none tracking-tightest transition-colors duration-300 ${isActive ? "text-gradient" : "text-ink group-active:text-accent"}`}>
-                                                {l.label}
-                                            </span>
-                                        </Item>
-                                    </div>
-                                );
-                            })}
-                            <Wrap variants={itemVariants} className="mt-8 flex">
-                                <a href="#involved" onClick={() => setOpen(false)} className="btn-accent flex-1 justify-center py-3.5 text-base">Partner with us</a>
-                            </Wrap>
-                        </List>
-                    </Overlay>
+                    <Motion.div key="scrim" aria-hidden="true" onClick={() => setOpen(false)}
+                        className="fixed inset-0 z-30 bg-ink/20 lg:hidden"
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        transition={{ duration: DUR.base, ease: EASE.out }} />
+                )}
+                {open && (
+                    <Motion.div key="menu" id="mobile-menu" ref={sheetRef}
+                        className="fixed inset-x-0 top-0 z-40 max-h-[100svh] overflow-y-auto overscroll-contain rounded-b-xl bg-bg pt-14 shadow-float lg:hidden"
+                        variants={sheet} initial="hidden" animate="show" exit="exit">
+                        <Motion.ul className="container-page pb-8 pt-4" variants={sheetList}>
+                            {LINKS.map((l) => (
+                                <Motion.li key={l.id} variants={sheetItem}>
+                                    <a href={`${base}#${l.id}`} onClick={() => setOpen(false)}
+                                        aria-current={active === l.id ? "location" : undefined}
+                                        className="flex min-h-[52px] items-center text-h4 text-ink transition-colors duration-base hover:text-accent">
+                                        {l.label}
+                                    </a>
+                                </Motion.li>
+                            ))}
+                            <Motion.li variants={sheetItem} className="mt-6">
+                                <a href={`${base}#${CTA.id}`} onClick={() => setOpen(false)} className="btn-primary w-full">
+                                    {CTA.label}
+                                </a>
+                            </Motion.li>
+                        </Motion.ul>
+                    </Motion.div>
                 )}
             </AnimatePresence>
         </>

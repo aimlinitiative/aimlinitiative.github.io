@@ -1,120 +1,89 @@
-import { useRef } from "react";
-import { motion as Motion, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
-import SectionLabel from "../components/SectionLabel";
-import { SOCIALS } from "../components/Footer";
-import { EASE } from "../lib/motion";
-import Aurora from "../components/fx/Aurora";
-import Magnetic from "../components/fx/Magnetic";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion as Motion } from "motion/react";
+import { DUR, EASE, SPRING } from "../lib/motion";
+import { EMAIL, mailto } from "../content/site";
 import { Item, Stagger } from "../components/fx/Stagger";
-import { POP } from "../components/fx/variants";
-import { C } from "../components/fx/palette";
-import "../components/fx/fx.css";
 
-const EMAIL = "aimlinitiative@gmail.com";
-
-// Each word carries its own slice of one continuous white -> periwinkle -> violet -> cyan ramp.
-const WORDS = [
-    { w: "Let's", g: "linear-gradient(100deg, #FFFFFF 10%, #DCE3FF 60%, #B8C6FF)" },
-    { w: "talk.", g: `linear-gradient(100deg, #B8C6FF, #9A8BFF 45%, ${C.cyan})` },
-];
-
-const WORD = {
-    hidden: { y: "112%", rotate: 5 },
-    show: { y: "0%", rotate: 0, transition: { duration: 1.2, ease: EASE.out } },
+// Label swap for the copy button: the old label lifts out, the new one rises in.
+const LABEL = {
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0, transition: { duration: DUR.fast, ease: EASE.out } },
+    exit: { opacity: 0, y: -8, transition: { duration: DUR.instant, ease: EASE.out } },
 };
 
-const TEXT_CLIP = { WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" };
+function CopyIcon() {
+    return (
+        <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+            <path d="M10.5 3.5v-.5a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5h.5" />
+        </svg>
+    );
+}
 
-// "Let's talk.": masked word-by-word rise, gentle scale with scroll, and a
-// slow light sheen once it has landed.
-function Headline() {
-    const reduce = useReducedMotion();
-    const ref = useRef(null);
-    const inView = useInView(ref, { amount: 0.5 });
-    const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
-    const scale = useTransform(scrollYProgress, [0, 1], [0.82, 1]);
+function CheckIcon() {
+    return (
+        <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m3.5 8.5 3 3 6-7" />
+        </svg>
+    );
+}
+
+function CopyButton() {
+    const [copied, setCopied] = useState(false);
+    const timer = useRef(0);
+    useEffect(() => () => clearTimeout(timer.current), []);
+
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(EMAIL);
+        } catch {
+            return; // Clipboard blocked: the address is still on screen to select.
+        }
+        setCopied(true);
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => setCopied(false), 2000);
+    };
 
     return (
-        <Motion.div ref={ref} style={reduce ? undefined : { scale }} className="mt-6">
-            <h2 className="display text-[clamp(4rem,15vw,11.5rem)] font-bold leading-[0.95] tracking-tightest">
-                <Stagger inherit each={0.12} as="span" className="fx-sheen relative inline-block px-[0.04em]" data-play={inView && !reduce}>
-                    {WORDS.map((x, i) => (
-                        <span key={x.w}>
-                            {i > 0 && " "}
-                            <span className="inline-block overflow-hidden pb-[0.12em] align-bottom -mb-[0.12em]">
-                                <Item as="span" variants={WORD} className="inline-block origin-bottom-left" style={{ backgroundImage: x.g, ...TEXT_CLIP }}>
-                                    {x.w}
-                                </Item>
-                            </span>
-                        </span>
-                    ))}
-                    {!reduce && (
-                        <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-                            <span
-                                className="fx-sheen-window absolute inset-y-0 left-0 w-[40%] overflow-hidden"
-                                style={{ WebkitMaskImage: "linear-gradient(90deg, transparent, #000 50%, transparent)", maskImage: "linear-gradient(90deg, transparent, #000 50%, transparent)" }}
-                            >
-                                <span className="fx-sheen-copy absolute inset-y-0 left-0 w-[250%] whitespace-nowrap px-[0.04em] text-white/80">
-                                    {WORDS.map((x) => x.w).join(" ")}
-                                </span>
-                            </span>
-                        </span>
-                    )}
-                </Stagger>
-            </h2>
-        </Motion.div>
+        <Motion.button
+            type="button"
+            onClick={copy}
+            whileTap={{ scale: 0.98 }}
+            transition={SPRING.press}
+            aria-label={copied ? "Email address copied" : "Copy email address"}
+            className="btn-secondary w-[7.5rem] overflow-hidden"
+        >
+            <AnimatePresence mode="popLayout" initial={false}>
+                <Motion.span key={copied ? "done" : "copy"} variants={LABEL} initial="initial" animate="animate" exit="exit" className="inline-flex items-center gap-2">
+                    {copied ? <CheckIcon /> : <CopyIcon />}
+                    {copied ? "Copied" : "Copy"}
+                </Motion.span>
+            </AnimatePresence>
+            <span className="sr-only" aria-live="polite">{copied ? "Copied to clipboard" : ""}</span>
+        </Motion.button>
     );
 }
 
 export default function Contact() {
     return (
-        <>
-            {/* ===================== CONTACT ===================== */}
-            {/* A dark "stage" finale: drifting aurora, huge gradient headline. */}
-            <section id="contact" data-nav-theme="dark" className="relative isolate overflow-hidden bg-stage text-center text-white">
-                <Aurora />
-                <span aria-hidden className="absolute inset-x-0 top-0 h-px opacity-60" style={{ background: `linear-gradient(90deg, transparent, ${C.accent}, ${C.violet}, ${C.cyan}, transparent)` }} />
-                <Stagger each={0.12} amount={0.3} className="container-page py-32 sm:py-44">
-                    <Item>
-                        <SectionLabel n="07" className="justify-center [&>span:first-child>span]:!text-[#8FB0FF] [&>span:last-child]:!text-white/70 [&>span:nth-child(2)]:!bg-[#8FB0FF]">Contact</SectionLabel>
-                    </Item>
-                    <Headline />
-                    <Item as="p" className="mx-auto mt-8 max-w-lg text-lg text-white/65">
-                        Partner, fund, teach, or just say hi. We answer every message.
-                    </Item>
-                    <Item className="mt-12 flex justify-center">
-                        <Magnetic strength={0.35} max={10} reach={20}>
-                            <span className="group relative inline-block">
-                                <span
-                                    aria-hidden
-                                    className="fx-glow pointer-events-none absolute -inset-4 rounded-full blur-2xl transition-opacity duration-500 group-hover:!opacity-100"
-                                    style={{ background: `linear-gradient(90deg, ${C.accent}, ${C.violet}, ${C.cyan})` }}
-                                />
-                                <a
-                                    href={`mailto:${EMAIL}`}
-                                    className="btn-accent relative px-8 py-3.5 text-base ring-1 ring-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:text-lg"
-                                >
-                                    Contact us
-                                </a>
-                            </span>
-                        </Magnetic>
-                    </Item>
-                    <Stagger inherit each={0.07} className="mt-12 flex items-center justify-center gap-3">
-                        {SOCIALS.map((s) => (
-                            <Item key={s.label} as="span" variants={POP} className="inline-block">
-                                <Magnetic strength={0.4} max={8} reach={6}>
-                                    <a
-                                        href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}
-                                        className="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-white/70 transition-colors duration-300 hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{s.icon}</svg>
-                                    </a>
-                                </Magnetic>
-                            </Item>
-                        ))}
-                    </Stagger>
-                </Stagger>
-            </section>
-        </>
+        <section id="contact" aria-labelledby="contact-title" className="bg-bg py-22 md:py-30">
+            <Stagger className="container-page">
+                <Item as="h2" id="contact-title" className="text-h2 text-ink">
+                    Get in touch
+                </Item>
+                <Item as="p" className="mt-4 max-w-prose text-lead text-ink2">
+                    Partner, fund, teach, or ask a question. We reply to every email.
+                </Item>
+                <Item className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+                    <a
+                        href={mailto()}
+                        className="break-all text-h4 text-ink underline decoration-transparent decoration-2 underline-offset-[6px] transition-colors duration-base ease-out hover:decoration-ink sm:text-h3"
+                    >
+                        {EMAIL}
+                    </a>
+                    <CopyButton />
+                </Item>
+            </Stagger>
+        </section>
     );
 }

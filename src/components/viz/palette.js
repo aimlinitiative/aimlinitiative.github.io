@@ -1,7 +1,11 @@
-/* Chart palette for the data-viz pieces, mirroring the site tokens:
- * electric blue -> violet -> cyan, plus the near-black stage. */
-export const BLUES = ["#2F6BFF", "#7C5CFF", "#22D3EE"];
-export const INK = "#0B0D12";
-export const STAGE = "#07080C";
-// Luminous variants for strokes and points on the dark stage.
-export const GLOW = { blue: "#5B8CFF", violet: "#9D85FF", cyan: "#3BE0F5" };
+/* Chart palette for the SVG diagrams, mirroring the Pine tokens in
+ * tailwind.config.js. Ink for structure, one accent for the key element. */
+export const INK = "#1A1C1A";
+export const INK2 = "#484B47";
+export const INK3 = "#5E615C";
+export const LINE = "#C9CBC5";   // linestrong: marks that must stay visible
+export const HAIR = "#E3E4DF";   // line: axes and quiet edges
+export const CARD = "#FFFFFF";
+export const ACCENT = "#1F5C45";
+export const ACCENT_SOFT = "#E6F0EA";
+

@@ -1,34 +1,28 @@
-import Reveal from "../components/Reveal";
-import SectionLabel from "../components/SectionLabel";
+import { useRef } from "react";
+import { motion as Motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import Summit from "../components/Summit";
 
+/* The page's one dark band. The panel grows from an inset card to full size as
+ * it scrolls in (scale 0.92 -> 1, corners 48px -> 28px). data-nav-theme sits on
+ * the panel, not the section, so the navbar only turns dark over the dark part.
+ * Nothing inside is sticky, and nothing here clips overflow. */
 export default function SummitSection() {
+    const panelRef = useRef(null);
+    const reduce = useReducedMotion();
+    const { scrollYProgress } = useScroll({ target: panelRef, offset: ["start end", "start 0.25"] });
+    const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
+    const borderRadius = useTransform(scrollYProgress, [0, 1], [48, 28]);
+
     return (
-        <>
-            {/* ===================== SUMMIT ===================== */}
-            {/* Summit lays out its own containers: the day timeline runs full-bleed
-                (and pins on desktop), so no ancestor here may clip overflow. */}
-            <section id="summit" className="border-y border-line bg-surface py-24 sm:py-32">
-                <div className="container-page">
-                    <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
-                        <Reveal>
-                            <SectionLabel n="04">The summit</SectionLabel>
-                            <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem] sm:leading-[1.08]">
-                                LA Student AI Summit and Hackathon
-                            </h2>
-                        </Reveal>
-                        <Reveal>
-                            <p className="text-lg leading-relaxed text-muted">
-                                Most students use AI outside school every day, but few are taught how it works or where it
-                                fails. The summit is one free, supervised day where Los Angeles public school students hear
-                                from people who build AI, see how the tools they already use actually work, and build
-                                something of their own.
-                            </p>
-                        </Reveal>
-                    </div>
-                </div>
+        <section id="summit" aria-labelledby="summit-title" className="bg-bg px-3 py-6 sm:px-5 md:py-10">
+            <Motion.div
+                ref={panelRef}
+                data-nav-theme="dark"
+                className="mx-auto w-full max-w-[1400px] rounded-2xl bg-dark py-22 text-dark-ink md:py-30"
+                style={reduce ? undefined : { scale, borderRadius }}
+            >
                 <Summit />
-            </section>
-        </>
+            </Motion.div>
+        </section>
     );
 }
