@@ -28,7 +28,7 @@ const part = {
     show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.9, ease: EASE.out } },
 };
 
-const link = "focusable group inline-flex items-center gap-1 text-muted transition-colors duration-300 hover:text-ink";
+const link = "focusable group inline-flex items-center gap-1 rounded text-muted transition-colors duration-300 hover:text-ink";
 
 // Small "opens elsewhere" arrow; nudges toward its corner on hover.
 function OutArrow() {
