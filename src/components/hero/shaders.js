@@ -4,7 +4,11 @@
  * A "wave" is one forward pass. Its phase u runs 0 -> layers + 1 over uPeriod
  * seconds: the signal leaves layer i at u = i and lands on layer i + 1 at
  * u = i + 1; the last stretch is a rest. Waves are offset evenly and each has
- * its own colour (blue, violet, cyan). */
+ * its own colour from the spotlight family (blue, violet, cyan).
+ *
+ * The look is deliberately quiet (DESIGN.md: nothing competes with the words):
+ * crisp points with tight halos, gentle arrival flashes, comets that stay in
+ * their hue instead of going white-hot. */
 
 const common = /* glsl */ `
 uniform float uTime;
@@ -69,12 +73,12 @@ void main() {
     float f2 = arrival(2.0, aWaves.z);
     float flash = max(max(f0, f1), f2);
     vFlashColor = (uWave0 * f0 + uWave1 * f1 + uWave2 * f2) / max(f0 + f1 + f2, 1e-4);
-    float twinkle = 0.75 + 0.25 * sin(uTime * 0.9 + aSeed * 6.2831);
+    float twinkle = 0.84 + 0.16 * sin(uTime * 0.7 + aSeed * 6.2831);
     float dust = step(aLayer, -1.0);
     vFlash = flash;
     vColor = aColor;
-    vAlpha = depthFade(depth) * twinkle * mix(1.0, 0.55, dust) * uIntensity;
-    float size = aSize * (1.0 + flash * 1.1) * uPixelRatio * (uSizeScale / depth);
+    vAlpha = depthFade(depth) * twinkle * mix(1.0, 0.5, dust) * uIntensity;
+    float size = aSize * (1.0 + flash * 0.6) * uPixelRatio * (uSizeScale / depth);
     gl_PointSize = min(size, 120.0 * uPixelRatio);
     gl_Position = projectionMatrix * mv;
     vAlpha *= veil(gl_Position);
@@ -90,11 +94,11 @@ varying float vFlash;
 void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     if (d > 1.0) discard;
-    // hot core + soft bloom
-    float core = 1.0 - smoothstep(0.1, 0.24, d);
-    float glow = pow(1.0 - d, 2.6);
+    // crisp core + tight halo (a softer, wider bloom reads as fog behind type)
+    float core = 1.0 - smoothstep(0.1, 0.22, d);
+    float glow = pow(1.0 - d, 3.2);
     vec3 base = mix(vColor, vFlashColor, vFlash);
-    vec3 col = base * glow * (0.55 + 1.3 * vFlash) + mix(base, vec3(1.0), 0.55 + 0.35 * vFlash) * core * (0.55 + 0.6 * vFlash);
+    vec3 col = base * glow * (0.42 + 0.75 * vFlash) + mix(base, vec3(1.0), 0.4 + 0.3 * vFlash) * core * (0.5 + 0.4 * vFlash);
     vec3 outC = col * vAlpha;
     gl_FragColor = vec4(outC, max(outC.r, max(outC.g, outC.b)));
 }
@@ -156,7 +160,7 @@ void main() {
     float behind = head - vT;
     if (behind < 0.0 || behind > tail) discard;
     float g = 1.0 - behind / max(tail, 1e-4);
-    vec3 col = mix(vColor, vec3(1.0), g * g * 0.5) * g * g * 1.6;
+    vec3 col = mix(vColor, vec3(1.0), g * g * 0.3) * g * g * 1.15;
     vec3 outC = col * vAlpha;
     gl_FragColor = vec4(outC, max(outC.r, max(outC.g, outC.b)));
 }
@@ -177,8 +181,8 @@ void main() {
     float depth = -mv.z;
     vColor = waveColor(aWave);
     vAlpha = vis * depthFade(depth) * uIntensity;
-    float size = 40.0 * uPixelRatio * (uSizeScale / depth);
-    gl_PointSize = vis > 0.001 ? min(size, 140.0 * uPixelRatio) : 0.0;
+    float size = 30.0 * uPixelRatio * (uSizeScale / depth);
+    gl_PointSize = vis > 0.001 ? min(size, 110.0 * uPixelRatio) : 0.0;
     gl_Position = projectionMatrix * mv;
     vAlpha *= veil(gl_Position);
 }
@@ -191,8 +195,8 @@ void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     if (d > 1.0) discard;
     float core = 1.0 - smoothstep(0.06, 0.16, d);
-    float glow = pow(1.0 - d, 2.6);
-    vec3 col = vColor * glow * 1.4 + vec3(1.0) * core;
+    float glow = pow(1.0 - d, 3.0);
+    vec3 col = vColor * glow * 0.95 + mix(vColor, vec3(1.0), 0.6) * core * 0.85;
     vec3 outC = col * vAlpha;
     gl_FragColor = vec4(outC, max(outC.r, max(outC.g, outC.b)));
 }

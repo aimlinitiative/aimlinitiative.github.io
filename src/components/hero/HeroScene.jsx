@@ -7,7 +7,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { AddEquation, BufferAttribute, BufferGeometry, CustomBlending, OneFactor, ShaderMaterial } from "three";
-import { buildNetwork, hex, NET_LENGTH } from "./network";
+import { SPOT } from "./color";
+import { buildNetwork, NET_LENGTH } from "./network";
 import * as S from "./shaders";
 
 const FOV = 38;
@@ -55,12 +56,14 @@ function Network({ small, reduced, progress, onFirstFrame }) {
     const spin = useRef(null);
     const state = useRef({ t: reduced ? 4.2 : 0, p: 0, px: 0, py: 0, tx: 0, ty: 0, first: true });
 
+    // A little sparser than a "busy" net, and one or two forward passes in
+    // flight at a time: the scene is ambience behind the headline.
     const data = useMemo(
         () =>
             buildNetwork(
                 small
-                    ? { layers: [16, 24, 28, 24, 16], waves: 3, startsPerWave: 2, dust: 70 }
-                    : { layers: [26, 40, 50, 50, 40, 26], waves: 3, startsPerWave: 3, dust: 160 },
+                    ? { layers: [14, 20, 24, 20, 14], waves: 3, startsPerWave: 2, dust: 56 }
+                    : { layers: [22, 34, 42, 42, 34, 22], waves: 3, startsPerWave: 2, dust: 120 },
             ),
         [small],
     );
@@ -68,26 +71,27 @@ function Network({ small, reduced, progress, onFirstFrame }) {
     const objects = useMemo(() => {
         const shared = {
             uTime: { value: 0 },
-            uPeriod: { value: small ? 8.5 : 9.5 },
+            uPeriod: { value: small ? 10 : 11 },
             uLayers: { value: data.layers },
             uWaves: { value: data.waves },
             uPixelRatio: { value: 1 },
             uSizeScale: { value: 12 },
             uFadeNear: { value: 11 },
             uFadeFar: { value: 26 },
-            uIntensity: { value: 1 },
-            uVeil: { value: 0.75 },
-            uVeilSize: { value: [0.52, 0.5] },
-            uWave0: { value: hex(0x3d7bff) },
-            uWave1: { value: hex(0x9272ff) },
-            uWave2: { value: hex(0x33dbf2) },
+            uIntensity: { value: 0.9 },
+            uVeil: { value: 0.86 },
+            uVeilSize: { value: [0.76, 0.64] },
+            // Forward passes in the spotlight family: blue, then the two accents.
+            uWave0: { value: SPOT.blue },
+            uWave1: { value: SPOT.violet },
+            uWave2: { value: SPOT.cyan },
         };
         return {
             shared,
             nodes: { geometry: makeGeometry(data.nodes), material: makeMaterial(S.nodeVert, S.nodeFrag, shared) },
             edges: {
                 geometry: makeGeometry(data.edges),
-                material: makeMaterial(S.edgeVert, S.edgeFrag, { ...shared, uColor: { value: hex(0x4d7dff) }, uOpacity: { value: small ? 0.26 : 0.2 } }),
+                material: makeMaterial(S.edgeVert, S.edgeFrag, { ...shared, uColor: { value: SPOT.blue }, uOpacity: { value: small ? 0.18 : 0.14 } }),
             },
             pulseLines: { geometry: makeGeometry(data.pulseLines), material: makeMaterial(S.pulseLineVert, S.pulseLineFrag, shared) },
             heads: { geometry: makeGeometry(data.heads), material: makeMaterial(S.headVert, S.headFrag, shared) },
@@ -141,10 +145,15 @@ function Network({ small, reduced, progress, onFirstFrame }) {
         const span = NET_LENGTH * Math.sin(-YAW_START);
         const fit = Math.min(1.6, Math.max(0.62, ((portrait ? visH : visH * aspect) * (portrait ? 0.98 : 0.92)) / span));
 
-        // Headline veil lifts as the copy blurs away and we fly in.
-        u.uVeil.value = 0.78 * (1 - clamp01(s.p / 0.32));
-        u.uVeilSize.value[0] = portrait ? 1.05 : 0.5;
-        u.uVeilSize.value[1] = portrait ? 0.46 : 0.5;
+        // Headline veil: the network sinks back wherever the copy sits (the
+        // poster headline spans ~3/4 of the width; on phones the stack runs
+        // from the pill down to the buttons), then lifts as the copy blurs
+        // away and we fly in. With no words left to compete with, the network
+        // brightens a touch for the flight.
+        u.uVeil.value = 0.86 * (1 - clamp01(s.p / 0.32));
+        u.uVeilSize.value[0] = portrait ? 1.15 : 0.76;
+        u.uVeilSize.value[1] = portrait ? 0.7 : 0.64;
+        u.uIntensity.value = lerp(0.9, 1.1, easeInOut(clamp01((s.p - 0.1) / 0.4)));
 
         orient.current.rotation.z = portrait ? Math.PI / 2 - 0.3 : 0.12;
         orient.current.scale.setScalar(fit);

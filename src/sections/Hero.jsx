@@ -91,7 +91,8 @@ export default function Hero() {
     const copyPointer = useTransform(scrollYProgress, (v) => (v > 0.3 ? "none" : "auto"));
     const cueOpacity = useTransform(scrollYProgress, map([0, 0.08], [1, 0]));
     const stageScale = useTransform(scrollYProgress, map([0.7, 1], [1, 0.9]));
-    const stageRadius = useTransform(scrollYProgress, map([0.7, 1], [0, 40]));
+    // Ends as a card with the panel radius (DESIGN.md: 28px).
+    const stageRadius = useTransform(scrollYProgress, map([0.7, 1], [0, 28]));
 
     const initial = reduce ? false : "hidden";
 
