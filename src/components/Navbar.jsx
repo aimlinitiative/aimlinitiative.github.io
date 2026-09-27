@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react
 import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { EASE, SPRING } from "../lib/motion";
 import { toneOf } from "./chrome/tone";
+import { SECTION_LINKS as LINKS } from "./chrome/links";
 
 /* Navbar (DESIGN.md "nav"): a 56px bar, clear over the hero, frosted once the
  * page scrolls (canvas/80 on light grounds, stage/60 over the dark stages). It
@@ -9,14 +10,6 @@ import { toneOf } from "./chrome/tone";
  * being read wears a quiet pill. Below lg the links live in a full-screen menu
  * that grows out of the menu button. */
 
-const LINKS = [
-    { href: "#about", label: "Who we are" },
-    { href: "#curriculum", label: "Curriculum" },
-    { href: "#summit", label: "Summit" },
-    { href: "#supporters", label: "Supporters" },
-    { href: "#involved", label: "Get involved" },
-    { href: "#contact", label: "Contact" },
-];
 const IDS = LINKS.map((l) => l.href.slice(1));
 
 const Header = motion.header;
