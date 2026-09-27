@@ -1,9 +1,16 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { animate, motion as Motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import UnitViz from "./viz/UnitViz";
+import useMediaQuery, { FINE_POINTER } from "./fx/useMediaQuery";
+import { GLOW } from "./viz/palette";
 
-/* Horizontal curved-arc coverflow: the active card faces you flat and front;
- * neighbors rotate on the Y-axis, recede in Z, and dip along an arc as they fan
- * out to the sides. Each unit carries its own animated concept-visual.
- * Drag left/right, click the left/right side to step, arrows/dots, or click a card. */
+/* Horizontal curved-arc coverflow on the dark stage: the active card faces you,
+ * lifted and glowing; neighbors rotate on the Y-axis, recede in Z, dip along an
+ * arc and soften with distance. Everything hangs off one spring-driven motion
+ * value (`pos`, a fractional card index), so dragging, momentum, snapping,
+ * arrows, dots and keys all move the same physical system.
+ * Drag left/right (flick for momentum), click the left/right side to step,
+ * arrows/dots, or the keyboard. Each unit carries its own live mini-chart. */
 
 const UNITS = [
     { r: "1-2",   t: "Foundations",       s: "How machines learn from data.",            k: "data" },
@@ -18,196 +25,192 @@ const STEPX = 208;  // px between cards
 const ANGLE = 42;   // deg of Y-rotation per step
 const DEPTH = 150;  // px pushed back per step
 const ARCY = 26;    // px arc dip per step
+const LIFT = 10;    // px the active card rises
+const SNAP = { type: "spring", stiffness: 190, damping: 27, mass: 1 };
+const DOT = 22;     // px between indicator dots
 
-function Visual({ k, accent }) {
-    if (k === "data") {
-        const dots = [[34, 30], [58, 60], [46, 72], [88, 42], [118, 66]];
-        const hot = [[120, 26], [150, 34], [178, 54], [192, 30]];
-        return (
-            <svg viewBox="0 0 220 92" className="h-full w-full">
-                {dots.map((d, i) => <circle key={i} className="viz-twinkle" style={{ animationDelay: `${i * 0.3}s` }} cx={d[0]} cy={d[1]} r="4" fill="currentColor" />)}
-                {hot.map((d, i) => <circle key={i} className="viz-twinkle" style={{ animationDelay: `${0.6 + i * 0.3}s` }} cx={d[0]} cy={d[1]} r="4" fill={accent} />)}
-            </svg>
-        );
-    }
-    if (k === "classify") {
-        return (
-            <svg viewBox="0 0 220 92" className="h-full w-full">
-                <line className="viz-march" x1="26" y1="84" x2="196" y2="14" stroke={accent} strokeWidth="2" />
-                <g fill="currentColor" opacity="0.5"><circle cx="44" cy="70" r="4" /><circle cx="66" cy="76" r="4" /><circle cx="40" cy="54" r="4" /><circle cx="82" cy="66" r="4" /></g>
-                <g fill={accent}><circle cx="150" cy="30" r="4" /><circle cx="172" cy="22" r="4" /><circle cx="182" cy="42" r="4" /><circle cx="150" cy="50" r="4" /></g>
-            </svg>
-        );
-    }
-    if (k === "fit") {
-        return (
-            <svg viewBox="0 0 220 92" className="h-full w-full">
-                <path className="viz-draw" d="M18,74 C56,70 74,38 116,34 C158,30 182,24 204,20" fill="none" stroke={accent} strokeWidth="2.5" strokeLinecap="round" />
-                <g fill="currentColor" opacity="0.55"><circle cx="40" cy="66" r="3.5" /><circle cx="78" cy="52" r="3.5" /><circle cx="116" cy="42" r="3.5" /><circle cx="150" cy="32" r="3.5" /><circle cx="186" cy="26" r="3.5" /></g>
-            </svg>
-        );
-    }
-    if (k === "net") {
-        const c1 = [26, 46, 66], c2 = [18, 40, 62, 84], c3 = [38, 60];
-        const lines = [];
-        c1.forEach((y1) => c2.forEach((y2) => lines.push([34, y1, 110, y2])));
-        c2.forEach((y1) => c3.forEach((y2) => lines.push([110, y1, 186, y2])));
-        return (
-            <svg viewBox="0 0 220 92" className="h-full w-full">
-                <g stroke="currentColor" strokeWidth="1">
-                    {lines.map((l, i) => <line key={i} className="viz-pulse" style={{ animationDelay: `${(i % 6) * 0.22}s` }} x1={l[0]} y1={l[1]} x2={l[2]} y2={l[3]} opacity="0.22" />)}
-                </g>
-                {c1.map((y, i) => <circle key={`a${i}`} cx="34" cy={y} r="5" fill="currentColor" />)}
-                {c2.map((y, i) => <circle key={`b${i}`} cx="110" cy={y} r="5" fill="currentColor" opacity="0.75" />)}
-                {c3.map((y, i) => <circle key={`c${i}`} className="viz-pulse" style={{ animationDelay: `${i * 0.4}s` }} cx="186" cy={y} r="5.5" fill={accent} />)}
-            </svg>
-        );
-    }
-    if (k === "tokens") {
-        const bars = [{ x: 26, h: 26 }, { x: 52, h: 42 }, { x: 78, h: 18 }, { x: 104, h: 58, hot: true }, { x: 130, h: 34 }, { x: 156, h: 22 }, { x: 182, h: 30 }];
-        return (
-            <svg viewBox="0 0 220 92" className="h-full w-full">
-                {bars.map((b, i) => (
-                    <rect key={i} className="viz-bar" style={{ animationDelay: `${i * 0.15}s` }} x={b.x} y={82 - b.h} width="14" height={b.h} rx="2.5"
-                        fill={b.hot ? accent : "currentColor"} opacity={b.hot ? 1 : 0.38} />
-                ))}
-            </svg>
-        );
-    }
-    // ship
-    const bars = [{ x: 30, h: 24, o: 0.35 }, { x: 74, h: 40, o: 0.5 }, { x: 118, h: 56, o: 0.72 }];
+function Card({ u, i, n, pos, spread, tiltX, tiltY, active, play, soften }) {
+    const o = useTransform(pos, (p) => i - p);
+    const ao = useTransform(o, (v) => Math.abs(v));
+    const near = useTransform(ao, (a) => Math.max(0, 1 - a * 1.6)); // 1 = dead center
+    // `spread` fans the deck out along the arc (0 = stacked, 1 = full arc).
+    const x = useTransform([o, spread], ([v, s]) => v * STEPX * s);
+    const y = useTransform([ao, spread, near], ([a, s, nr]) => a * ARCY * s - LIFT * nr);
+    const z = useTransform(ao, (a) => -a * DEPTH);
+    const rotateY = useTransform([o, spread, tiltY, near], ([v, s, t, nr]) => -v * ANGLE * s + t * nr);
+    const rotateX = useTransform([tiltX, near], ([t, nr]) => t * nr);
+    const scale = useTransform(ao, (a) => Math.max(0.8, 1 - a * 0.06));
+    const opacity = useTransform(ao, (a) => (a > 2.7 ? 0 : Math.max(0, 1 - a * 0.3)));
+    const zIndex = useTransform(ao, (a) => 100 - Math.round(a * 10));
+    const filter = useTransform(ao, (a) => (soften ? `blur(${Math.min(2.2, Math.max(0, a - 0.5) * 1.2).toFixed(2)}px)` : "none"));
+    const dimText = useTransform(near, (v) => 0.55 + v * 0.45);
+
     return (
-        <svg viewBox="0 0 220 92" className="h-full w-full">
-            {bars.map((b, i) => <rect key={i} x={b.x} y={82 - b.h} width="26" height={b.h} rx="3" fill="currentColor" opacity={b.o} />)}
-            <g className="viz-bob">
-                <rect x="162" y="8" width="26" height="74" rx="3" fill={accent} />
-                <path d="M175,0 l10 11 h-20 z" fill={accent} />
-            </g>
-        </svg>
+        <Motion.div
+            className="absolute left-1/2 top-1/2 w-[min(80vw,19rem)]"
+            style={{ x, y, z, rotateX, rotateY, scale, opacity, zIndex, filter, pointerEvents: "none" }}
+            transformTemplate={(_, t) => `translate(-50%, -50%) ${t}`}
+            role="option"
+            aria-selected={active}
+        >
+            {/* glow behind the active card */}
+            <Motion.div aria-hidden="true" className="absolute -inset-6 rounded-[2.25rem]"
+                style={{ opacity: near, background: `radial-gradient(60% 55% at 50% 45%, ${GLOW.violet}55, ${GLOW.blue}22 55%, transparent 75%)` }} />
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0D0F17] text-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
+                {/* luminous hairline + top sheen, fades in as the card centers */}
+                <Motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-2xl"
+                    style={{ opacity: near, boxShadow: `inset 0 0 0 1px ${GLOW.violet}66`, background: `radial-gradient(120% 70% at 50% 0%, ${GLOW.blue}26, transparent 60%)` }} />
+                <div className="relative h-32 border-b border-white/[0.07] bg-white/[0.02] px-3 pb-1.5 pt-3">
+                    <UnitViz k={u.k} play={play} />
+                </div>
+                <Motion.div className="relative px-6 py-5" style={{ opacity: dimText }}>
+                    <div className="flex items-center justify-between">
+                        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white/45">Weeks {u.r}</span>
+                        <span className="font-mono text-[11px] text-white/40">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</span>
+                    </div>
+                    <h3 className="display mt-3 text-xl font-bold tracking-tight">{u.t}</h3>
+                    <p className="mt-1.5 text-[15px] text-white/65">{u.s}</p>
+                </Motion.div>
+            </div>
+        </Motion.div>
     );
 }
 
 export default function Curriculum() {
-    const [active, setActive] = useState(0);
-    const [drag, setDrag] = useState(0); // live drag offset in px
-    const dragging = useRef(false);
-    const startX = useRef(0);
-    const dragPx = useRef(0); // live drag distance (ref, always current for snap)
-    const moved = useRef(false);
-    const stageRef = useRef(null);
-
     const n = UNITS.length;
+    const reduced = useReducedMotion();
+    const soften = useMediaQuery("(min-width: 768px)") && !reduced;
+    const [active, setActive] = useState(0);
+    const pos = useMotionValue(0);
+    const anim = useRef(null);
+    const stageRef = useRef(null);
+    const inView = useInView(stageRef, { amount: 0.35 });
+    const fine = useMediaQuery(FINE_POINTER) && !reduced;
+
+    // Entrance: the deck deals out from a stack the first time it comes into view.
+    const spread = useMotionValue(reduced ? 1 : 0);
+    useEffect(() => {
+        if (!inView || spread.get() === 1) return;
+        const c = animate(spread, 1, { type: "spring", stiffness: 60, damping: 16, mass: 1.1, delay: 0.15 });
+        return () => c.stop();
+    }, [inView, spread]);
+
+    // Hover tilt for the active card (fine pointers only).
+    const tiltX = useSpring(0, { stiffness: 150, damping: 18 });
+    const tiltY = useSpring(0, { stiffness: 150, damping: 18 });
+    const onHover = (e) => {
+        if (!fine || drag.current.on || !stageRef.current) return;
+        const r = stageRef.current.getBoundingClientRect();
+        const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 180));
+        const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / 140));
+        tiltY.set(nx * 9);
+        tiltX.set(-ny * 7);
+    };
+    const onHoverEnd = () => { tiltX.set(0); tiltY.set(0); };
+    const drag = useRef({ on: false, x: 0, p: 0, moved: false });
+
     const clamp = (v) => Math.max(0, Math.min(n - 1, v));
-    const go = (dir) => setActive((a) => clamp(a + dir));
+
+    const settle = (target, velocity = pos.getVelocity()) => {
+        const t = clamp(target);
+        setActive(t);
+        anim.current?.stop();
+        anim.current = reduced ? (pos.set(t), null) : animate(pos, t, { ...SNAP, velocity });
+    };
+    const go = (dir) => settle(active + dir);
+    useEffect(() => () => anim.current?.stop(), []);
+
+    // Indicator: follows `pos` continuously and stretches with speed.
+    const dotX = useTransform(pos, (p) => clamp(p) * DOT);
+    const dotStretch = useTransform(pos, () => (reduced ? 1 : 1 + Math.min(0.9, Math.abs(pos.getVelocity()) * 0.12)));
 
     const onDown = (e) => {
-        dragging.current = true;
-        startX.current = e.clientX;
-        dragPx.current = 0;
-        moved.current = false;
+        anim.current?.stop();
+        onHoverEnd();
+        drag.current = { on: true, x: e.clientX, p: pos.get(), moved: false };
         try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* no-op */ }
     };
     const onMove = (e) => {
-        if (!dragging.current) return;
-        const d = e.clientX - startX.current;
-        dragPx.current = d;
-        if (Math.abs(d) > 4) moved.current = true;
-        setDrag(d);
+        const d = drag.current;
+        if (!d.on) return onHover(e);
+        const dx = e.clientX - d.x;
+        if (Math.abs(dx) > 4) d.moved = true;
+        let p = d.p - dx / STEPX;
+        if (p < 0) p *= 0.3; // rubber-band past the ends
+        if (p > n - 1) p = n - 1 + (p - (n - 1)) * 0.3;
+        pos.set(p);
     };
-    const onUp = (e) => {
-        if (!dragging.current) return;
-        dragging.current = false;
-        if (moved.current) {
-            const step = Math.round(dragPx.current / STEPX);
-            setActive((a) => clamp(a - step));
-        } else if (stageRef.current) {
+    const release = (e, cancelled) => {
+        const d = drag.current;
+        if (!d.on) return;
+        d.on = false;
+        if (d.moved) {
+            const v = pos.getVelocity(); // cards per second
+            settle(Math.round(pos.get() + v * 0.22), v);
+        } else if (!cancelled && stageRef.current) {
             // light click: left half steps back, right half steps forward
             const rect = stageRef.current.getBoundingClientRect();
-            const dir = e.clientX < rect.left + rect.width / 2 ? -1 : 1;
-            setActive((a) => clamp(a + dir));
+            go(e.clientX < rect.left + rect.width / 2 ? -1 : 1);
+        } else {
+            settle(Math.round(pos.get()));
         }
-        dragPx.current = 0;
-        setDrag(0);
-    };
-    const onLeave = () => {
-        if (!dragging.current) return;
-        dragging.current = false;
-        const step = Math.round(dragPx.current / STEPX);
-        setActive((a) => clamp(a - step));
-        dragPx.current = 0;
-        setDrag(0);
     };
     const onKey = (e) => {
         if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(1); }
         if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(-1); }
+        if (e.key === "Home") { e.preventDefault(); settle(0); }
+        if (e.key === "End") { e.preventDefault(); settle(n - 1); }
     };
 
     return (
         <div className="mt-12 flex flex-col items-center">
-            <div
-                ref={stageRef}
-                className="relative w-full cursor-pointer select-none overflow-hidden"
-                style={{ height: 360, perspective: "1500px", touchAction: "pan-y", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)" }}
-                onPointerDown={onDown}
-                onPointerMove={onMove}
-                onPointerUp={onUp}
-                onPointerLeave={onLeave}
-                onKeyDown={onKey}
-                tabIndex={0}
-                role="listbox"
-                aria-label="Curriculum units"
-            >
-                <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
-                    {UNITS.map((u, i) => {
-                        const o = i - active + drag / STEPX;
-                        const ao = Math.abs(o);
-                        const hidden = ao > 2.7;
-                        const isActive = i === active;
-                        const accent = isActive ? "#8FB2E6" : "#3D77C9";
-                        const style = {
-                            transform: `translate(-50%, -50%) translateX(${o * STEPX}px) translateY(${ao * ARCY}px) translateZ(${-ao * DEPTH}px) rotateY(${-o * ANGLE}deg) scale(${Math.max(0.8, 1 - ao * 0.06)})`,
-                            opacity: hidden ? 0 : Math.max(0, 1 - ao * 0.3),
-                            zIndex: 100 - Math.round(ao * 10),
-                            transition: dragging.current ? "none" : "transform 0.55s cubic-bezier(0.16,1,0.3,1), opacity 0.55s ease",
-                            pointerEvents: "none",
-                        };
-                        return (
-                            <div key={i} className="absolute left-1/2 top-1/2 w-[min(80vw,19rem)]" style={style} role="option" aria-selected={isActive}>
-                                <div className={`overflow-hidden rounded-2xl border transition-colors duration-500 ${isActive ? "border-transparent bg-ink text-white shadow-lift" : "border-line bg-white text-ink shadow-soft"}`}>
-                                    <div className={`viz-grid flex h-28 items-center justify-center overflow-hidden border-b ${isActive ? "border-white/10 bg-white/[0.05]" : "border-line bg-surface"}`}>
-                                        <div className="relative h-14 w-[66%]"><Visual k={u.k} accent={accent} /></div>
-                                    </div>
-                                    <div className="px-6 py-5">
-                                        <div className="flex items-center justify-between">
-                                            <span className={`font-mono text-[11px] font-semibold uppercase tracking-[0.2em] ${isActive ? "text-white/45" : "text-faint"}`}>Weeks {u.r}</span>
-                                            <span className={`font-mono text-[11px] ${isActive ? "text-white/40" : "text-faint"}`}>{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</span>
-                                        </div>
-                                        <h3 className="display mt-3 text-xl font-bold tracking-tight">{u.t}</h3>
-                                        <p className={`mt-1.5 text-[15px] ${isActive ? "text-white/70" : "text-muted"}`}>{u.s}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+            <div className="relative w-full">
+                {/* floor glow under the active card */}
+                <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[88%] h-24 w-[min(90vw,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-[50%]"
+                    style={{ background: `radial-gradient(50% 50% at 50% 50%, ${GLOW.blue}40, ${GLOW.violet}18 50%, transparent 72%)` }} />
+                <div
+                    ref={stageRef}
+                    className="focusable relative w-full cursor-grab select-none overflow-hidden active:cursor-grabbing"
+                    style={{ height: 390, perspective: "1500px", touchAction: "pan-y", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)" }}
+                    onPointerDown={onDown}
+                    onPointerMove={onMove}
+                    onPointerUp={(e) => release(e, false)}
+                    onPointerCancel={(e) => release(e, true)}
+                    onPointerLeave={onHoverEnd}
+                    onLostPointerCapture={(e) => release(e, true)}
+                    onKeyDown={onKey}
+                    tabIndex={0}
+                    role="listbox"
+                    aria-label="Curriculum units"
+                >
+                    <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+                        {UNITS.map((u, i) => (
+                            <Card key={u.k} u={u} i={i} n={n} pos={pos} spread={spread} tiltX={tiltX} tiltY={tiltY} active={i === active}
+                                play={i === active && inView && !reduced} soften={soften} />
+                        ))}
+                    </div>
                 </div>
             </div>
 
             {/* Controls */}
             <div className="mt-6 flex items-center gap-5">
                 <button onClick={() => go(-1)} disabled={active === 0} aria-label="Previous unit"
-                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-ink/30 disabled:pointer-events-none disabled:opacity-25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:border-white/40 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-25">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
                 </button>
-                <div className="flex items-center gap-1.5">
+                <div className="relative flex items-center">
+                    <Motion.span aria-hidden="true" className="pointer-events-none absolute left-0 top-1/2 -mt-[3px] h-1.5 w-5 rounded-full"
+                        style={{ x: dotX, scaleX: dotStretch, background: `linear-gradient(90deg, ${GLOW.blue}, ${GLOW.violet}, ${GLOW.cyan})`, boxShadow: `0 0 12px ${GLOW.violet}99`, marginLeft: 1 }} />
                     {UNITS.map((u, i) => (
-                        <button key={i} onClick={() => setActive(i)} aria-label={`Unit ${i + 1}`}
-                            className="h-1.5 rounded-full transition-all duration-300"
-                            style={{ width: i === active ? 24 : 6, backgroundColor: i === active ? "#2C63B0" : "rgba(21,21,26,0.16)" }} />
+                        <button key={i} onClick={() => settle(i)} aria-label={`Unit ${i + 1}`} aria-current={i === active ? "true" : undefined}
+                            className="focusable group flex h-6 items-center justify-center" style={{ width: DOT }}>
+                            <span className="block h-1.5 w-1.5 rounded-full bg-white/20 transition-colors group-hover:bg-white/45" />
+                        </button>
                     ))}
                 </div>
                 <button onClick={() => go(1)} disabled={active === n - 1} aria-label="Next unit"
-                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-ink/30 disabled:pointer-events-none disabled:opacity-25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:border-white/40 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-25">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
                 </button>
             </div>
         </div>
