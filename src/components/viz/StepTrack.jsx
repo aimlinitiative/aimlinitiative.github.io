@@ -1,17 +1,16 @@
-import { useId, useMemo } from "react";
+import { useMemo } from "react";
 import { motion as Motion, useMotionValueEvent, useTransform } from "motion/react";
-import { BLUES } from "./palette";
+import { COLORS } from "../../lib/palette";
 
-/* A connector that draws itself through a set of anchor points (the step badges).
+/* A connector that draws itself through a set of anchor points (the step nodes).
  * Anchors are measured from the DOM (offset-based, so transforms never skew
  * them), which lets the same component draw a horizontal line on desktop and a
  * vertical one on mobile. `progress` is a 0..1 MotionValue (scroll-linked).
- * A dashed track shows the whole route; the gradient stroke draws over it with a
- * soft glowing dot riding the tip. `onReach(i)` fires as the tip passes anchor i. */
+ * A dotted track shows the whole route; a solid accent stroke draws over it with
+ * a small accent tip riding the end. `onReach(i)` fires as the tip passes anchor i.
+ * `color` is the drawn stroke, `ground` the section color the tip is cut out of. */
 
-export default function StepTrack({ points, progress, onReach, reduced }) {
-    const gid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-
+export default function StepTrack({ points, progress, onReach, reduced, color = COLORS.accent, ground = COLORS.parchment }) {
     const geo = useMemo(() => {
         if (points.length < 2) return null;
         const cum = [0];
@@ -30,7 +29,7 @@ export default function StepTrack({ points, progress, onReach, reduced }) {
             const [x0, y0] = points[i - 1], [x1, y1] = points[i];
             return [x0 + (x1 - x0) * k, y0 + (y1 - y0) * k];
         };
-        return { d, at, fracs: cum.map((c) => c / total), first: points[0], last: points[points.length - 1] };
+        return { d, at, fracs: cum.map((c) => c / total) };
     }, [points]);
 
     // Tip position for the traveling dot (transform only).
@@ -44,36 +43,24 @@ export default function StepTrack({ points, progress, onReach, reduced }) {
     });
 
     if (!geo) return null;
-    const [ax, ay] = geo.first, [bx, by] = geo.last;
 
     return (
         <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
-            <defs>
-                <linearGradient id={`st-g-${gid}`} gradientUnits="userSpaceOnUse" x1={ax} y1={ay} x2={bx} y2={by}>
-                    <stop offset="0" stopColor={BLUES[0]} />
-                    <stop offset="0.5" stopColor={BLUES[1]} />
-                    <stop offset="1" stopColor={BLUES[2]} />
-                </linearGradient>
-                <radialGradient id={`st-h-${gid}`}>
-                    <stop offset="0" stopColor="#7C5CFF" stopOpacity="0.55" />
-                    <stop offset="1" stopColor="#7C5CFF" stopOpacity="0" />
-                </radialGradient>
-            </defs>
             {/* the full route, quiet */}
-            <path d={geo.d} fill="none" stroke="rgba(21,21,26,0.12)" strokeWidth="1" strokeDasharray="2 5" />
+            <path d={geo.d} fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1.25" strokeLinecap="round" strokeDasharray="0.01 6" />
             {/* the drawn line */}
             <Motion.path
                 d={geo.d}
                 fill="none"
-                stroke={`url(#st-g-${gid})`}
-                strokeWidth="1.75"
+                stroke={color}
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 style={{ pathLength: reduced ? 1 : progress }}
             />
             {!reduced && (
                 <Motion.g style={{ x: tipX, y: tipY, opacity: tipO }}>
-                    <circle r="14" fill={`url(#st-h-${gid})`} />
-                    <circle r="3" fill="#fff" stroke="#2F6BFF" strokeWidth="1.5" />
+                    <circle r="9" fill={color} fillOpacity="0.1" />
+                    <circle r="3.5" fill={color} stroke={ground} strokeWidth="1.5" />
                 </Motion.g>
             )}
         </svg>
