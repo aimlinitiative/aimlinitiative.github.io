@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 /* Cycles through phrases with a type / delete effect and a softly breathing
- * caret. Reduced motion: shows the first phrase, still. */
+ * caret in the text's own color (blue is reserved for clicks). Reduced
+ * motion: shows the first phrase, still. */
 export default function Typewriter({ words, className = "" }) {
     const reduce = useReducedMotion();
     const [i, setI] = useState(0);
@@ -33,7 +34,7 @@ export default function Typewriter({ words, className = "" }) {
     return (
         <span className={className}>
             {reduce ? words[0] : text}
-            <span aria-hidden="true" className={`font-normal text-accent/70 ${idle && !reduce ? "caret-soft" : ""}`}>|</span>
+            <span aria-hidden="true" className={`font-normal ${idle && !reduce ? "caret-soft" : ""}`}>|</span>
         </span>
     );
 }

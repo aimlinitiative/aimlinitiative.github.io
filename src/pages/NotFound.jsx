@@ -2,8 +2,13 @@ import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE } from "../lib/motion";
 
+/* 404 as a poster (DESIGN.md): the number at display-2xl in ink, the message
+ * two-toned beneath it in faint, one Action Blue way home. Left-aligned, like
+ * every light room. The digits rise and un-blur one after another. */
+
 const Stack = motion.div;
 const Digit = motion.span;
+const Line = motion.span;
 const Part = motion.div;
 
 const stack = { hidden: {}, show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } } };
@@ -19,20 +24,25 @@ const part = {
 export default function NotFound() {
     const reduce = useReducedMotion();
     return (
-        <Stack className="container-page flex min-h-[70vh] flex-col items-center justify-center py-24 text-center"
-            variants={stack} initial={reduce ? false : "hidden"} animate="show">
-            <div className="display text-7xl font-bold tracking-tight text-ink" aria-label="404">
-                {["4", "0", "4"].map((d, i) => (
-                    <Digit key={i} aria-hidden="true" variants={digit} className={`inline-block ${i === 1 ? "text-gradient" : ""}`}>{d}</Digit>
-                ))}
-            </div>
-            <Part variants={part}>
-                <h1 className="display mt-3 text-xl font-semibold text-ink">Page not found</h1>
-                <p className="mt-2 max-w-md text-muted">We couldn't find what you were looking for.</p>
-            </Part>
-            <Part variants={part}>
-                <Link to="/" className="btn-accent mt-8">Back home</Link>
-            </Part>
-        </Stack>
+        <section className="section-y bg-canvas">
+            <Stack className="container-page flex min-h-[50svh] flex-col justify-center"
+                variants={stack} initial={reduce ? false : "hidden"} animate="show">
+                <h1 className="display">
+                    <span className="sr-only">404. </span>
+                    <span aria-hidden="true" className="block text-display-2xl tabular-nums text-ink">
+                        {["4", "0", "4"].map((d, i) => (
+                            <Digit key={i} variants={digit} className="inline-block">{d}</Digit>
+                        ))}
+                    </span>
+                    <Line variants={part} className="mt-3 block text-balance text-display-lg text-faint">Page not found</Line>
+                </h1>
+                <Part variants={part}>
+                    <p className="mt-6 max-w-measure text-pretty text-lead text-muted">We couldn't find what you were looking for.</p>
+                </Part>
+                <Part variants={part} className="mt-10">
+                    <Link to="/" className="btn-accent">Back home</Link>
+                </Part>
+            </Stack>
+        </section>
     );
 }

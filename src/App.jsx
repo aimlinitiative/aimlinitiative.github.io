@@ -17,7 +17,7 @@ export default function App() {
                 <SmoothScroll />
                 <ScrollProgress />
                 <Cursor />
-                <div className="flex min-h-screen flex-col bg-bg">
+                <div className="flex min-h-screen flex-col bg-canvas">
                     <Navbar />
                     <main className="flex-1">
                         <Routes>
