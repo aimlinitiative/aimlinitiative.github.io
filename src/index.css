@@ -69,6 +69,9 @@ section[id] { scroll-margin-top: 5.5rem; }
     .btn-ghost { @apply btn border border-linestrong bg-transparent text-ink hover:bg-black/[0.04]; }
     .btn-light { @apply btn bg-white text-black hover:bg-[#E8E8ED]; }
     .btn-dark { @apply btn border border-white/[0.14] bg-white/[0.08] text-ondark hover:bg-white/[0.14]; }
+    /* Compact pill for dense desktop chrome (the nav CTA): 36px tall, 14px.
+     * Combine with a variant: class="btn-accent btn-sm". Touch layouts keep 44px. */
+    .btn-sm { min-height: 36px; padding-inline: 16px; font-size: 14px; }
 
     .link { @apply text-accent underline-offset-4 hover:underline; }
 

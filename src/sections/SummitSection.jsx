@@ -6,19 +6,23 @@ export default function SummitSection() {
     return (
         <>
             {/* ===================== SUMMIT ===================== */}
-            {/* Summit lays out its own containers: the day timeline runs full-bleed
-                (and pins on desktop), so no ancestor here may clip overflow. */}
-            <section id="summit" className="border-y border-line bg-surface py-24 sm:py-32">
+            {/* Canvas ground (DESIGN.md §5). Summit lays out its own containers: the day
+                timeline runs full-bleed (and pins on desktop), so no ancestor here may
+                clip overflow. */}
+            <section id="summit" className="section-y bg-canvas">
                 <div className="container-page">
-                    <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
-                        <Reveal>
+                    {/* Desktop: the headline takes the full row (the two tones split at the
+                        line break), and the lead sits under it in the 7-column track. */}
+                    <div className="grid gap-8 lg:grid-cols-[5fr_7fr] lg:gap-x-16 lg:gap-y-12">
+                        <Reveal className="lg:col-span-2">
                             <SectionLabel n="04">The summit</SectionLabel>
-                            <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem] sm:leading-[1.08]">
-                                LA Student AI Summit and Hackathon
+                            <h2 className="display mt-6 text-balance text-display-xl text-ink">
+                                LA Student AI Summit{" "}
+                                <span className="text-faint lg:block">and Hackathon</span>
                             </h2>
                         </Reveal>
-                        <Reveal>
-                            <p className="text-lg leading-relaxed text-muted">
+                        <Reveal delay={120} className="lg:col-start-2">
+                            <p className="max-w-measure text-pretty text-lead text-muted">
                                 Most students use AI outside school every day, but few are taught how it works or where it
                                 fails. The summit is one free, supervised day where Los Angeles public school students hear
                                 from people who build AI, see how the tools they already use actually work, and build
