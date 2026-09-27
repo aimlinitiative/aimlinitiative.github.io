@@ -3,6 +3,7 @@ import { motion, transform, useMotionTemplate, useReducedMotion, useScroll, useT
 import Typewriter from "../components/Typewriter";
 import HeroBackdrop from "../components/hero/HeroBackdrop";
 import { DUR, EASE } from "../lib/motion";
+import { COLORS } from "../lib/palette";
 import "../components/hero/hero.css";
 
 const MDiv = motion.div;
@@ -11,17 +12,23 @@ const MA = motion.a;
 const MP = motion.p;
 const MH1 = motion.h1;
 
-const STAGE = "#07080C";
+const STAGE = COLORS.stage;
+
+// The page's one gradient word (DESIGN.md §2): the spotlight family, drifting
+// slowly through "everyone" (animation in hero.css).
+const KEYWORD_GRADIENT = `linear-gradient(100deg, ${COLORS.blue} 0%, ${COLORS.violet} 30%, ${COLORS.cyan} 56%, ${COLORS.violet} 80%, ${COLORS.blue} 100%)`;
 
 // Clamped linear map between two ranges.
 const map = (input, output) => transform(input, output, { clamp: true });
 
 // Headline, split into words for the masked rise. `accent` words get the
-// gradient treatment; `tail` is punctuation that stays white but rides along.
+// gradient treatment; `tail` is punctuation that stays white but rides along;
+// `br` ends the first line on desktop ("AI literacy for / everyone, everywhere."),
+// which is also where text-wrap: balance lands on its own.
 const HEADLINE = [
     { w: "AI" },
     { w: "literacy" },
-    { w: "for" },
+    { w: "for", br: true },
     { w: "everyone", accent: true, tail: "," },
     { w: "everywhere." },
 ];
@@ -114,7 +121,7 @@ export default function Hero() {
                     <HeroBackdrop watchRef={ref} progress={scrollYProgress} reduced={!!reduce} />
 
                     <MDiv
-                        className="container-page relative z-10 origin-center pb-20 pt-32 sm:pb-24 sm:pt-36"
+                        className="hero-copy container-page relative z-10 origin-center"
                         style={reduce ? undefined : { scale: copyScale, y: copyY, opacity: copyOpacity, filter: copyFilter, pointerEvents: copyPointer }}
                         // Keyboard users tabbing into the copy mid-flight: bring it back into view.
                         onFocusCapture={() => {
@@ -122,13 +129,16 @@ export default function Hero() {
                             window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.scrollY, behavior: "auto" });
                         }}
                     >
-                        <MDiv className="mx-auto max-w-3xl text-center" initial={initial} animate="show" variants={cascade}>
+                        {/* One vertical rhythm for the whole stack (hero.css): --hero-s 24px
+                            between related lines, --hero-m 32px between groups, --hero-l 40px
+                            before the actions. */}
+                        <MDiv className="text-center" initial={initial} animate="show" variants={cascade}>
                             <MA
                                 href="#summit"
                                 initial={initial}
                                 animate="show"
                                 variants={pill}
-                                className="focusable group relative mb-8 inline-flex max-w-full rounded-full p-px text-[13px] font-medium text-white/70 shadow-[0_0_24px_-6px_rgba(47,107,255,0.45)] transition-[color,box-shadow] duration-300 hover:text-white hover:shadow-[0_0_32px_-4px_rgba(47,107,255,0.65)] sm:text-sm"
+                                className="focusable group relative mb-[var(--hero-m)] inline-flex max-w-full rounded-full p-px text-[13px] font-medium text-white/70 shadow-[0_0_24px_-6px_rgba(47,107,255,0.45)] transition-[color,box-shadow] duration-300 hover:text-white hover:shadow-[0_0_32px_-4px_rgba(47,107,255,0.65)] sm:text-sm"
                             >
                                 <span aria-hidden="true" className="hero-pill-clip">
                                     <span className="hero-pill-ring" />
@@ -144,8 +154,9 @@ export default function Hero() {
                                 </span>
                             </MA>
 
+                            {/* Poster headline: Geist 600 at display-2xl (-0.05em, 0.92 leading). */}
                             <MH1
-                                className="display text-balance text-[2.75rem] font-bold leading-[1.02] tracking-tightest text-white [text-shadow:0_2px_30px_rgba(7,8,12,0.6)] sm:text-7xl"
+                                className="display text-balance text-display-2xl text-ondark [text-shadow:0_2px_30px_rgba(7,8,12,0.6)]"
                                 initial={initial}
                                 animate="show"
                                 variants={container}
@@ -153,31 +164,43 @@ export default function Hero() {
                                 {HEADLINE.map((item, i) => (
                                     <span key={item.w}>
                                         {/* Mask: the word rises out of its own line box. Padding + negative
-                                            margin leave room for descenders without shifting layout. */}
+                                            margin leave room for descenders (they drop 0.15em below the
+                                            baseline, past the 0.92 line box) without shifting layout. */}
                                         <span className="-mb-[0.14em] inline-block overflow-hidden pb-[0.14em] align-bottom">
                                             <MSpan className="inline-block will-change-transform" variants={word}>
-                                                {item.accent ? <span className="hero-gradient-text [text-shadow:none]">{item.w}</span> : item.w}
+                                                {item.accent ? (
+                                                    <span className="hero-keyword" style={{ backgroundImage: KEYWORD_GRADIENT }}>
+                                                        {item.w}
+                                                    </span>
+                                                ) : (
+                                                    item.w
+                                                )}
                                                 {item.tail}
                                             </MSpan>
                                         </span>
                                         {i < HEADLINE.length - 1 ? " " : null}
+                                        {item.br ? <br className="hidden lg:inline" /> : null}
                                     </span>
                                 ))}
                             </MH1>
 
-                            <MP variants={rise} className="mx-auto mt-7 max-w-xl text-pretty text-lg leading-relaxed text-white/[0.68]">
+                            <MP variants={rise} className="hero-lead mx-auto mt-[var(--hero-m)] max-w-[34rem] text-balance text-lead text-ondarkmuted">
                                 We build free, open-source AI courses and bring them into public schools.
                                 We're starting with LAUSD, the second-largest district in the country.
                             </MP>
-                            <MP variants={rise} className="mt-7 text-base text-white/[0.68]">
+                            {/* The phrase gets its own line on phones so typing never rewraps the stack. */}
+                            <MP variants={rise} className="mt-[var(--hero-s)] text-body text-ondarkmuted">
                                 Students learn to{" "}
-                                <Typewriter className="display font-semibold text-[#8FB0FF]" words={["train their first model", "question the tools they use", "explain how an LLM works", "spot AI bias", "build a working classifier", "solve a real-world problem"]} />
+                                <Typewriter
+                                    className="block font-display font-semibold text-ondark sm:inline [&>[aria-hidden]]:text-accentdark"
+                                    words={["train their first model", "question the tools they use", "explain how an LLM works", "spot AI bias", "build a working classifier", "solve a real-world problem"]}
+                                />
                             </MP>
-                            <MDiv variants={rise} className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                            <MDiv variants={rise} className="mt-[var(--hero-l)] flex flex-col items-center justify-center gap-3 sm:flex-row">
                                 <a href="#involved" className="btn-accent w-full shadow-[0_8px_30px_-8px_rgba(47,107,255,0.7)] sm:w-auto">Get involved</a>
                                 <a href="#about" className="btn focusable w-full border border-white/15 bg-white/[0.05] text-white backdrop-blur-md hover:border-white/30 hover:bg-white/[0.1] sm:w-auto">Learn more</a>
                             </MDiv>
-                            <MP variants={rise} className="mt-9 text-[13px] uppercase tracking-[0.14em] text-white/50">
+                            <MP variants={rise} className="eyebrow mx-auto mt-[var(--hero-m)] max-w-[22rem] text-balance leading-[1.7] text-ondarkmuted sm:max-w-none">
                                 Advised by people from Google&nbsp;DeepMind &amp; Y&nbsp;Combinator
                             </MP>
                         </MDiv>
@@ -186,7 +209,7 @@ export default function Hero() {
                     {!reduce && (
                         <MDiv
                             aria-hidden="true"
-                            className="pointer-events-none absolute inset-x-0 bottom-8 z-10 hidden flex-col items-center gap-2 sm:flex"
+                            className="hero-cue pointer-events-none absolute inset-x-0 bottom-8 z-10 flex-col items-center gap-2"
                             style={{ opacity: cueOpacity }}
                         >
                             <MDiv

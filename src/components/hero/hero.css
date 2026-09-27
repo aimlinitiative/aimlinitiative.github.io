@@ -1,4 +1,37 @@
-/* Hero-only styles (kept out of index.css, which another area owns). */
+/* Hero-only styles (kept out of index.css, which another area owns).
+ * Colors come from src/lib/palette.js and are applied inline in Hero.jsx. */
+
+/* ---- Copy stack: one vertical rhythm ----
+ * --hero-s  between related lines (lead -> typewriter)
+ * --hero-m  between groups (pill -> headline -> lead, actions -> advisors)
+ * --hero-l  before the actions
+ * Phones and short screens use 16/24/32; roomy screens 24/32/40. The pinned
+ * stage is exactly one viewport tall, so the stack has to fit inside it:
+ * padding only clears the nav on top (and the scroll cue on roomy screens). */
+.hero-copy {
+    --hero-s: 1rem;
+    --hero-m: 1.5rem;
+    --hero-l: 2rem;
+    padding-top: 5.5rem;
+    padding-bottom: 1.5rem;
+}
+@media (min-width: 640px) {
+    .hero-copy { padding-top: 5rem; }
+}
+.hero-cue { display: none; }
+@media (min-width: 640px) and (min-height: 860px) {
+    .hero-copy { --hero-s: 1.5rem; --hero-m: 2rem; --hero-l: 2.5rem; padding-top: 8rem; padding-bottom: 6rem; }
+    .hero-cue { display: flex; }
+}
+
+/* Short laptop screens (1366x768 and 1280x720 displays under browser chrome):
+ * the lead widens to three lines and the poster headline is capped by height,
+ * continuously, so the stack still fits. Above ~660px of height the cap is
+ * larger than the display-2xl token, whose clamp is repeated here unchanged. */
+@media (max-height: 700px) {
+    .hero-copy h1 { font-size: min(clamp(3.25rem, 1.6rem + 6.4vw, 7rem), max(3.25rem, 54svh - 15.375rem)); }
+    .hero-copy .hero-lead { max-width: 40rem; }
+}
 
 /* Clip for the ring. clip-path (not just overflow + radius) so the rotating,
  * composited layer can never leak past the pill's rounded edge. */
@@ -60,19 +93,20 @@
     22%, 100% { transform: translateX(320%); }
 }
 
-/* "everyone": blue -> violet -> cyan, drifting slowly through the word. */
-.hero-gradient-text {
-    background-image: linear-gradient(100deg, #4d82ff 0%, #8b6bff 28%, #22d3ee 52%, #6d8dff 76%, #4d82ff 100%);
+/* "everyone": the page's one gradient word. The spotlight gradient itself is
+ * set inline from palette.js; this clips it to the glyphs and lets it drift. */
+.hero-keyword {
     background-size: 220% 100%;
     background-position: 0% 50%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    animation: hero-gradient-drift 9s ease-in-out infinite alternate;
+    text-shadow: none;
+    animation: hero-keyword-drift 10s ease-in-out infinite alternate;
 }
-@keyframes hero-gradient-drift { to { background-position: 100% 50%; } }
+@keyframes hero-keyword-drift { to { background-position: 100% 50%; } }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero-pill-ring, .hero-pill-sheen::after, .hero-gradient-text { animation: none; }
+    .hero-pill-ring, .hero-pill-sheen::after, .hero-keyword { animation: none; }
 }
