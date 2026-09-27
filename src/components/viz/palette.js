@@ -1,7 +1,9 @@
-/* Chart palette for the data-viz pieces, mirroring the site tokens:
- * electric blue -> violet -> cyan, plus the near-black stage. */
-export const BLUES = ["#2F6BFF", "#7C5CFF", "#22D3EE"];
-export const INK = "#0B0D12";
-export const STAGE = "#07080C";
+import { COLORS } from "../../lib/palette";
+
+/* Chart palette for the data-viz pieces (see DESIGN.md): the spotlight family
+ * as categorical series, plus ink and the dark stage. */
+export const BLUES = [COLORS.blue, COLORS.violet, COLORS.cyan];
+export const INK = COLORS.ink;
+export const STAGE = COLORS.stage;
 // Luminous variants for strokes and points on the dark stage.
-export const GLOW = { blue: "#5B8CFF", violet: "#9D85FF", cyan: "#3BE0F5" };
+export const GLOW = { blue: "#5AB0FF", violet: "#9D85FF", cyan: "#3BE0F5" };

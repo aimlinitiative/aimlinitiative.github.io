@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { EASE } from "../lib/motion";
+import { COLORS } from "../lib/palette";
 
-/* Section kicker: a numbered index in the electric-blue tint + the label in the
- * display font, uppercase and spaced. On first view the number rolls up, a short
- * accent line draws, and the label decodes out of scrambled glyphs. The label's
- * box is sized by the real text, so nothing shifts while it decodes. */
-
-// Electric blue family, deep -> bright (sleek, single-hue)
-export const BLUE = ["#1F4FD8", "#2F6BFF", "#3F63F5", "#5B5CFF", "#4C8DFF", "#22A3E6"];
+/* Section label (DESIGN.md §4): the section number in the accent, a short
+ * hairline, and the label as a Geist Mono eyebrow. On first view the number
+ * rolls up, the line draws, and the label decodes out of scrambled glyphs. The
+ * label's box is sized by the real text, so nothing shifts while it decodes.
+ * On dark sections the parent recolors via [&>span] selectors or `tone`. */
 
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/<>#%*+=";
 const Num = motion.span;
@@ -50,22 +49,22 @@ function Decode({ text, run }) {
     );
 }
 
-export default function SectionLabel({ n, children, className = "" }) {
-    const idx = Math.max(0, parseInt(n, 10) - 1) % BLUE.length;
+export default function SectionLabel({ n, children, className = "", tone = "light" }) {
+    const dark = tone === "dark";
     const ref = useRef(null);
     const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
     const reduce = useReducedMotion();
-    const color = BLUE[idx];
+    const color = dark ? COLORS.accentDark : COLORS.accent;
     const on = reduce || inView;
 
-    const label = <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.22em] text-ink/75">
+    const label = <span className={`font-mono text-[12px] font-medium uppercase tracking-[0.08em] ${dark ? "text-ondarkmuted" : "text-faint"}`}>
         {typeof children === "string" && !reduce ? <Decode text={children} run={inView} /> : children}
     </span>;
 
     return (
         <div ref={ref} className={`flex items-center gap-2.5 ${className}`}>
             <span className="inline-flex overflow-hidden">
-                <Num className="inline-block font-mono text-[13px] font-bold tabular-nums" style={{ color }}
+                <Num className="inline-block font-mono text-[12px] font-medium tabular-nums" style={{ color }}
                     initial={reduce ? false : { y: "110%", opacity: 0 }}
                     animate={on ? { y: "0%", opacity: 1 } : undefined}
                     transition={{ duration: 0.8, ease: EASE.out }}>
