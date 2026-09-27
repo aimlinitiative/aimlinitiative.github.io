@@ -64,7 +64,7 @@ components:
   card:                  { bg: "canvas on parchment sections, parchment on white sections", border: "1px line", rounded: card, padding: "24px mobile / 32px desktop", shadow: none }
   card-dark:             { bg: stage-1, border: "1px stage-line", rounded: card, shadow: "inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 30px rgba(0,0,0,0.25)" }
   spotlight-card:        { bg: "spotlight gradient + soft aurora inside the card", text: "#FFFFFF", rounded: panel, padding: "48px → 96px", limit: "one per page (the contact finale)" }
-  chip:                  { bg: accent-soft, text: accent, font: caption, rounded: pill }
+  chip:                  { bg: accent-soft, text: accent, font: caption, rounded: pill, use: "highlights only; neutral hairline chips for plain lists" }
   nav:                   { height: 56px, bg: "canvas 80% + blur(20px) saturate(180%) once scrolled; stage 60% over dark sections", links: "body-sm, muted → ink", cta: "small button-primary (button-primary-dark over stage)" }
   section-label:         { font: eyebrow, color: faint, number: "accent (accent-on-dark on stage)", rule: "24px hairline" }
   footer:                { bg: parchment, text: faint, font: body-sm, padding: "64px top", layout: "brand block + link columns + legal row" }
@@ -97,7 +97,7 @@ A gallery with posters on the walls. Each section is a room: full-bleed, one col
 - **Cards** (`.card`): 20px radius, 1px hairline, flat. White cards on parchment sections, parchment cards on white sections. On stage use `.card-dark` (stage-1 with a light top edge). Hover may tilt/brighten the border, never add a colored glow.
 - **Spotlight card** (`contact` only): 28px radius, spotlight gradient with a slow aurora inside the card, white type, white pill CTA. The one moment of color saturation on the page.
 - **Section header:** `SectionLabel` (eyebrow) → headline (`display-xl`) → optional `lead` paragraph. Left-aligned in light rooms; centered in stage rooms.
-- **Chips:** caption text on `accent-soft`, pill radius. Used for "Most needed" and tool lists.
+- **Chips:** caption text on `accent-soft`, pill radius, for highlights such as "Most needed". Plain lists (the summit's tool list) use neutral chips: white, 1px hairline, ink text, so nothing that isn't clickable turns blue.
 
 ## 5. Layout
 

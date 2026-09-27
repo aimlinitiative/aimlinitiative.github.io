@@ -3,6 +3,7 @@ import { motion, transform, useMotionTemplate, useReducedMotion, useScroll, useT
 import Typewriter from "../components/Typewriter";
 import HeroBackdrop from "../components/hero/HeroBackdrop";
 import { DUR, EASE } from "../lib/motion";
+import { COLORS } from "../lib/palette";
 import "../components/hero/hero.css";
 
 const MDiv = motion.div;
@@ -11,17 +12,26 @@ const MA = motion.a;
 const MP = motion.p;
 const MH1 = motion.h1;
 
-const STAGE = "#07080C";
+const STAGE = COLORS.stage;
+
+// The page's one gradient word (DESIGN.md §2): the spotlight family, drifting
+// slowly through "everyone" (animation in hero.css).
+const KEYWORD_GRADIENT = `linear-gradient(100deg, ${COLORS.blue} 0%, ${COLORS.violet} 30%, ${COLORS.cyan} 56%, ${COLORS.violet} 80%, ${COLORS.blue} 100%)`;
+
+// The summit pill's travelling border light: a short accent comet, dark elsewhere.
+const PILL_LIGHT = `conic-gradient(from 0deg, transparent 0deg 225deg, ${COLORS.accentDark} 335deg, transparent 360deg)`;
 
 // Clamped linear map between two ranges.
 const map = (input, output) => transform(input, output, { clamp: true });
 
 // Headline, split into words for the masked rise. `accent` words get the
-// gradient treatment; `tail` is punctuation that stays white but rides along.
+// gradient treatment; `tail` is punctuation that stays white but rides along;
+// `br` ends the first line on desktop ("AI literacy for / everyone, everywhere."),
+// which is also where text-wrap: balance lands on its own.
 const HEADLINE = [
     { w: "AI" },
     { w: "literacy" },
-    { w: "for" },
+    { w: "for", br: true },
     { w: "everyone", accent: true, tail: "," },
     { w: "everywhere." },
 ];
@@ -108,13 +118,13 @@ export default function Hero() {
             >
                 <MDiv
                     data-nav-theme="dark"
-                    className="sticky top-0 isolate flex min-h-[100svh] items-center overflow-hidden text-white"
+                    className="sticky top-0 isolate flex min-h-[100svh] items-center overflow-hidden text-ondark"
                     style={reduce ? { backgroundColor: STAGE } : { backgroundColor: STAGE, scale: stageScale, borderRadius: stageRadius }}
                 >
                     <HeroBackdrop watchRef={ref} progress={scrollYProgress} reduced={!!reduce} />
 
                     <MDiv
-                        className="container-page relative z-10 origin-center pb-20 pt-32 sm:pb-24 sm:pt-36"
+                        className="hero-copy container-page relative z-10 origin-center"
                         style={reduce ? undefined : { scale: copyScale, y: copyY, opacity: copyOpacity, filter: copyFilter, pointerEvents: copyPointer }}
                         // Keyboard users tabbing into the copy mid-flight: bring it back into view.
                         onFocusCapture={() => {
@@ -122,30 +132,34 @@ export default function Hero() {
                             window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.scrollY, behavior: "auto" });
                         }}
                     >
-                        <MDiv className="mx-auto max-w-3xl text-center" initial={initial} animate="show" variants={cascade}>
+                        {/* One vertical rhythm for the whole stack (hero.css): --hero-s between
+                            related lines, --hero-m between groups, --hero-l before the actions;
+                            24/32/40px on roomy screens, 16/24/32px on phones and short screens. */}
+                        <MDiv className="text-center" initial={initial} animate="show" variants={cascade}>
+                            {/* Summit pill: translucent hairline pill, mono date chip, and a
+                                faint accent light travelling along the border (hero.css).
+                                The ::before pads the hit area to 44px without growing the pill. */}
                             <MA
                                 href="#summit"
                                 initial={initial}
                                 animate="show"
                                 variants={pill}
-                                className="focusable group relative mb-8 inline-flex max-w-full rounded-full p-px text-[13px] font-medium text-white/70 shadow-[0_0_24px_-6px_rgba(47,107,255,0.45)] transition-[color,box-shadow] duration-300 hover:text-white hover:shadow-[0_0_32px_-4px_rgba(47,107,255,0.65)] sm:text-sm"
+                                className="group relative mb-[var(--hero-m)] inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.06] py-1 pl-1 pr-3.5 text-caption text-ondark/85 outline-none transition-colors duration-300 before:absolute before:-inset-y-[7px] before:inset-x-0 before:content-[''] hover:border-white/[0.16] hover:bg-white/[0.09] hover:text-ondark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accentdk sm:text-[14px]"
                             >
-                                <span aria-hidden="true" className="hero-pill-clip">
-                                    <span className="hero-pill-ring" />
+                                <span aria-hidden="true" className="hero-pill-light">
+                                    <span className="hero-pill-comet" style={{ backgroundImage: PILL_LIGHT }} />
                                 </span>
-                                <span className="relative inline-flex min-w-0 items-center gap-2.5 rounded-full bg-[#0C0E15] py-1 pl-1 pr-3.5">
-                                    <span aria-hidden="true" className="hero-pill-sheen" />
-                                    <span className="relative shrink-0 rounded-full bg-[#2F6BFF]/[0.16] px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#9DBBFF]">Late 2026</span>
-                                    <span className="relative min-w-0 truncate">
-                                        <span className="sm:hidden">LA Student AI Summit</span>
-                                        <span className="hidden sm:inline">LA Student AI Summit and Hackathon</span>
-                                    </span>
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="relative shrink-0 transition-transform duration-300 group-hover:translate-x-0.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                                <span className="eyebrow relative shrink-0 rounded-full bg-accentdark/[0.14] px-2.5 py-[5px] text-accentdark">Late 2026</span>
+                                <span className="relative min-w-0 truncate">
+                                    <span className="sm:hidden">LA Student AI Summit</span>
+                                    <span className="hidden sm:inline">LA Student AI Summit and Hackathon</span>
                                 </span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="relative shrink-0 text-ondarkmuted transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-ondark"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                             </MA>
 
+                            {/* Poster headline: Geist 600 at display-2xl (-0.05em, 0.92 leading). */}
                             <MH1
-                                className="display text-balance text-[2.75rem] font-bold leading-[1.02] tracking-tightest text-white [text-shadow:0_2px_30px_rgba(7,8,12,0.6)] sm:text-7xl"
+                                className="display text-balance text-display-2xl text-ondark [text-shadow:0_2px_30px_rgba(7,8,12,0.6)]"
                                 initial={initial}
                                 animate="show"
                                 variants={container}
@@ -153,31 +167,45 @@ export default function Hero() {
                                 {HEADLINE.map((item, i) => (
                                     <span key={item.w}>
                                         {/* Mask: the word rises out of its own line box. Padding + negative
-                                            margin leave room for descenders without shifting layout. */}
+                                            margin leave room for descenders (they drop 0.15em below the
+                                            baseline, past the 0.92 line box) without shifting layout. */}
                                         <span className="-mb-[0.14em] inline-block overflow-hidden pb-[0.14em] align-bottom">
                                             <MSpan className="inline-block will-change-transform" variants={word}>
-                                                {item.accent ? <span className="hero-gradient-text [text-shadow:none]">{item.w}</span> : item.w}
+                                                {item.accent ? (
+                                                    <span className="hero-keyword" style={{ backgroundImage: KEYWORD_GRADIENT }}>
+                                                        {item.w}
+                                                    </span>
+                                                ) : (
+                                                    item.w
+                                                )}
                                                 {item.tail}
                                             </MSpan>
                                         </span>
                                         {i < HEADLINE.length - 1 ? " " : null}
+                                        {item.br ? <br className="hidden lg:inline" /> : null}
                                     </span>
                                 ))}
                             </MH1>
 
-                            <MP variants={rise} className="mx-auto mt-7 max-w-xl text-pretty text-lg leading-relaxed text-white/[0.68]">
+                            <MP variants={rise} className="hero-lead mx-auto mt-[var(--hero-m)] max-w-[34rem] text-balance text-lead text-ondarkmuted">
                                 We build free, open-source AI courses and bring them into public schools.
                                 We're starting with LAUSD, the second-largest district in the country.
                             </MP>
-                            <MP variants={rise} className="mt-7 text-base text-white/[0.68]">
+                            {/* The phrase gets its own line on phones so typing never rewraps the stack. */}
+                            <MP variants={rise} className="mt-[var(--hero-s)] text-body text-ondarkmuted">
                                 Students learn to{" "}
-                                <Typewriter className="display font-semibold text-[#8FB0FF]" words={["train their first model", "question the tools they use", "explain how an LLM works", "spot AI bias", "build a working classifier", "solve a real-world problem"]} />
+                                <Typewriter
+                                    className="block font-display font-semibold text-ondark sm:inline [&>[aria-hidden]]:text-accentdark"
+                                    words={["train their first model", "question the tools they use", "explain how an LLM works", "spot AI bias", "build a working classifier", "solve a real-world problem"]}
+                                />
                             </MP>
-                            <MDiv variants={rise} className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                                <a href="#involved" className="btn-accent w-full shadow-[0_8px_30px_-8px_rgba(47,107,255,0.7)] sm:w-auto">Get involved</a>
-                                <a href="#about" className="btn focusable w-full border border-white/15 bg-white/[0.05] text-white backdrop-blur-md hover:border-white/30 hover:bg-white/[0.1] sm:w-auto">Learn more</a>
+                            {/* Stage pills (DESIGN.md §4): white primary, translucent secondary.
+                                Side by side at every width; they fit down to 320px. */}
+                            <MDiv variants={rise} className="mt-[var(--hero-l)] flex flex-wrap items-center justify-center gap-3">
+                                <a href="#involved" className="btn-light">Get involved</a>
+                                <a href="#about" className="btn-dark">Learn more</a>
                             </MDiv>
-                            <MP variants={rise} className="mt-9 text-[13px] uppercase tracking-[0.14em] text-white/50">
+                            <MP variants={rise} className="eyebrow mx-auto mt-[var(--hero-m)] max-w-[22rem] text-balance leading-[1.7] text-ondarkmuted sm:max-w-none">
                                 Advised by people from Google&nbsp;DeepMind &amp; Y&nbsp;Combinator
                             </MP>
                         </MDiv>
@@ -186,21 +214,23 @@ export default function Hero() {
                     {!reduce && (
                         <MDiv
                             aria-hidden="true"
-                            className="pointer-events-none absolute inset-x-0 bottom-8 z-10 hidden flex-col items-center gap-2 sm:flex"
+                            className="hero-cue pointer-events-none absolute inset-x-0 bottom-6 z-10 flex-col items-center"
                             style={{ opacity: cueOpacity }}
                         >
                             <MDiv
-                                className="flex flex-col items-center gap-2"
+                                className="flex flex-col items-center gap-2.5"
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: BODY_DELAY + 0.9, duration: DUR.slow, ease: EASE.out }}
                             >
-                                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">Scroll</span>
-                                <span className="relative block h-9 w-px overflow-hidden bg-white/10">
+                                {/* Chrome, not copy: dimmer than the advisors line above it. */}
+                                <span className="eyebrow text-white/40">Scroll</span>
+                                {/* 1px hairline with a soft drop of light running down it */}
+                                <span className="relative block h-8 w-px overflow-hidden bg-white/30">
                                     <MSpan
-                                        className="absolute inset-x-0 top-0 block h-3 bg-gradient-to-b from-transparent to-[#8FB0FF]"
-                                        animate={{ y: ["-100%", "300%"] }}
-                                        transition={{ duration: 1.8, ease: EASE.inOut, repeat: Infinity, repeatDelay: 0.4 }}
+                                        className="absolute inset-x-0 top-0 block h-1/2 bg-gradient-to-b from-transparent to-white"
+                                        animate={{ y: ["-100%", "200%"] }}
+                                        transition={{ duration: 2, ease: EASE.inOut, repeat: Infinity, repeatDelay: 0.6 }}
                                     />
                                 </span>
                             </MDiv>

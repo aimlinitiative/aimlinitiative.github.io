@@ -6,7 +6,8 @@ const { stiffness, damping, mass } = SPRING.soft;
 const SPRING_CFG = { stiffness, damping, mass };
 
 /* TiltCard: gentle 3D tilt toward the pointer, springing back on leave.
- *   max              max rotation in degrees on each axis (6)
+ *   max              max rotation in degrees on each axis (4: a lean, not a
+ *                    flip; DESIGN.md keeps cards flat)
  *   perspective      px of the 3D perspective (1000)
  *   hoverScale       scale while hovered (1 = none; try 1.01)
  *   className        classes on the tilting element
@@ -14,7 +15,7 @@ const SPRING_CFG = { stiffness, damping, mass };
  *                    and receives the pointer, so its rect never wobbles)
  * Motion values only (no re-render per mousemove). Off on touch / coarse
  * pointers and when the user prefers reduced motion. */
-export default function TiltCard({ max = 6, perspective = 1000, hoverScale = 1, className = "", wrapperClassName = "", children }) {
+export default function TiltCard({ max = 4, perspective = 1000, hoverScale = 1, className = "", wrapperClassName = "", children }) {
     const reduce = useReducedMotion();
     const fine = useMediaQuery(FINE_POINTER);
     const on = fine && !reduce;

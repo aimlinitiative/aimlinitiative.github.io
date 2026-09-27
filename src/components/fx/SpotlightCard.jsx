@@ -6,23 +6,40 @@ const SOLID = "linear-gradient(#000 0 0)";
 const RING_MASK = `${SOLID} content-box, ${SOLID}`;
 const RING_GRADIENT = `linear-gradient(135deg, ${C.accent}, ${C.violet} 50%, ${C.cyan})`;
 
-/* SpotlightCard: a card with a soft radial highlight that follows the pointer
- * and a matching glow on its 1px border. Pointer position lives in motion
- * values, so moving the mouse never re-renders React.
+// Flat look (DESIGN.md §4): neutral highlight, hairline that firms up under the
+// pointer. `edge` peaks near the pointer and keeps `floor` of it everywhere else
+// while hovered, so over a `line` border the edge reads about `linestrong`.
+const FLAT = {
+    light: { color: "0,0,0", strength: 0.022, edge: "0,0,0", peak: 0.1, floor: 0.35 },
+    dark: { color: "255,255,255", strength: 0.045, edge: "255,255,255", peak: 0.24, floor: 0.3 },
+};
+
+/* SpotlightCard: a card that answers the pointer with a soft radial highlight
+ * and a brighter border near it. Pointer position lives in motion values, so
+ * moving the mouse never re-renders React.
  *   as        element tag, default "div" (renders a motion element, so motion
  *             props like variants/initial/whileInView pass straight through)
  *   className the card's own look: radius, border, background, padding
- *   glow      "blue" (default): border glow in the accent color
- *             "gradient": border lights up in the blue/violet/cyan gradient
- *             around the pointer, with a faint full gradient ring on hover
- *   color     fill color as "r,g,b" (default accent)
+ *   glow      "line" (default): flat. The hairline border firms up toward
+ *             `linestrong` under the pointer, with a barely-there neutral
+ *             highlight. No color, no glow.
+ *             "none": the highlight only, border untouched
+ *             "blue": legacy; border glow in the accent color
+ *             "gradient": legacy; border lights up in the blue/violet/cyan
+ *             gradient around the pointer, with a faint full ring on hover
+ *   tone      "light" (default) or "dark": which way the flat look brightens
+ *             (use "dark" for stage cards with a `stageline` border)
+ *   color     highlight color as "r,g,b" (neutral for the flat look, accent
+ *             for the legacy glows)
  *   size      highlight radius in px (360)
- *   strength  alpha of the fill highlight (0.07); the border glow is stronger
+ *   strength  alpha of the highlight (0.022 flat, 0.045 flat dark, 0.07 legacy)
  *   lift      true: also fade in a soft drop shadow on hover (opacity only)
- * Off for touch input and prefers-reduced-motion. Give it a 1px border to glow.
- * It sets `relative isolate`; the glow layers sit under the content (-z-10). */
+ * Off for touch input and prefers-reduced-motion. Give it a 1px border for the
+ * edge to follow; the edge draws over that border, so it is clipped away if
+ * the card itself is overflow-hidden (clip an inner wrapper instead).
+ * It sets `relative isolate`; the layers sit under the content (-z-10). */
 export default function SpotlightCard({
-    as = "div", className = "", glow = "blue", color = RGB.accent, size = 360, strength = 0.07, lift = false,
+    as = "div", className = "", glow = "line", tone = "light", color, size = 360, strength, lift = false,
     children, onPointerMove, onPointerEnter, onPointerLeave, ...rest
 }) {
     const M = Motion[as] ?? Motion.div;
@@ -33,8 +50,16 @@ export default function SpotlightCard({
     const faint = useTransform(o, (v) => v * 0.35);
     const r = Math.round(size * 0.75);
 
-    const fill = useMotionTemplate`radial-gradient(${size}px circle at ${x}px ${y}px, rgba(${color},${strength}), transparent 70%)`;
-    const ring = useMotionTemplate`radial-gradient(${r}px circle at ${x}px ${y}px, rgba(${color},${Math.min(strength * 6, 0.55)}), transparent 70%)`;
+    const legacy = glow === "blue" || glow === "gradient";
+    const flat = FLAT[tone] ?? FLAT.light;
+    const rgb = color ?? (legacy ? RGB.accent : flat.color);
+    const alpha = strength ?? (legacy ? 0.07 : flat.strength);
+    const edge = legacy ? rgb : color ?? flat.edge;
+    const peak = legacy ? Math.min(alpha * 6, 0.55) : flat.peak;
+    const floor = legacy ? 0 : +(peak * flat.floor).toFixed(3);
+
+    const fill = useMotionTemplate`radial-gradient(${size}px circle at ${x}px ${y}px, rgba(${rgb},${alpha}), transparent 70%)`;
+    const ring = useMotionTemplate`radial-gradient(${r}px circle at ${x}px ${y}px, rgba(${edge},${peak}), rgba(${edge},${floor}) 70%)`;
     // Gradient mode: pointer spot intersected with the ring shape.
     const spotMask = useMotionTemplate`radial-gradient(${r}px circle at ${x}px ${y}px, #000, transparent 72%), ${SOLID}, ${SOLID}`;
 
@@ -89,7 +114,7 @@ export default function SpotlightCard({
                         }}
                     />
                 </>
-            ) : (
+            ) : glow !== "none" && (
                 <Motion.span aria-hidden className={ringLayer} style={{ background: ring, opacity: o, ...maskStyle }} />
             )}
             {children}

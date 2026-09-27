@@ -2,6 +2,25 @@
  * off screen (data-paused), and off entirely for reduced motion. */
 
 /* ---- Aurora: three soft color fields drifting on long, offset loops ---- */
+/* Fields are sized from the Aurora's own box (container query units), so it
+ * fills a card as well as a section: --k is a field's diameter as a fraction
+ * of the box's longer side, left/top place its center. Without container
+ * units the fields fall back to a fraction of the box's width. */
+.fx-aurora { container-type: size; }
+.fx-aurora > span {
+    position: absolute;
+    border-radius: 9999px;
+    width: calc(var(--k) * 100%);
+    aspect-ratio: 1;
+    margin: calc(var(--k) * -50%) 0 0 calc(var(--k) * -50%);
+}
+@supports (width: 1cqmax) {
+    .fx-aurora > span {
+        width: calc(var(--k) * 100cqmax);
+        height: calc(var(--k) * 100cqmax);
+        margin: calc(var(--k) * -50cqmax) 0 0 calc(var(--k) * -50cqmax);
+    }
+}
 @keyframes fx-drift-a {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
     33% { transform: translate3d(9%, -7%, 0) scale(1.14); }
@@ -24,6 +43,8 @@
 .fx-aurora[data-paused="true"] > span { animation-play-state: paused; }
 
 /* ---- Sheen: a soft light band sweeping across text, then resting ---- */
+/* (Sheen and glow pulse are kept for older code; the DESIGN.md sections don't
+ * use them: no glows, and gradient text only for the hero keyword.) */
 /* The window moves right; the text copy inside it moves left by the same
  * pixels (window is 40% of the text width, the copy 250% of the window). */
 @keyframes fx-sheen-window {

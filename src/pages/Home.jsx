@@ -17,7 +17,10 @@ export default function Home() {
             <Hero />
             <About />
             <Work />
-            <SectionTransition><CurriculumSection /></SectionTransition>
+            {/* parchment behind the opening card, so the reveal matches How it works above */}
+            <div className="bg-parchment">
+                <SectionTransition><CurriculumSection /></SectionTransition>
+            </div>
             <SummitSection />
             <SupportersSection />
             <Involved />

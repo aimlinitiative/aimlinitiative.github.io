@@ -3,19 +3,24 @@ import { useInView } from "motion/react";
 import { RGB } from "./palette";
 import "./fx.css";
 
+/* The spotlight family (DESIGN.md §2): blue, violet, cyan. x / y place each
+ * field's center as a % of the box; k is its diameter as a fraction of the
+ * box's longer side; a is its peak alpha. */
 const FIELDS = [
-    { rgb: RGB.accent, size: "70vmax", left: "-18%", top: "-30%", a: 0.55 },
-    { rgb: RGB.violet, size: "62vmax", left: "42%", top: "-10%", a: 0.5 },
-    { rgb: RGB.cyan, size: "54vmax", left: "8%", top: "38%", a: 0.32 },
+    { rgb: RGB.blue, x: "10%", y: "8%", k: 1.05, a: 0.62 },
+    { rgb: RGB.violet, x: "92%", y: "30%", k: 0.95, a: 0.58 },
+    { rgb: RGB.cyan, x: "62%", y: "100%", k: 0.85, a: 0.5 },
 ];
 
-/* Aurora: a slow, drifting mesh of blue / violet / cyan light for dark
- * "stage" sections. Absolutely fills its (relative, overflow-hidden) parent
- * and sits behind content. Transform-only CSS loops, paused off screen,
- * static with reduced motion.
+/* Aurora: a slow, drifting mesh of blue / violet / cyan light. It absolutely
+ * fills its positioned parent (clip the parent with overflow-hidden) and sits
+ * behind content (-z-10). Fields are sized from the Aurora's own box, not the
+ * viewport, so it works in a card as well as across a full section.
+ * Transform-only CSS loops, paused off screen, static with reduced motion.
  *   className  extra classes on the layer (e.g. opacity)
- *   grid       true: add a faint grid that fades out toward the edges */
-export default function Aurora({ className = "", grid = true }) {
+ *   intensity  multiplier on every field's alpha (1)
+ *   grid       true: add a faint grid that fades out toward the edges (false) */
+export default function Aurora({ className = "", intensity = 1, grid = false }) {
     const ref = useRef(null);
     const inView = useInView(ref);
     return (
@@ -24,10 +29,10 @@ export default function Aurora({ className = "", grid = true }) {
                 {FIELDS.map((f) => (
                     <span
                         key={f.rgb}
-                        className="absolute rounded-full mix-blend-screen"
+                        className="mix-blend-screen"
                         style={{
-                            width: f.size, height: f.size, left: f.left, top: f.top,
-                            background: `radial-gradient(circle at center, rgba(${f.rgb},${f.a}), rgba(${f.rgb},0) 62%)`,
+                            "--k": f.k, left: f.x, top: f.y,
+                            background: `radial-gradient(circle at center, rgba(${f.rgb},${Math.min(1, f.a * intensity)}), rgba(${f.rgb},0) 62%)`,
                         }}
                     />
                 ))}
