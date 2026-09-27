@@ -6,15 +6,16 @@ export default function SupportersSection() {
     return (
         <>
             {/* ===================== SUPPORTERS ===================== */}
-            {/* Supporters lays out its own containers: the logo band runs full-bleed. */}
-            <section id="supporters" className="py-24 sm:py-32">
+            {/* Parchment ground (DESIGN.md §5). Supporters lays out its own containers:
+                the logo band runs full-bleed. */}
+            <section id="supporters" className="section-y bg-parchment">
                 <div className="container-page">
-                    <Reveal className="max-w-2xl">
+                    <Reveal className="max-w-3xl">
                         <SectionLabel n="05">Supporters</SectionLabel>
-                        <h2 className="display mt-5 text-balance text-3xl font-bold tracking-tightest text-ink sm:text-[2.5rem]">
+                        <h2 className="display mt-6 text-balance text-display-xl text-ink">
                             Who's already in.
                         </h2>
-                        <p className="mt-4 text-lg text-muted">
+                        <p className="mt-6 max-w-measure text-pretty text-lead text-muted">
                             Nine partners have committed to the summit so far.
                         </p>
                     </Reveal>
