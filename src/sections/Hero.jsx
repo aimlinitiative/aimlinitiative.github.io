@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, transform, useMotionTemplate, useReducedMotion, useScroll, useTransform } from "motion/react";
 import Typewriter from "../components/Typewriter";
 import HeroBackdrop from "../components/hero/HeroBackdrop";
@@ -23,6 +23,10 @@ const PILL_LIGHT = `conic-gradient(from 0deg, transparent 0deg 225deg, ${COLORS.
 
 // Clamped linear map between two ranges.
 const map = (input, output) => transform(input, output, { clamp: true });
+
+// Resting copy styles when the hero is not pinned (explicit, so nothing a
+// scroll-driven value set earlier can linger).
+const UNPINNED_COPY = { scale: 1, y: 0, opacity: 1, filter: "none", pointerEvents: "auto" };
 
 // Headline, split into words for the masked rise. `accent` words get the
 // gradient treatment; `tail` is punctuation that stays white but rides along;
@@ -77,7 +81,52 @@ const pill = {
  * rounded card that scrolls away into the light page. */
 export default function Hero() {
     const ref = useRef(null);
+    const stageRef = useRef(null);
+    const copyRef = useRef(null);
     const reduce = useReducedMotion();
+
+    // The pinned flight needs the whole stack inside one small-viewport height
+    // (the stage is exactly 100svh while pinned). On phones too short for that
+    // (a 375px iPhone in Safari) the hero stays in the normal flow instead, as
+    // it does under reduced motion, so the buttons never sit below the fold for
+    // the whole pin. Measured once the webfonts are in (fallback metrics would
+    // misjudge the stack); svh ignores the collapsing toolbar, so this never
+    // flips mid-scroll.
+    const [fits, setFits] = useState(true);
+    useEffect(() => {
+        const stage = stageRef.current;
+        const copy = copyRef.current;
+        if (!stage || !copy) return;
+        let live = true;
+        let ro;
+        const check = () => {
+            if (!live) return;
+            const room = parseFloat(getComputedStyle(stage).minHeight) || window.innerHeight;
+            setFits(copy.offsetHeight <= room + 1);
+        };
+        (document.fonts?.ready ?? Promise.resolve()).then(() => {
+            if (!live) return;
+            check();
+            ro = new ResizeObserver(check);
+            ro.observe(copy);
+        });
+        window.addEventListener("resize", check);
+        return () => {
+            live = false;
+            ro?.disconnect();
+            window.removeEventListener("resize", check);
+        };
+    }, []);
+    const pinned = !reduce && fits;
+
+    // Pinning changes the section's height without a scroll event, and motion's
+    // scroll tracking only re-measures on scroll / resize: nudge it.
+    const pinnedBefore = useRef(pinned);
+    useEffect(() => {
+        if (pinnedBefore.current === pinned) return;
+        pinnedBefore.current = pinned;
+        window.dispatchEvent(new Event("scroll"));
+    }, [pinned]);
 
     // Mapper functions (not range arrays) on purpose: motion would otherwise try
     // to hand opacity to a native ScrollTimeline, whose range does not match
@@ -91,7 +140,8 @@ export default function Hero() {
     const copyPointer = useTransform(scrollYProgress, (v) => (v > 0.3 ? "none" : "auto"));
     const cueOpacity = useTransform(scrollYProgress, map([0, 0.08], [1, 0]));
     const stageScale = useTransform(scrollYProgress, map([0.7, 1], [1, 0.9]));
-    const stageRadius = useTransform(scrollYProgress, map([0.7, 1], [0, 40]));
+    // Ends as a card with the panel radius (DESIGN.md: 28px).
+    const stageRadius = useTransform(scrollYProgress, map([0.7, 1], [0, 28]));
 
     const initial = reduce ? false : "hidden";
 
@@ -114,21 +164,23 @@ export default function Hero() {
                 ref={ref}
                 aria-label="Introduction"
                 style={{ marginTop: -navH }}
-                className={`relative ${reduce ? "" : "h-[170svh] sm:h-[200svh]"}`}
+                className={`relative ${pinned ? "h-[170svh] sm:h-[200svh]" : ""}`}
             >
                 <MDiv
+                    ref={stageRef}
                     data-nav-theme="dark"
                     className="sticky top-0 isolate flex min-h-[100svh] items-center overflow-hidden text-ondark"
-                    style={reduce ? { backgroundColor: STAGE } : { backgroundColor: STAGE, scale: stageScale, borderRadius: stageRadius }}
+                    style={pinned ? { backgroundColor: STAGE, scale: stageScale, borderRadius: stageRadius } : { backgroundColor: STAGE, scale: 1, borderRadius: 0 }}
                 >
-                    <HeroBackdrop watchRef={ref} progress={scrollYProgress} reduced={!!reduce} />
+                    <HeroBackdrop watchRef={ref} progress={pinned ? scrollYProgress : undefined} reduced={!!reduce} />
 
                     <MDiv
+                        ref={copyRef}
                         className="hero-copy container-page relative z-10 origin-center"
-                        style={reduce ? undefined : { scale: copyScale, y: copyY, opacity: copyOpacity, filter: copyFilter, pointerEvents: copyPointer }}
+                        style={pinned ? { scale: copyScale, y: copyY, opacity: copyOpacity, filter: copyFilter, pointerEvents: copyPointer } : UNPINNED_COPY}
                         // Keyboard users tabbing into the copy mid-flight: bring it back into view.
                         onFocusCapture={() => {
-                            if (reduce || scrollYProgress.get() < 0.08 || !ref.current) return;
+                            if (!pinned || scrollYProgress.get() < 0.08 || !ref.current) return;
                             window.scrollTo({ top: ref.current.getBoundingClientRect().top + window.scrollY, behavior: "auto" });
                         }}
                     >
@@ -211,7 +263,7 @@ export default function Hero() {
                         </MDiv>
                     </MDiv>
 
-                    {!reduce && (
+                    {pinned && (
                         <MDiv
                             aria-hidden="true"
                             className="hero-cue pointer-events-none absolute inset-x-0 bottom-6 z-10 flex-col items-center"

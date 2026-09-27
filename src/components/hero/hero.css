@@ -12,7 +12,7 @@
     --hero-s: 1rem;
     --hero-m: 1.5rem;
     --hero-l: 2rem;
-    padding-top: 5.5rem;
+    padding-top: 4.75rem; /* the 57px nav + ~20px */
     padding-bottom: 1.5rem;
 }
 @media (min-width: 640px) {

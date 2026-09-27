@@ -7,14 +7,17 @@
  * - Rendering pauses when the hero is offscreen or the tab is hidden. */
 import { Component, lazy, Suspense, useEffect, useState } from "react";
 import { css, EASE } from "../../lib/motion";
+import { COLORS } from "../../lib/palette";
+import { rgba } from "./color";
 
 const HeroScene = lazy(() => import("./HeroScene"));
 
+// Stage lighting, kept low so the headline owns the room: one soft blue pool
+// behind the copy, a faint violet accent low on the right, and a wash from above.
 const STAGE_GLOW = [
-    "radial-gradient(55% 45% at 50% 42%, rgba(47,107,255,0.20), transparent 72%)",
-    "radial-gradient(38% 42% at 78% 70%, rgba(124,92,255,0.18), transparent 70%)",
-    "radial-gradient(34% 38% at 20% 74%, rgba(34,211,238,0.09), transparent 70%)",
-    "radial-gradient(120% 90% at 50% 0%, rgba(47,107,255,0.06), transparent 60%)",
+    `radial-gradient(58% 48% at 50% 40%, ${rgba(COLORS.blue, 0.12)}, transparent 72%)`,
+    `radial-gradient(36% 40% at 80% 76%, ${rgba(COLORS.violet, 0.09)}, transparent 70%)`,
+    `radial-gradient(120% 80% at 50% 0%, ${rgba(COLORS.blue, 0.05)}, transparent 60%)`,
 ].join(",");
 
 function hasWebGL() {
