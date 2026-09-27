@@ -2,7 +2,7 @@
 /* Design tokens. See DESIGN.md at the repo root for the rules behind them:
  * one family, one ink, one accent that means "clickable", flat surfaces. */
 export default {
-    content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+    content: { relative: true, files: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"] },
     theme: {
         extend: {
             colors: {
