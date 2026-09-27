@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { animate, motion as Motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import UnitViz from "./viz/UnitViz";
 import useMediaQuery, { FINE_POINTER } from "./fx/useMediaQuery";
-import { GLOW } from "./viz/palette";
+import { COLORS } from "../lib/palette";
 
-/* Horizontal curved-arc coverflow on the dark stage: the active card faces you,
- * lifted and glowing; neighbors rotate on the Y-axis, recede in Z, dip along an
- * arc and soften with distance. Everything hangs off one spring-driven motion
- * value (`pos`, a fractional card index), so dragging, momentum, snapping,
- * arrows, dots and keys all move the same physical system.
+/* Horizontal curved-arc coverflow on the dark stage: the active card faces you
+ * and lifts; neighbors rotate on the Y-axis, recede in Z, dip along an arc and
+ * soften with distance. Everything hangs off one spring-driven motion value
+ * (`pos`, a fractional card index), so dragging, momentum, snapping, arrows,
+ * dots and keys all move the same physical system.
+ * Cards are dark surfaces (DESIGN.md card-dark): stage-1 with a hairline and a
+ * light top edge; the card facing you lifts to stage-2 with an accent hairline.
  * Drag left/right (flick for momentum), click the left/right side to step,
  * arrows/dots, or the keyboard. Each unit carries its own live mini-chart. */
 
@@ -29,7 +31,12 @@ const LIFT = 10;    // px the active card rises
 const SNAP = { type: "spring", stiffness: 190, damping: 27, mass: 1 };
 const DOT = 22;     // px between indicator dots
 
-function Card({ u, i, n, pos, spread, tiltX, tiltY, active, play, soften }) {
+// The facing card: a light top edge plus an accent hairline in place of the border.
+const LIFTED = `inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 0 1px ${COLORS.accentDark}73`;
+const RING = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accentdark";
+const ICON_BTN = `flex h-11 w-11 items-center justify-center rounded-full border border-stageline bg-stage1 text-ondark transition-[background-color,border-color,transform] duration-200 hover:border-white/15 hover:bg-stage2 motion-safe:active:scale-[0.96] disabled:pointer-events-none disabled:opacity-30 ${RING}`;
+
+function Card({ u, i, n, id, pos, spread, tiltX, tiltY, active, play, soften }) {
     const o = useTransform(pos, (p) => i - p);
     const ao = useTransform(o, (v) => Math.abs(v));
     const near = useTransform(ao, (a) => Math.max(0, 1 - a * 1.6)); // 1 = dead center
@@ -47,37 +54,53 @@ function Card({ u, i, n, pos, spread, tiltX, tiltY, active, play, soften }) {
 
     return (
         <Motion.div
+            id={id}
             className="absolute left-1/2 top-1/2 w-[min(80vw,19rem)]"
             style={{ x, y, z, rotateX, rotateY, scale, opacity, zIndex, filter, pointerEvents: "none" }}
             transformTemplate={(_, t) => `translate(-50%, -50%) ${t}`}
             role="option"
             aria-selected={active}
         >
-            {/* glow behind the active card */}
-            <Motion.div aria-hidden="true" className="absolute -inset-6 rounded-[2.25rem]"
-                style={{ opacity: near, background: `radial-gradient(60% 55% at 50% 45%, ${GLOW.violet}55, ${GLOW.blue}22 55%, transparent 75%)` }} />
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0D0F17] text-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
-                {/* luminous hairline + top sheen, fades in as the card centers */}
-                <Motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-2xl"
-                    style={{ opacity: near, boxShadow: `inset 0 0 0 1px ${GLOW.violet}66`, background: `radial-gradient(120% 70% at 50% 0%, ${GLOW.blue}26, transparent 60%)` }} />
-                <div className="relative h-32 border-b border-white/[0.07] bg-white/[0.02] px-3 pb-1.5 pt-3">
-                    <UnitViz k={u.k} play={play} />
-                </div>
-                <Motion.div className="relative px-6 py-5" style={{ opacity: dimText }}>
-                    <div className="flex items-center justify-between">
-                        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white/45">Weeks {u.r}</span>
-                        <span className="font-mono text-[11px] text-white/40">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</span>
+            {/* keyboard focus on the deck shows on the card that faces you */}
+            {active && (
+                <span aria-hidden="true" className="pointer-events-none absolute -inset-[5px] rounded-[25px] border-2 border-accentdark opacity-0 group-focus-visible:opacity-100" />
+            )}
+            <div className="relative rounded-card border border-stageline bg-stage1 text-ondark shadow-edge">
+                {/* lift to stage-2 with an accent hairline as the card centers */}
+                <Motion.div aria-hidden="true" className="pointer-events-none absolute -inset-px rounded-card bg-stage2"
+                    style={{ opacity: near, boxShadow: LIFTED }} />
+                <div className="relative p-2">
+                    <div className="h-32 overflow-hidden rounded-xl border border-stageline bg-stage px-3 pb-1.5 pt-3">
+                        <UnitViz k={u.k} play={play} />
                     </div>
-                    <h3 className="display mt-3 text-xl font-bold tracking-tight">{u.t}</h3>
-                    <p className="mt-1.5 text-[15px] text-white/65">{u.s}</p>
+                </div>
+                <Motion.div className="relative px-6 pb-6 pt-3" style={{ opacity: dimText }}>
+                    <div className="flex items-center justify-between gap-4">
+                        <span className="eyebrow text-ondarkmuted">Weeks {u.r}</span>
+                        <span aria-hidden="true" className="eyebrow tabular-nums text-ondarkmuted/70">
+                            {String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
+                        </span>
+                    </div>
+                    <h3 className="mt-4 font-display text-title text-ondark">{u.t}</h3>
+                    <p className="mt-1.5 text-body-sm text-ondarkmuted">{u.s}</p>
                 </Motion.div>
             </div>
         </Motion.div>
     );
 }
 
+function Chevron({ d }) {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d={d} />
+        </svg>
+    );
+}
+
 export default function Curriculum() {
     const n = UNITS.length;
+    const uid = useId();
+    const optionId = (i) => `${uid}-unit-${i}`;
     const reduced = useReducedMotion();
     const soften = useMediaQuery("(min-width: 768px)") && !reduced;
     const [active, setActive] = useState(0);
@@ -163,54 +186,48 @@ export default function Curriculum() {
     };
 
     return (
-        <div className="mt-12 flex flex-col items-center">
-            <div className="relative w-full">
-                {/* floor glow under the active card */}
-                <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[88%] h-24 w-[min(90vw,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-[50%]"
-                    style={{ background: `radial-gradient(50% 50% at 50% 50%, ${GLOW.blue}40, ${GLOW.violet}18 50%, transparent 72%)` }} />
-                <div
-                    ref={stageRef}
-                    className="focusable relative w-full cursor-grab select-none overflow-hidden active:cursor-grabbing"
-                    style={{ height: 390, perspective: "1500px", touchAction: "pan-y", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)" }}
-                    onPointerDown={onDown}
-                    onPointerMove={onMove}
-                    onPointerUp={(e) => release(e, false)}
-                    onPointerCancel={(e) => release(e, true)}
-                    onPointerLeave={onHoverEnd}
-                    onLostPointerCapture={(e) => release(e, true)}
-                    onKeyDown={onKey}
-                    tabIndex={0}
-                    role="listbox"
-                    aria-label="Curriculum units"
-                >
-                    <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
-                        {UNITS.map((u, i) => (
-                            <Card key={u.k} u={u} i={i} n={n} pos={pos} spread={spread} tiltX={tiltX} tiltY={tiltY} active={i === active}
-                                play={i === active && inView && !reduced} soften={soften} />
-                        ))}
-                    </div>
+        <div className="mt-14 flex flex-col items-center sm:mt-16">
+            <div
+                ref={stageRef}
+                className="group relative w-full cursor-grab select-none overflow-hidden outline-none active:cursor-grabbing"
+                style={{ height: 390, perspective: "1500px", touchAction: "pan-y", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)" }}
+                onPointerDown={onDown}
+                onPointerMove={onMove}
+                onPointerUp={(e) => release(e, false)}
+                onPointerCancel={(e) => release(e, true)}
+                onPointerLeave={onHoverEnd}
+                onLostPointerCapture={(e) => release(e, true)}
+                onKeyDown={onKey}
+                tabIndex={0}
+                role="listbox"
+                aria-label="Curriculum units"
+                aria-activedescendant={optionId(active)}
+            >
+                <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+                    {UNITS.map((u, i) => (
+                        <Card key={u.k} u={u} i={i} n={n} id={optionId(i)} pos={pos} spread={spread} tiltX={tiltX} tiltY={tiltY} active={i === active}
+                            play={i === active && inView && !reduced} soften={soften} />
+                    ))}
                 </div>
             </div>
 
             {/* Controls */}
-            <div className="mt-6 flex items-center gap-5">
-                <button onClick={() => go(-1)} disabled={active === 0} aria-label="Previous unit"
-                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:border-white/40 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+            <div className="mt-8 flex items-center gap-4">
+                <button type="button" onClick={() => go(-1)} disabled={active === 0} aria-label="Previous unit" className={ICON_BTN}>
+                    <Chevron d="m15 18-6-6 6-6" />
                 </button>
                 <div className="relative flex items-center">
-                    <Motion.span aria-hidden="true" className="pointer-events-none absolute left-0 top-1/2 -mt-[3px] h-1.5 w-5 rounded-full"
-                        style={{ x: dotX, scaleX: dotStretch, background: `linear-gradient(90deg, ${GLOW.blue}, ${GLOW.violet}, ${GLOW.cyan})`, boxShadow: `0 0 12px ${GLOW.violet}99`, marginLeft: 1 }} />
+                    <Motion.span aria-hidden="true" className="pointer-events-none absolute left-0 top-1/2 -mt-[3px] ml-px h-1.5 w-5 rounded-full bg-accentdark"
+                        style={{ x: dotX, scaleX: dotStretch }} />
                     {UNITS.map((u, i) => (
-                        <button key={i} onClick={() => settle(i)} aria-label={`Unit ${i + 1}`} aria-current={i === active ? "true" : undefined}
-                            className="focusable group flex h-6 items-center justify-center" style={{ width: DOT }}>
-                            <span className="block h-1.5 w-1.5 rounded-full bg-white/20 transition-colors group-hover:bg-white/45" />
+                        <button key={u.k} type="button" onClick={() => settle(i)} aria-label={`Unit ${i + 1}`} aria-current={i === active ? "true" : undefined}
+                            className={`group/dot flex h-11 items-center justify-center rounded-full ${RING}`} style={{ width: DOT }}>
+                            <span className="block h-1.5 w-1.5 rounded-full bg-white/25 transition-colors group-hover/dot:bg-white/50" />
                         </button>
                     ))}
                 </div>
-                <button onClick={() => go(1)} disabled={active === n - 1} aria-label="Next unit"
-                    className="focusable flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:border-white/40 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                <button type="button" onClick={() => go(1)} disabled={active === n - 1} aria-label="Next unit" className={ICON_BTN}>
+                    <Chevron d="m9 18 6-6-6-6" />
                 </button>
             </div>
         </div>

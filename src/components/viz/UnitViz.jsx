@@ -1,11 +1,13 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { animate, motion as Motion, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
 import { EASE } from "../../lib/motion";
-import { GLOW } from "./palette";
+import { COLORS } from "../../lib/palette";
+import { SERIES } from "./palette";
 
-/* Six mini-charts, one per curriculum unit, styled like a live analytics panel
- * on the dark stage: hairline axes, gridlines that fade in, mono tick labels
- * whose numbers tick up, and luminous blue -> violet -> cyan marks with glow.
+/* Six mini-charts, one per curriculum unit, drawn like a quiet analytics panel
+ * on the dark stage: hairline axes, gridlines that draw in, mono tick labels
+ * whose numbers tick up, and crisp marks in the spotlight family (blue is the
+ * primary series, violet and cyan the secondary ones). No glow filters.
  * `play` = this card is active and on screen (and motion is allowed). When it
  * flips on, the chart remounts and draws itself in, then settles into a quiet
  * live loop. When off, every chart renders its complete, static final state. */
@@ -13,9 +15,11 @@ import { GLOW } from "./palette";
 // Plot box inside the 264 x 96 viewBox.
 const W = 264, H = 96;
 const X0 = 26, X1 = 254, Y0 = 8, Y1 = 78;
-const MONO = "'JetBrains Mono', ui-monospace, monospace";
-const DIM = "rgba(255,255,255,0.34)";
-const CARD = "#0D0F17";
+const MONO = "'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace";
+const { blue: BLUE, violet: VIOLET, cyan: CYAN } = SERIES;
+const DIM = "rgba(255,255,255,0.3)";
+const WELL = COLORS.stage; // the chart well behind the marks; hollow marks are cut out of it
+const HAIR = 0.6;          // axis / tick stroke width
 
 // Tiny seeded PRNG so the "data" is identical on every render.
 function rng(seed) {
@@ -43,7 +47,7 @@ function smooth(pts) {
     return d;
 }
 
-const label = (extra = {}) => ({ fontFamily: MONO, fontSize: 7, fill: "#fff", fillOpacity: 0.42, letterSpacing: "0.04em", ...extra });
+const label = (extra = {}) => ({ fontFamily: MONO, fontSize: 7, fill: "#fff", fillOpacity: 0.45, letterSpacing: "0.04em", ...extra });
 const fadeIn = (play, delay = 0, duration = 0.6) => (play ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration, ease: EASE.out, delay } } : {});
 const pop = (play, delay = 0) => (play ? { initial: { opacity: 0, scale: 0 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.5, ease: EASE.out, delay } } : {});
 const draw = (play, delay = 0, duration = 1.4, ease = EASE.inOut) => (play ? { initial: { pathLength: 0, opacity: 0 }, animate: { pathLength: 1, opacity: 1 }, transition: { duration, ease, delay, opacity: { duration: 0.15, delay } } } : {});
@@ -59,25 +63,25 @@ function Count({ play, from = 0, to, fmt, delay = 0.4, duration = 1.4, ...rest }
     return <text ref={ref} {...rest}>{fmt(play ? from : to)}</text>;
 }
 
-/* Shared chart frame: gridlines fading in one by one, axes that draw, ticks. */
+/* Shared chart frame: gridlines drawing in one by one, axes that draw, ticks. */
 function Frame({ play, xl = [], yl = [], grid = [Y0 + 4, (Y0 + Y1) / 2] }) {
     return (
         <g>
             {grid.map((y, i) => (
-                <Motion.line key={y} x1={X0} x2={X1} y1={y} y2={y} stroke="#fff" strokeOpacity="0.1" strokeWidth="0.6" strokeDasharray="1.5 3"
+                <Motion.line key={y} x1={X0} x2={X1} y1={y} y2={y} stroke="#fff" strokeOpacity="0.08" strokeWidth="0.5" strokeDasharray="1.5 3"
                     {...draw(play, 0.15 + i * 0.12, 0.9, EASE.out)} />
             ))}
-            <Motion.path d={`M${X0},${Y0} V${Y1} H${X1}`} fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="0.8" {...draw(play, 0, 0.8, EASE.out)} />
+            <Motion.path d={`M${X0},${Y0} V${Y1} H${X1}`} fill="none" stroke="#fff" strokeOpacity="0.22" strokeWidth={HAIR} {...draw(play, 0, 0.8, EASE.out)} />
             <Motion.g {...fadeIn(play, 0.3)}>
                 {xl.map(([x, s]) => (
                     <g key={x}>
-                        <line x1={x} x2={x} y1={Y1} y2={Y1 + 2.5} stroke="#fff" strokeOpacity="0.28" strokeWidth="0.8" />
+                        <line x1={x} x2={x} y1={Y1} y2={Y1 + 2.5} stroke="#fff" strokeOpacity="0.22" strokeWidth={HAIR} />
                         <text x={x} y={H - 5} textAnchor="middle" style={label()}>{s}</text>
                     </g>
                 ))}
                 {yl.map(([y, s, num]) => (
                     <g key={y}>
-                        <line x1={X0 - 2.5} x2={X0} y1={y} y2={y} stroke="#fff" strokeOpacity="0.28" strokeWidth="0.8" />
+                        <line x1={X0 - 2.5} x2={X0} y1={y} y2={y} stroke="#fff" strokeOpacity="0.22" strokeWidth={HAIR} />
                         {num !== undefined
                             ? <Count play={play} to={num} fmt={s} x={X0 - 5} y={y + 2.4} textAnchor="end" style={label()} />
                             : <text x={X0 - 5} y={y + 2.4} textAnchor="end" style={label()}>{s}</text>}
@@ -91,13 +95,13 @@ function Frame({ play, xl = [], yl = [], grid = [Y0 + 4, (Y0 + Y1) / 2] }) {
 function Readout({ play, children, x = X0 + 6, anchor = "start" }) {
     return (
         <Motion.g {...fadeIn(play, 0.5)}>
-            <text x={x} y={Y0 + 7} textAnchor={anchor} style={label({ fillOpacity: 0.75 })}>{children}</text>
+            <text x={x} y={Y0 + 7} textAnchor={anchor} style={label({ fillOpacity: 0.8 })}>{children}</text>
         </Motion.g>
     );
 }
 
 /* ---------- 01 data: points arrive scattered, then settle into clusters ---------- */
-const CLU = [GLOW.blue, GLOW.violet, GLOW.cyan];
+const CLU = [BLUE, VIOLET, CYAN];
 const DATA = (() => {
     const r = rng(7);
     const centers = [[78, 54], [150, 30], [214, 58]];
@@ -114,7 +118,7 @@ const DATA = (() => {
     return { centers, pts };
 })();
 
-function DataViz({ play, ids }) {
+function DataViz({ play }) {
     const cyc = { duration: 7, times: [0, 0.3, 0.8, 1], ease: "easeInOut", repeat: Infinity, delay: 0.9 };
     return (
         <>
@@ -129,21 +133,19 @@ function DataViz({ play, ids }) {
                     animate={play ? { opacity: [0, 0, 1, 1, 0] } : { opacity: 1 }}
                     transition={play ? { ...cyc, times: [0, 0.24, 0.34, 0.76, 0.84] } : undefined}
                 >
-                    <circle cx={c[0]} cy={c[1]} r="17" fill={CLU[k]} fillOpacity="0.08" stroke={CLU[k]} strokeOpacity="0.6" strokeWidth="0.7" strokeDasharray="2 2.5" />
-                    <path d={`M${c[0] - 3},${c[1]} h6 M${c[0]},${c[1] - 3} v6`} stroke={CLU[k]} strokeWidth="1" />
+                    <circle cx={c[0]} cy={c[1]} r="17" fill={CLU[k]} fillOpacity="0.06" stroke={CLU[k]} strokeOpacity="0.5" strokeWidth="0.6" strokeDasharray="2 2.5" />
+                    <path d={`M${c[0] - 3},${c[1]} h6 M${c[0]},${c[1] - 3} v6`} stroke={CLU[k]} strokeWidth="0.8" />
                 </Motion.g>
             ))}
-            <g filter={ids.glow}>
-                {DATA.pts.map((p, i) => (
-                    <Motion.circle key={i} cx={p.x} cy={p.y} r="2.4"
-                        initial={play ? { opacity: 0, x: p.sx - p.x, y: p.sy - p.y, fill: DIM } : false}
-                        animate={play
-                            ? { opacity: 1, x: [p.sx - p.x, 0, 0, p.sx - p.x], y: [p.sy - p.y, 0, 0, p.sy - p.y], fill: [DIM, CLU[p.k], CLU[p.k], DIM] }
-                            : { opacity: 1, x: 0, y: 0, fill: CLU[p.k] }}
-                        transition={play ? { ...cyc, opacity: { duration: 0.5, delay: 0.15 + i * 0.025 } } : undefined}
-                    />
-                ))}
-            </g>
+            {DATA.pts.map((p, i) => (
+                <Motion.circle key={i} cx={p.x} cy={p.y} r="2.2"
+                    initial={play ? { opacity: 0, x: p.sx - p.x, y: p.sy - p.y, fill: DIM } : false}
+                    animate={play
+                        ? { opacity: 1, x: [p.sx - p.x, 0, 0, p.sx - p.x], y: [p.sy - p.y, 0, 0, p.sy - p.y], fill: [DIM, CLU[p.k], CLU[p.k], DIM] }
+                        : { opacity: 1, x: 0, y: 0, fill: CLU[p.k] }}
+                    transition={play ? { ...cyc, opacity: { duration: 0.5, delay: 0.15 + i * 0.025 } } : undefined}
+                />
+            ))}
         </>
     );
 }
@@ -168,14 +170,14 @@ const acc = (deg) => CLS.filter((p) => side(p, deg) === p.a).length / CLS.length
 const START = -26;
 
 function ClassPoint({ p, angle, i, play }) {
-    const fill = useTransform(angle, (a) => (side(p, a) ? GLOW.violet : GLOW.cyan));
+    const fill = useTransform(angle, (a) => (side(p, a) ? VIOLET : CYAN));
     const enter = pop(play, 0.1 + i * 0.02);
     return p.a
-        ? <Motion.circle cx={p.x} cy={p.y} r="2.4" style={{ fill }} {...enter} />
-        : <Motion.rect x={p.x - 2.2} y={p.y - 2.2} width="4.4" height="4.4" rx="0.8" style={{ fill }} {...enter} />;
+        ? <Motion.circle cx={p.x} cy={p.y} r="2.2" style={{ fill }} {...enter} />
+        : <Motion.rect x={p.x - 2} y={p.y - 2} width="4" height="4" rx="0.8" style={{ fill }} {...enter} />;
 }
 
-function ClassifyViz({ play, ids }) {
+function ClassifyViz({ play }) {
     const clip = sid(useId());
     const angle = useMotionValue(play ? START : FINAL);
     const txt = useRef(null);
@@ -195,17 +197,15 @@ function ClassifyViz({ play, ids }) {
                 <g transform={`translate(${PIV[0]} ${PIV[1]})`}>
                     <Motion.g style={{ rotate: angle }} {...fadeIn(play, 0.6, 0.5)}>
                         <rect x="-300" y="-300" width="600" height="600" fill="none" />
-                        <rect x="-300" y="-300" width="600" height="300" fill={GLOW.cyan} fillOpacity="0.07" />
-                        <rect x="-300" y="0" width="600" height="300" fill={GLOW.violet} fillOpacity="0.06" />
-                        <line x1="-300" x2="300" y1="-7" y2="-7" stroke="#fff" strokeOpacity="0.22" strokeWidth="0.6" strokeDasharray="2 2.5" />
-                        <line x1="-300" x2="300" y1="7" y2="7" stroke="#fff" strokeOpacity="0.22" strokeWidth="0.6" strokeDasharray="2 2.5" />
-                        <line x1="-300" x2="300" y1="0" y2="0" stroke={GLOW.blue} strokeWidth="1.4" filter={ids.glow} />
+                        <rect x="-300" y="-300" width="600" height="300" fill={CYAN} fillOpacity="0.05" />
+                        <rect x="-300" y="0" width="600" height="300" fill={VIOLET} fillOpacity="0.06" />
+                        <line x1="-300" x2="300" y1="-7" y2="-7" stroke="#fff" strokeOpacity="0.16" strokeWidth="0.5" strokeDasharray="2 2.5" />
+                        <line x1="-300" x2="300" y1="7" y2="7" stroke="#fff" strokeOpacity="0.16" strokeWidth="0.5" strokeDasharray="2 2.5" />
+                        <line x1="-300" x2="300" y1="0" y2="0" stroke={BLUE} strokeWidth="1.2" />
                     </Motion.g>
                 </g>
             </g>
-            <g filter={ids.glow}>
-                {CLS.map((p, i) => <ClassPoint key={i} p={p} i={i} angle={angle} play={play} />)}
-            </g>
+            {CLS.map((p, i) => <ClassPoint key={i} p={p} i={i} angle={angle} play={play} />)}
             <Readout play={play}><tspan ref={txt}>{`acc ${acc(play ? START : FINAL).toFixed(2)}`}</tspan></Readout>
         </>
     );
@@ -224,7 +224,7 @@ const FIT = (() => {
 const fmt2 = (v) => v.toFixed(2);
 const fmt1 = (v) => v.toFixed(1);
 
-function FitViz({ play, ids }) {
+function FitViz({ play }) {
     const tx = useMotionValue(X0 + 10);
     const ty = useTransform(tx, f);
     useEffect(() => {
@@ -237,23 +237,23 @@ function FitViz({ play, ids }) {
         <>
             <Frame play={play} xl={[[X0 + 4, "0"], [(X0 + X1) / 2, "x"], [X1 - 4, "1"]]} yl={[[Y0 + 4, fmt1, 1], [(Y0 + Y1) / 2, fmt1, 0.5]]} />
             <Motion.g {...fadeIn(play, 0.5)}>
-                <text x={X0 + 6} y={Y0 + 7} style={label({ fillOpacity: 0.75 })}>R²</text>
-                <Count play={play} to={0.96} fmt={fmt2} delay={CURVE_D} duration={CURVE_T + 0.4} x={X0 + 18} y={Y0 + 7} style={label({ fillOpacity: 0.75 })} />
+                <text x={X0 + 6} y={Y0 + 7} style={label({ fillOpacity: 0.8 })}>R²</text>
+                <Count play={play} to={0.96} fmt={fmt2} delay={CURVE_D} duration={CURVE_T + 0.4} x={X0 + 18} y={Y0 + 7} style={label({ fillOpacity: 0.8 })} />
             </Motion.g>
             {FIT.pts.map(([x, y], i) => (
-                <Motion.line key={`r${i}`} x1={x} x2={x} y1={y} y2={f(x)} stroke="#fff" strokeOpacity="0.45" strokeWidth="0.7"
+                <Motion.line key={`r${i}`} x1={x} x2={x} y1={y} y2={f(x)} stroke="#fff" strokeOpacity="0.3" strokeWidth="0.6"
                     {...(play ? { initial: { opacity: 0, scaleY: 0 }, animate: { opacity: 1, scaleY: 1 }, style: { originY: y < f(x) ? 0 : 1 }, transition: { duration: 0.5, ease: EASE.out, delay: CURVE_D + ((x - X0) / (X1 - X0)) * CURVE_T + 0.1 } } : {})} />
             ))}
-            <Motion.path d={FIT.d} fill="none" stroke={ids.grad} strokeWidth="1.8" strokeLinecap="round" filter={ids.glow} {...draw(play, CURVE_D, CURVE_T)} />
+            <Motion.path d={FIT.d} fill="none" stroke={BLUE} strokeWidth="1.4" strokeLinecap="round" {...draw(play, CURVE_D, CURVE_T)} />
             {FIT.pts.map(([x, y], i) => (
-                <Motion.circle key={`p${i}`} cx={x} cy={y} r="2.3" fill="#fff" fillOpacity="0.9" {...pop(play, 0.25 + i * 0.05)} />
+                <Motion.circle key={`p${i}`} cx={x} cy={y} r="2.1" fill="#fff" fillOpacity="0.9" {...pop(play, 0.25 + i * 0.05)} />
             ))}
             {play && (
                 <Motion.g style={{ x: tx }} {...fadeIn(true, 2.8)}>
-                    <line x1="0" x2="0" y1={Y0} y2={Y1} stroke={GLOW.cyan} strokeOpacity="0.45" strokeWidth="0.6" strokeDasharray="1.5 2" />
+                    <line x1="0" x2="0" y1={Y0} y2={Y1} stroke={CYAN} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="1.5 2" />
                     <Motion.g style={{ y: ty }}>
-                        <circle r="6" fill={GLOW.cyan} fillOpacity="0.18" />
-                        <circle r="2.6" fill={GLOW.cyan} stroke={CARD} strokeWidth="1.1" />
+                        <circle r="5.5" fill={CYAN} fillOpacity="0.14" />
+                        <circle r="2.4" fill={CYAN} stroke={WELL} strokeWidth="1" />
                     </Motion.g>
                 </Motion.g>
             )}
@@ -267,10 +267,10 @@ const NL = [3, 4, 4, 2].map((n, l) => Array.from({ length: n }, (_, k) => [NX[l]
 const EDGES = [];
 for (let l = 0; l < 3; l++) NL[l].forEach((a) => NL[l + 1].forEach((b) => EDGES.push([a, b])));
 const ROUTES = [[0, 1, 2, 0], [2, 3, 1, 1], [1, 0, 3, 0], [1, 2, 0, 1]].map((r) => r.map((k, l) => NL[l][k]));
-const RC = [GLOW.blue, GLOW.violet, GLOW.cyan, GLOW.blue];
+const RC = [BLUE, VIOLET, CYAN, BLUE];
 const NET_CYCLE = 3.2;
 
-function NetViz({ play, ids }) {
+function NetViz({ play }) {
     const loop = (i, times) => ({ duration: NET_CYCLE, times, ease: "linear", repeat: Infinity, delay: 0.8 + i * (NET_CYCLE / ROUTES.length) });
     return (
         <>
@@ -280,40 +280,39 @@ function NetViz({ play, ids }) {
                 <Count play={play} from={2.3} to={0.08} fmt={fmt2} delay={0.8} duration={3.2} x={X1} y={Y0 + 12} textAnchor="end" style={label({ fillOpacity: 0.85 })} />
             </Motion.g>
             <Motion.g {...fadeIn(play, 0.2, 0.8)}>
-                {EDGES.map(([a, b], i) => <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="#fff" strokeOpacity="0.1" strokeWidth="0.6" />)}
+                {EDGES.map(([a, b], i) => <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="#fff" strokeOpacity="0.08" strokeWidth="0.5" />)}
             </Motion.g>
-            <g filter={ids.glow}>
-                {ROUTES.map((r, ri) => (
-                    <g key={ri}>
-                        {[0, 1, 2].map((s) => (
-                            <Motion.line key={s} x1={r[s][0]} y1={r[s][1]} x2={r[s + 1][0]} y2={r[s + 1][1]} stroke={RC[ri]} strokeWidth="1.1" strokeLinecap="round"
-                                initial={play ? { opacity: 0 } : false}
-                                animate={play ? { opacity: [0, 0, 0.95, 0, 0] } : { opacity: ri < 2 ? 0.7 : 0 }}
-                                transition={play ? loop(ri, [0, 0.25 * s, 0.25 * s + 0.08, 0.25 * (s + 1) + 0.14, 1]) : undefined} />
-                        ))}
-                        {play && r.map((n, s) => (
-                            <Motion.circle key={`g${s}`} cx={n[0]} cy={n[1]} r="7.5" fill={RC[ri]}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: [0, 0, 0.4, 0, 0] }}
-                                transition={loop(ri, [0, Math.max(0, 0.25 * s - 0.02), 0.25 * s + 0.03, 0.25 * s + 0.2, 1])} />
-                        ))}
-                        {play && (
-                            <Motion.circle cx="0" cy="0" r="2.2" fill="#fff"
-                                initial={{ opacity: 0, x: r[0][0], y: r[0][1] }}
-                                animate={{ x: [r[0][0], r[1][0], r[2][0], r[3][0], r[3][0]], y: [r[0][1], r[1][1], r[2][1], r[3][1], r[3][1]], opacity: [0, 1, 1, 1, 0, 0] }}
-                                transition={{
-                                    x: loop(ri, [0, 0.25, 0.5, 0.75, 1]),
-                                    y: loop(ri, [0, 0.25, 0.5, 0.75, 1]),
-                                    opacity: loop(ri, [0, 0.04, 0.5, 0.74, 0.8, 1]),
-                                }} />
-                        )}
-                    </g>
-                ))}
-            </g>
+            {ROUTES.map((r, ri) => (
+                <g key={ri}>
+                    {[0, 1, 2].map((s) => (
+                        <Motion.line key={s} x1={r[s][0]} y1={r[s][1]} x2={r[s + 1][0]} y2={r[s + 1][1]} stroke={RC[ri]} strokeWidth="1" strokeLinecap="round"
+                            initial={play ? { opacity: 0 } : false}
+                            animate={play ? { opacity: [0, 0, 0.95, 0, 0] } : { opacity: ri < 2 ? 0.7 : 0 }}
+                            transition={play ? loop(ri, [0, 0.25 * s, 0.25 * s + 0.08, 0.25 * (s + 1) + 0.14, 1]) : undefined} />
+                    ))}
+                    {/* a thin ring flashes on each node the signal passes */}
+                    {play && r.map((n, s) => (
+                        <Motion.circle key={`g${s}`} cx={n[0]} cy={n[1]} r="6.5" fill="none" stroke={RC[ri]} strokeWidth="0.8"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: [0, 0, 0.8, 0, 0] }}
+                            transition={loop(ri, [0, Math.max(0, 0.25 * s - 0.02), 0.25 * s + 0.03, 0.25 * s + 0.2, 1])} />
+                    ))}
+                    {play && (
+                        <Motion.circle cx="0" cy="0" r="2" fill="#fff"
+                            initial={{ opacity: 0, x: r[0][0], y: r[0][1] }}
+                            animate={{ x: [r[0][0], r[1][0], r[2][0], r[3][0], r[3][0]], y: [r[0][1], r[1][1], r[2][1], r[3][1], r[3][1]], opacity: [0, 1, 1, 1, 0, 0] }}
+                            transition={{
+                                x: loop(ri, [0, 0.25, 0.5, 0.75, 1]),
+                                y: loop(ri, [0, 0.25, 0.5, 0.75, 1]),
+                                opacity: loop(ri, [0, 0.04, 0.5, 0.74, 0.8, 1]),
+                            }} />
+                    )}
+                </g>
+            ))}
             {NL.map((layer, l) => layer.map(([x, y], k) => (
-                <Motion.circle key={`${l}-${k}`} cx={x} cy={y} r={l === 3 ? 4.6 : 4}
-                    fill={l === 3 ? GLOW.cyan : CARD}
-                    stroke={l === 3 ? GLOW.cyan : "#fff"} strokeOpacity={l === 3 ? 1 : 0.5} strokeWidth="1"
+                <Motion.circle key={`${l}-${k}`} cx={x} cy={y} r={l === 3 ? 4.4 : 4}
+                    fill={l === 3 ? BLUE : WELL}
+                    stroke={l === 3 ? BLUE : "#fff"} strokeOpacity={l === 3 ? 1 : 0.45} strokeWidth="0.8"
                     {...pop(play, 0.1 + l * 0.12 + k * 0.03)} />
             )))}
         </>
@@ -334,7 +333,7 @@ const ATTN = [
 const BASE = 58, BAR_H = 44, WMAX = 0.55;
 const hy = (w) => BASE - (w / WMAX) * BAR_H;
 
-function TokensViz({ play, ids }) {
+function TokensViz({ play }) {
     const [q, setQ] = useState(2);
     useEffect(() => {
         if (!play) return;
@@ -350,14 +349,13 @@ function TokensViz({ play, ids }) {
             {TX.map((x, i) => (
                 <Motion.rect key={i} x={x - 6} y={BASE - BAR_H} width="12" height={BAR_H} rx="1.5"
                     style={{ originY: 1 }}
-                    fill={i === hot ? ids.vgrad : DIM}
-                    filter={i === hot ? ids.glow : undefined}
+                    fill={i === hot ? BLUE : "rgba(255,255,255,0.22)"}
                     initial={play ? { scaleY: 0 } : false}
                     animate={{ scaleY: row[i] / WMAX }}
                     transition={{ type: "spring", stiffness: 170, damping: 22, delay: play && q === 2 ? 0.5 + i * 0.06 : 0 }} />
             ))}
-            <line x1={X0} x2={X1} y1={BASE + 0.5} y2={BASE + 0.5} stroke="#fff" strokeOpacity="0.22" strokeWidth="0.6" />
-            <Motion.rect y={BASE + 5} width="32" height="13" rx="3.5" fill={GLOW.blue} fillOpacity="0.2" stroke={GLOW.blue} strokeWidth="0.8"
+            <line x1={X0} x2={X1} y1={BASE + 0.5} y2={BASE + 0.5} stroke="#fff" strokeOpacity="0.2" strokeWidth="0.5" />
+            <Motion.rect y={BASE + 5} width="32" height="13" rx="6.5" fill={BLUE} fillOpacity="0.16" stroke={BLUE} strokeWidth="0.7"
                 initial={false} animate={{ x: TX[q] - 16 }} transition={{ type: "spring", stiffness: 200, damping: 26 }} />
             {TOKENS.map((s, i) => (
                 <text key={i} x={TX[i]} y={BASE + 14.2} textAnchor="middle" style={label({ fontSize: 7.5, fillOpacity: i === q ? 0.95 : 0.5 })}>{s}</text>
@@ -378,7 +376,7 @@ const SHIP = (() => {
     return { pts, d, area: `${d} L${last[0]},${Y1} L${pts[0][0]},${Y1} Z`, last };
 })();
 
-function ShipViz({ play, ids }) {
+function ShipViz({ play }) {
     const gid = sid(useId());
     const LINE_D = 0.5, LINE_T = 1.6;
     const [ex, ey] = SHIP.last;
@@ -386,26 +384,26 @@ function ShipViz({ play, ids }) {
         <>
             <defs>
                 <linearGradient id={`a${gid}`} x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0" stopColor={GLOW.violet} stopOpacity="0.38" />
-                    <stop offset="1" stopColor={GLOW.blue} stopOpacity="0" />
+                    <stop offset="0" stopColor={BLUE} stopOpacity="0.28" />
+                    <stop offset="1" stopColor={BLUE} stopOpacity="0" />
                 </linearGradient>
             </defs>
             <Frame play={play} xl={[[SHIP.pts[0][0], "W1"], [SHIP.pts[5][0], "W6"], [SHIP.pts[11][0], "W12"]]} yl={[]} />
             <Motion.g {...fadeIn(play, 0.5)}>
-                <Count play={play} to={12} fmt={(v) => `${Math.round(v)} / 12 wk`} delay={LINE_D} duration={LINE_T} x={X0 + 6} y={Y0 + 7} style={label({ fillOpacity: 0.75 })} />
+                <Count play={play} to={12} fmt={(v) => `${Math.round(v)} / 12 wk`} delay={LINE_D} duration={LINE_T} x={X0 + 6} y={Y0 + 7} style={label({ fillOpacity: 0.8 })} />
             </Motion.g>
             <Motion.path d={SHIP.area} fill={`url(#a${gid})`} {...fadeIn(play, LINE_D + LINE_T * 0.6, 1)} />
-            <Motion.path d={SHIP.d} fill="none" stroke={ids.grad} strokeWidth="1.8" strokeLinecap="round" filter={ids.glow} {...draw(play, LINE_D, LINE_T)} />
+            <Motion.path d={SHIP.d} fill="none" stroke={BLUE} strokeWidth="1.4" strokeLinecap="round" {...draw(play, LINE_D, LINE_T)} />
             {SHIP.pts.map(([x, y], i) => i % 2 === 1 && i < 11 && (
-                <Motion.circle key={i} cx={x} cy={y} r="1.7" fill={CARD} stroke="#fff" strokeOpacity="0.8" strokeWidth="0.9"
+                <Motion.circle key={i} cx={x} cy={y} r="1.7" fill={WELL} stroke="#fff" strokeOpacity="0.75" strokeWidth="0.8"
                     {...pop(play, LINE_D + (i / 11) * LINE_T)} />
             ))}
             {play && (
-                <Motion.circle cx={ex} cy={ey} r="3" fill="none" stroke={GLOW.cyan} strokeWidth="0.8"
+                <Motion.circle cx={ex} cy={ey} r="3" fill="none" stroke={BLUE} strokeWidth="0.7"
                     initial={{ scale: 1, opacity: 0 }} animate={{ scale: [1, 3.2], opacity: [0.8, 0] }}
                     transition={{ duration: 2.2, ease: "easeOut", repeat: Infinity, delay: LINE_D + LINE_T }} />
             )}
-            <Motion.circle cx={ex} cy={ey} r="3" fill={GLOW.cyan} filter={ids.glow} {...pop(play, LINE_D + LINE_T - 0.1)} />
+            <Motion.circle cx={ex} cy={ey} r="2.8" fill={BLUE} {...pop(play, LINE_D + LINE_T - 0.1)} />
             {/* launch mark */}
             <Motion.g
                 initial={play ? { opacity: 0, x: -10, y: 10 } : false}
@@ -414,12 +412,12 @@ function ShipViz({ play, ids }) {
             >
                 <g transform={`translate(${ex + 10} ${ey - 8}) rotate(45)`}>
                     <Motion.g animate={play ? { y: [0, -1.6, 0] } : { y: 0 }} transition={play ? { duration: 2, ease: "easeInOut", repeat: Infinity, delay: 3 } : undefined}>
-                        <Motion.path d="M-1.3,4.6 L0,9.5 L1.3,4.6 Z" fill={GLOW.cyan} filter={ids.glow} style={{ originY: 0 }}
+                        <Motion.path d="M-1.3,4.6 L0,9.5 L1.3,4.6 Z" fill={CYAN} style={{ originY: 0 }}
                             animate={play ? { scaleY: [1, 0.55, 1] } : { scaleY: 1 }}
                             transition={play ? { duration: 0.35, repeat: Infinity, ease: "easeInOut" } : undefined} />
                         <path d="M0,-7.5 C3.2,-4.5 3.3,1 2.5,4.4 L-2.5,4.4 C-3.3,1 -3.2,-4.5 0,-7.5 Z" fill="#fff" />
-                        <path d="M-2.5,1.2 L-4.8,5.2 L-2.3,4.4 Z M2.5,1.2 L4.8,5.2 L2.3,4.4 Z" fill={GLOW.violet} />
-                        <circle cx="0" cy="-2" r="1.2" fill={GLOW.blue} />
+                        <path d="M-2.5,1.2 L-4.8,5.2 L-2.3,4.4 Z M2.5,1.2 L4.8,5.2 L2.3,4.4 Z" fill={VIOLET} />
+                        <circle cx="0" cy="-2" r="1.2" fill={BLUE} />
                     </Motion.g>
                 </g>
             </Motion.g>
@@ -430,28 +428,11 @@ function ShipViz({ play, ids }) {
 const VIZ = { data: DataViz, classify: ClassifyViz, fit: FitViz, net: NetViz, tokens: TokensViz, ship: ShipViz };
 
 export default function UnitViz({ k, play }) {
-    const u = sid(useId());
-    const ids = { grad: `url(#g${u})`, vgrad: `url(#v${u})`, glow: `url(#f${u})` };
     const Viz = VIZ[k];
     return (
         <svg aria-hidden="true" focusable="false" viewBox={`0 0 ${W} ${H}`} className="h-full w-full overflow-visible">
-            <defs>
-                <linearGradient id={`g${u}`} gradientUnits="userSpaceOnUse" x1={X0} x2={X1} y1="0" y2="0">
-                    <stop offset="0" stopColor={GLOW.blue} />
-                    <stop offset="0.55" stopColor={GLOW.violet} />
-                    <stop offset="1" stopColor={GLOW.cyan} />
-                </linearGradient>
-                <linearGradient id={`v${u}`} x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0" stopColor={GLOW.cyan} />
-                    <stop offset="1" stopColor={GLOW.violet} />
-                </linearGradient>
-                <filter id={`f${u}`} filterUnits="userSpaceOnUse" x="-10" y="-10" width={W + 20} height={H + 20}>
-                    <feGaussianBlur stdDeviation="2.2" result="b" />
-                    <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-                </filter>
-            </defs>
             {/* remount on play so the chart re-draws each time its card lands */}
-            <g key={play ? "play" : "still"}><Viz play={play} ids={ids} /></g>
+            <g key={play ? "play" : "still"}><Viz play={play} /></g>
         </svg>
     );
 }
