@@ -247,7 +247,7 @@ export default function Hero() {
                             <MP variants={rise} className="mt-[var(--hero-s)] text-body text-ondarkmuted">
                                 Students learn to{" "}
                                 <Typewriter
-                                    className="block font-display font-semibold text-ondark sm:inline [&>[aria-hidden]]:text-accentdark"
+                                    className="block font-display font-semibold text-ondark sm:inline"
                                     words={["train their first model", "question the tools they use", "explain how an LLM works", "spot AI bias", "build a working classifier", "solve a real-world problem"]}
                                 />
                             </MP>
