@@ -2,174 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Visual system: see DESIGN.md. Fonts are self-hosted (src/main.jsx):
- * Geist (display), Inter (body), Geist Mono (labels and numbers). */
+/* Visual system: see DESIGN.md. One typeface (Geist, self-hosted), one
+ * background, one text color, one secondary text color, one hairline. */
 
 :root {
-    color-scheme: light;
+    color-scheme: dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrolling is driven by Lenis (src/components/chrome/SmoothScroll.jsx).
- * CSS smooth scrolling is only a fallback for when Lenis isn't running, and
- * never for people who prefer reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
-    html:not(.lenis) { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; }
 }
-html.lenis, html.lenis body { height: auto; }
-.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
-.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-smooth iframe { pointer-events: none; }
-
-/* Anchor targets receive focus after a jump; no ring on the whole section. */
-[tabindex="-1"]:focus { outline: none; }
 
 body {
     margin: 0;
     min-width: 320px;
-    min-height: 100vh;
-    font-family: "Inter Variable", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Geist Variable", Geist, system-ui, -apple-system, sans-serif;
     font-size: 17px;
-    line-height: 1.5;
+    line-height: 1.55;
     letter-spacing: -0.01em;
-    color: #1D1D1F;
-    background-color: #FFFFFF;
-    -webkit-tap-highlight-color: transparent;
+    color: #F7F8F8;
+    background-color: #08090A;
 }
 
-::selection { background: #0071E3; color: #fff; }
+::selection { background: #F7F8F8; color: #08090A; }
 
-section[id] { scroll-margin-top: 5.5rem; }
+section[id] { scroll-margin-top: 4rem; }
 
 @layer components {
-    /* Containers and section rhythm (DESIGN.md §5) */
-    .container-page { @apply mx-auto w-full max-w-page px-6 sm:px-8 lg:px-10; }
-    .container-narrow { @apply mx-auto w-full max-w-reading px-6 sm:px-8 lg:px-10; }
-    .section-y { padding-block: clamp(5.5rem, 3.5rem + 7vw, 10rem); }
+    /* 12-column grid inside 80px side margins on desktop (24px on phones). */
+    .page { @apply mx-auto w-full max-w-page px-6 md:px-12 lg:px-20; }
+    .grid12 { @apply grid grid-cols-12 gap-x-6; }
 
-    /* Headline face: Geist, tracked tight. Size comes from the text-display-* tokens. */
-    .display { font-family: "Geist Variable", Geist, "Inter Variable", system-ui, sans-serif; letter-spacing: -0.035em; }
-
-    /* Mono kicker: section labels, card kickers, counters */
-    .eyebrow {
-        @apply font-mono text-[12px] font-medium uppercase leading-none tracking-[0.08em] text-faint;
-    }
-
-    /* Buttons: pills, 44px tall, press to 0.96 (DESIGN.md §4). */
+    /* Buttons: 6px radius, flat. Primary is the light fill; secondary is text. */
     .btn {
-        @apply relative inline-flex min-h-[44px] select-none items-center justify-center gap-2 whitespace-nowrap rounded-full px-[22px] text-[15px] font-medium leading-none tracking-[-0.01em];
-        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+        @apply inline-flex h-10 items-center justify-center rounded-md px-4 text-small font-medium transition-colors duration-150;
     }
-    .btn:active { transform: scale(0.96); }
-    .btn:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; }
-    .btn-accent { @apply btn bg-accent text-white hover:bg-accentdk; }
-    .btn-ghost { @apply btn border border-linestrong bg-transparent text-ink hover:bg-black/[0.04]; }
-    .btn-light { @apply btn bg-white text-black hover:bg-[#E8E8ED]; }
-    .btn-dark { @apply btn border border-white/[0.14] bg-white/[0.08] text-ondark hover:bg-white/[0.14]; }
-    /* Compact pill for dense desktop chrome (the nav CTA): 36px tall, 14px.
-     * Combine with a variant: class="btn-accent btn-sm". Touch layouts keep 44px. */
-    .btn-sm { min-height: 36px; padding-inline: 16px; font-size: 14px; }
+    .btn-primary { @apply btn bg-fg text-bg hover:bg-white; }
+    .btn-secondary { @apply btn px-0 text-fg underline decoration-line underline-offset-[6px] hover:decoration-fg; }
 
-    .link { @apply text-accent underline-offset-4 hover:underline; }
-
-    /* Cards: flat, hairline, 20px. White on parchment sections, parchment on white ones. */
-    .card { @apply rounded-card border border-line bg-canvas p-6 sm:p-8; }
-    .card-muted { @apply rounded-card border border-line bg-parchment p-6 sm:p-8; }
-    .card-dark { @apply rounded-card border border-stageline bg-stage1 p-6 shadow-edge sm:p-8; }
-
-    .chip { @apply inline-flex items-center rounded-full bg-accentsoft px-2.5 py-1 text-caption text-accent; }
-
-    .rule { @apply border-t border-line; }
+    .label { @apply text-small font-medium text-dim; }
+    .link { @apply underline decoration-line underline-offset-4 transition-colors hover:decoration-fg; }
 }
 
 @layer utilities {
-    /* Spotlight gradient: blue -> violet -> cyan. Only for the hero keyword and the
-     * contact spotlight card (DESIGN.md §2). */
-    .text-gradient {
-        background-image: linear-gradient(100deg, #2997FF 0%, #7C5CFF 55%, #22D3EE 100%);
-        background-size: 100% 100%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: transparent;
-    }
-    .text-gradient-shimmer {
-        background-image: linear-gradient(100deg, #2997FF 0%, #7C5CFF 30%, #22D3EE 50%, #7C5CFF 70%, #2997FF 100%);
-        background-size: 200% 100%;
-        animation: gradient-drift 8s ease-in-out infinite alternate;
-    }
-    /* Dark stage with a quiet blue/violet glow. */
-    .bg-stage-glow {
-        background-color: #07080C;
-        background-image:
-            radial-gradient(60% 50% at 20% 0%, rgba(41, 151, 255, 0.22), transparent 70%),
-            radial-gradient(50% 45% at 85% 15%, rgba(124, 92, 255, 0.16), transparent 70%);
-        color: #F5F5F7;
-    }
     .text-balance { text-wrap: balance; }
     .text-pretty { text-wrap: pretty; }
-    /* The outline follows each element's own radius, so pills stay pills. */
-    .focusable:focus-visible {
-        outline: 2px solid #0071E3;
-        outline-offset: 2px;
-    }
 }
 
-/* Page intro: a quick fade of the whole app on first paint (never delays content). */
-@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
-#root { animation: page-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+:focus-visible { outline: 2px solid #F7F8F8; outline-offset: 3px; border-radius: 2px; }
 
-/* Team avatar: an accent ring that slowly turns while hovered. */
-@property --ring-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-@keyframes ring-spin { to { --ring-angle: 360deg; } }
-.avatar-ring {
-    background: conic-gradient(from var(--ring-angle), #0066CC, #2997FF, rgba(41, 151, 255, 0.15), #0066CC);
-    animation: ring-spin 4s linear infinite;
-    animation-play-state: paused;
-}
-.group:hover .avatar-ring { animation-play-state: running; }
-
-@keyframes gradient-drift { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
-
-/* Reveal on scroll (legacy class; <Reveal> uses motion) */
-.reveal {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
-}
+/* Reveal: content fades up once, the first time it scrolls into view. */
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .reveal.is-visible { opacity: 1; transform: none; }
-
-/* Marquee */
-.marquee-mask {
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-}
-.marquee-track { animation: marquee 40s linear infinite; }
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-/* Typewriter carets */
-@keyframes blink { 0%, 48% { opacity: 1; } 50%, 100% { opacity: 0; } }
-.caret { animation: blink 1.1s step-end infinite; }
-@keyframes caret-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
-.caret-soft { animation: caret-soft 1.05s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
-    .marquee-track { animation: none; }
-    .animate-fade-up { animation: none !important; opacity: 1 !important; }
-    .text-gradient-shimmer { animation: none; }
-    #root { animation: none; }
-    .avatar-ring { animation: none; }
-    .btn { transition-property: background-color, border-color, color; }
-    .btn:active { transform: none; }
-    .caret { animation: none !important; }
 }
-
-::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-track { background: #FFFFFF; }
-::-webkit-scrollbar-thumb { background: #D2D2D7; border-radius: 999px; border: 3px solid #FFFFFF; }
-::-webkit-scrollbar-thumb:hover { background: #B0B0B5; }
