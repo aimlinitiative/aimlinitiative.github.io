@@ -1,13 +1,17 @@
-import Section from "../components/Section";
 import { EMAIL } from "../lib/site";
 
 export default function Contact() {
     return (
-        <Section id="contact" label="Contact">
-            <a href={`mailto:${EMAIL}`} className="block break-words text-h2 underline decoration-line decoration-2 underline-offset-[10px] transition-colors hover:decoration-fg">
-                {EMAIL}
-            </a>
-            <p className="mt-8 text-body text-dim">Partner, fund, teach, or just say hi. We answer every message.</p>
-        </Section>
+        <section id="contact" className="page pb-20 lg:pb-28">
+            <div className="rounded-card bg-ink px-6 py-12 text-white sm:px-10 lg:px-14 lg:py-16">
+                <p className="tag text-white/70">Contact</p>
+                <a href={`mailto:${EMAIL}`} className="mt-4 block break-words font-display text-h2 underline decoration-white/30 decoration-2 underline-offset-8 hover:decoration-white">
+                    {EMAIL}
+                </a>
+                <p className="mt-6 max-w-measure text-lead text-white/80">
+                    Partners, teachers, students and parents can all reach us here.
+                </p>
+            </div>
+        </section>
     );
 }

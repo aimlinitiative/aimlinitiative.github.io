@@ -2,11 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Visual system: see DESIGN.md. One typeface (Geist, self-hosted), one
- * background, one text color, one secondary text color, one hairline. */
+/* Visual system: see DESIGN.md. */
 
 :root {
-    color-scheme: dark;
+    color-scheme: light;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -20,32 +19,32 @@
 body {
     margin: 0;
     min-width: 320px;
-    font-family: "Geist Variable", Geist, system-ui, -apple-system, sans-serif;
+    font-family: "Public Sans Variable", system-ui, -apple-system, sans-serif;
     font-size: 17px;
-    line-height: 1.55;
-    letter-spacing: -0.01em;
-    color: #F7F8F8;
-    background-color: #08090A;
+    line-height: 1.6;
+    color: #101418;
+    background-color: #FFFFFF;
 }
 
-::selection { background: #F7F8F8; color: #08090A; }
+::selection { background: #1F5FBF; color: #FFFFFF; }
 
-section[id] { scroll-margin-top: 4rem; }
+section[id] { scroll-margin-top: 4.5rem; }
 
 @layer components {
-    /* 12-column grid inside 80px side margins on desktop (24px on phones). */
-    .page { @apply mx-auto w-full max-w-page px-6 md:px-12 lg:px-20; }
-    .grid12 { @apply grid grid-cols-12 gap-x-6; }
+    .page { @apply mx-auto w-full max-w-page px-5 md:px-10; }
 
-    /* Buttons: 6px radius, flat. Primary is the light fill; secondary is text. */
     .btn {
-        @apply inline-flex h-10 items-center justify-center rounded-md px-4 text-small font-medium transition-colors duration-150;
+        @apply inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-display text-[1rem] font-bold transition-colors duration-150;
     }
-    .btn-primary { @apply btn bg-fg text-bg hover:bg-white; }
-    .btn-secondary { @apply btn px-0 text-fg underline decoration-line underline-offset-[6px] hover:decoration-fg; }
+    .btn-primary { @apply btn bg-blue text-white hover:bg-ink; }
+    .btn-ink { @apply btn bg-ink text-white hover:bg-blue; }
+    .btn-outline { @apply btn border-2 border-ink text-ink hover:bg-ink hover:text-white; }
 
-    .label { @apply text-small font-medium text-dim; }
-    .link { @apply underline decoration-line underline-offset-4 transition-colors hover:decoration-fg; }
+    /* The one card: white, a 1.5px ink border, rounded. No shadow. */
+    .card { @apply rounded-card border-[1.5px] border-ink bg-white; }
+
+    .tag { @apply font-mono text-tag font-medium uppercase tracking-[0.06em] text-dim; }
+    .link { @apply font-bold text-blue underline decoration-2 underline-offset-4 hover:text-ink; }
 }
 
 @layer utilities {
@@ -53,10 +52,10 @@ section[id] { scroll-margin-top: 4rem; }
     .text-pretty { text-wrap: pretty; }
 }
 
-:focus-visible { outline: 2px solid #F7F8F8; outline-offset: 3px; border-radius: 2px; }
+:focus-visible { outline: 3px solid #1F5FBF; outline-offset: 3px; border-radius: 6px; }
 
 /* Reveal: content fades up once, the first time it scrolls into view. */
-.reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .reveal.is-visible { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
