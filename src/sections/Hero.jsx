@@ -1,58 +1,43 @@
 import Lab from "../components/Lab";
-import deepmind from "../assets/supporters/deepmind.png";
-import microsoft from "../assets/supporters/microsoft.png";
-import google from "../assets/supporters/google.png";
-import snap from "../assets/supporters/snap.png";
-import mongodb from "../assets/supporters/mongodb.png";
-import janestreet from "../assets/supporters/janestreet.png";
-import confluent from "../assets/supporters/confluent.png";
-import discovery from "../assets/supporters/discovery.png";
-import hackerfund from "../assets/supporters/hackerfund.png";
-
-// Heights balance the marks' visual weight.
-const LOGOS = [
-    [deepmind, "Google DeepMind", 19], [microsoft, "Microsoft", 21], [google, "Google", 23],
-    [snap, "Snap Inc.", 25], [mongodb, "MongoDB", 21], [janestreet, "Jane Street", 26],
-    [confluent, "Confluent", 17], [discovery, "Discovery Education", 23], [hackerfund, "Hacker Fund", 15],
-];
+import { PARTNERS } from "../lib/partners";
 
 export default function Hero() {
     return (
         <section>
             <div className="page grid items-center gap-12 pb-16 pt-12 lg:grid-cols-12 lg:gap-14 lg:pb-20 lg:pt-20">
-                <div className="lg:col-span-6">
-                    <p className="tag text-blue">Free AI course · Los Angeles</p>
+                <div className="lg:col-span-7">
+                    <p className="tag text-blue">AI/ML Literacy Initiative · Los Angeles</p>
                     <h1 className="mt-4 text-balance font-display text-hero">
-                        A free AI course for <span className="text-blue">LA public high schools.</span>
+                        Every LA public school student should learn how AI <span className="mark">actually works.</span>
                     </h1>
-                    <p className="mt-6 max-w-[34rem] text-pretty text-lead text-[#2B323A]">
-                        Twelve weeks of Python notebooks, written by LA high school students. Classes go from how a
-                        model learns to where it fails, with an ethics lab in every unit. We taught a four-week
-                        version at LACES and are piloting the course with LAUSD.
+                    <p className="mt-6 max-w-[35rem] text-pretty text-lead text-[#2B323A]">
+                        We're LA high schoolers making that happen. We wrote a free twelve-week AI course, taught a
+                        four-week version at LACES and are piloting it with LAUSD. This fall we're bringing 500+ students together for the
+                        LA Student AI Summit, with keynotes from Google DeepMind, Microsoft, Google and Snap.
                     </p>
                     <div className="mt-8 flex flex-wrap gap-3">
-                        <a href="#course" className="btn-primary">See the course</a>
-                        <a href="#summit" className="btn-outline">LA Student AI Summit</a>
+                        <a href="#summit" className="btn-primary">The summit</a>
+                        <a href="#course" className="btn-outline">See the course</a>
                     </div>
-                    <p className="mt-8 max-w-[34rem] text-small text-dim">
-                        Built with feedback from engineers at Google DeepMind and Microsoft, a UCLA professor and a
+                    <p className="mt-8 max-w-[35rem] text-small text-dim">
+                        The course was built with engineers at Google DeepMind and Microsoft, a UCLA professor and a
                         Y Combinator-backed founder.
                     </p>
                 </div>
-                <div className="lg:col-span-6">
+                <div className="lg:col-span-5">
                     <Lab />
                 </div>
             </div>
 
             <div className="page">
-                <div className="card px-6 py-6 lg:px-8">
-                    <p className="tag">Partners for the LA Student AI Summit</p>
+                <a href="#partners" className="card block px-6 py-6 transition-colors hover:bg-sky lg:px-8">
+                    <p className="tag">Nine partners behind the LA Student AI Summit</p>
                     <ul className="mt-5 flex flex-wrap items-center justify-between gap-x-7 gap-y-6">
-                        {LOGOS.map(([src, name, h]) => (
-                            <li key={name}><img src={src} alt={name} style={{ height: h }} className="w-auto" loading="lazy" decoding="async" /></li>
+                        {PARTNERS.map((p) => (
+                            <li key={p.name}><img src={p.logo} alt={p.name} style={{ height: Math.round(p.h * 0.86) }} className="w-auto" loading="lazy" decoding="async" /></li>
                         ))}
                     </ul>
-                </div>
+                </a>
             </div>
         </section>
     );

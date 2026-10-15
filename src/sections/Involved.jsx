@@ -2,7 +2,7 @@ import Section from "../components/Section";
 import { mailto } from "../lib/site";
 
 const NEEDS = [
-    { t: "A venue for the summit", most: true, d: "One Saturday, 8am to 8pm. Room for at least 200 students plus mentors, tables and chairs, power, and Wi-Fi that holds a few hundred devices. It's our biggest open item, and it sets the date." },
+    { t: "A venue for the summit", most: true, d: "One Saturday, 8am to 8pm. Room for 500+ students plus mentors, tables and chairs, power, and Wi-Fi that holds a few hundred devices. It's our biggest open item, and it sets the date." },
     { t: "Speakers, judges, demos and mentors", d: "Twenty minutes on what you build, pitched at a 15-year-old. An hour judging pitches. A demo students can get their hands on, hardware especially. An afternoon mentoring a table. Each takes half a day or less." },
     { t: "Sponsors and funders", d: "Cash or in kind: hardware, platform credits, swag, or a prize track in your area. Every dollar runs through our 501(c)(3) fiscal sponsor, with a receipt for every expense." },
     { t: "Schools and teachers", d: "Bring students to the summit, or teach the course in your classroom. We'll help you set it up." },
@@ -11,7 +11,7 @@ const NEEDS = [
 
 export default function Involved() {
     return (
-        <Section id="involved" tag="Get involved" title="What would help most right now."
+        <Section id="involved" tag="Get involved" title="Help us put on the summit."
             intro="The summit is planned for late November or early December. Each of these goes straight to our inbox.">
             <ul className="grid gap-4 md:grid-cols-2">
                 {NEEDS.map((n) => n.most ? (

@@ -21,7 +21,7 @@ export default {
                 mono: ["'JetBrains Mono Variable'", "ui-monospace", "monospace"],
             },
             fontSize: {
-                hero: ["clamp(2.75rem, 1.6rem + 4.4vw, 5.25rem)", { lineHeight: "1", letterSpacing: "-0.035em", fontWeight: "800" }],
+                hero: ["clamp(2.6rem, 1.6rem + 3.4vw, 4.5rem)", { lineHeight: "1", letterSpacing: "-0.035em", fontWeight: "800" }],
                 h2: ["clamp(2rem, 1.4rem + 2.4vw, 3.5rem)", { lineHeight: "1.04", letterSpacing: "-0.03em", fontWeight: "800" }],
                 h3: ["1.375rem", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700" }],
                 lead: ["1.1875rem", { lineHeight: "1.55" }],

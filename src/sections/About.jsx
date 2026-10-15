@@ -8,16 +8,16 @@ const TEAM = [
 
 export default function About() {
     return (
-        <Section id="about" tag="About" title="Most LA public high schools have no class on how AI works.">
+        <Section id="about" tag="Who we are" title="Run by LA high school students.">
             <div className="grid gap-12 lg:grid-cols-12">
                 <div className="space-y-5 text-pretty text-lead lg:col-span-7">
                     <p>
-                        Students already use AI every day, for homework and beyond. Well-off schools add
-                        machine-learning electives and tutors. Most public schools don't have either.
+                        Adrian Erlikhman and Michael Tarekegn founded AIML-LI in Los Angeles to build the AI class
+                        their own schools didn't have.
                     </p>
                     <p className="text-dim">
-                        We're LA high school students. We write the course, test it in classrooms, fix what doesn't
-                        work, and give it to schools for free. We've shown it at the LAUSD Innovation Expo.
+                        We write the course, test it in classrooms, fix what doesn't work and give it to schools for
+                        free. We've presented it at the LAUSD Innovation Expo, and aiEDU mentors the team.
                     </p>
                 </div>
                 <ul className="card divide-y divide-line self-start lg:col-span-5">

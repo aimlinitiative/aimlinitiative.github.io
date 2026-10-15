@@ -34,8 +34,13 @@ components:
   (`src/lib/minilab.js`, pooled over 25 draws). Every number on the page is
   sourced; regenerate the lab data from the notebook rather than editing it.
 - **Partner logos in full colour** (Adrian, 14 Sept 2026). Committed partners only.
+- **Marker underline** (`.mark`, orange on white; `.mark-light`, amber on the
+  blue summit band) under one phrase per heading, at most. Adrian asked for it
+  back on 15 Oct.
+- **The summit leads.** Mission, then the summit as a full-width blue band with
+  every committed partner, then the course.
 - **Not allowed:** tilted cards, offset "brutalist" shadows, graph-paper
-  backgrounds, highlighter marks, gradients, glass panels, 3D or particle
+  backgrounds, gradients, glass panels, 3D or particle
   heroes, custom cursors, marquees, typewriters, count-up numbers.
 - **Copy:** full sentences that state facts. No slogan fragments ("Nine
   partners are in."), no hype words, no lines that only sound good.

@@ -1,4 +1,5 @@
 import Hero from "../sections/Hero";
+import Goals from "../sections/Goals";
 import CurriculumSection from "../sections/CurriculumSection";
 import SummitSection from "../sections/SummitSection";
 import SupportersSection from "../sections/SupportersSection";
@@ -10,8 +11,9 @@ export default function Home() {
     return (
         <div id="top">
             <Hero />
-            <CurriculumSection />
+            <Goals />
             <SummitSection />
+            <CurriculumSection />
             <SupportersSection />
             <About />
             <Involved />
