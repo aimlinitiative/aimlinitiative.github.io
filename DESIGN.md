@@ -1,40 +1,48 @@
 ---
-version: 2
-name: AIML-LI — Linear-style editorial
-description: "A near-black, monochrome page in the manner of Linear's 2024 site. One typeface, one text color, one secondary text color, one hairline. Each section has a single visual anchor; everything else is plain text in an asymmetric 12-column frame."
+version: 3
+name: AIML-LI — bright classroom
+description: "A white, student-facing page: one display face, ink-bordered cards, one blue, and real course material instead of decoration. Chosen by Adrian on 15 Oct 2026 (option C of three, 'a little less AI')."
 
 colors:
-  bg: "#08090A"      # page background (Tailwind: bg)
-  fg: "#F7F8F8"      # headings, primary text, primary button fill (fg)
-  dim: "#A8ADB5"     # body copy, labels, secondary text, 8.7:1 on bg (dim)
-  line: "#23252A"    # hairlines between rows and sections (line)
-  # No accent hue. Links are fg with an underline.
+  bg: "#FFFFFF"     # page
+  ink: "#101418"    # text, card borders, dark button, contact panel
+  dim: "#525B66"    # secondary text (7.0:1 on white)
+  line: "#E2E5EA"   # hairlines inside cards
+  blue: "#1F5FBF"   # brand: tags, links, primary button, accuracy bar, venue banner
+  sky: "#EAF1FC"    # blue tint (capstone card, nav hover)
+  ora: "#E2592A"    # only for what the model gets wrong (winners found)
+  warm: "#FFF6EB"   # the summit band
 
 typography:
-  family: "Geist Variable, self-hosted (@fontsource-variable/geist). One family for everything."
-  hero:      { size: "clamp(48px → 120px)", weight: 600, lineHeight: 0.96, letterSpacing: "-0.05em" }
-  h2:        { size: "clamp(36px → 64px)", weight: 600, lineHeight: 1.02, letterSpacing: "-0.04em" }
-  statement: { size: "clamp(24px → 40px)", weight: 500, lineHeight: 1.2, letterSpacing: "-0.025em" }
-  h3:        { size: 22px, weight: 500, lineHeight: 1.25, letterSpacing: "-0.02em" }
-  body:      { size: 17px, weight: 400, lineHeight: 1.55 }
-  small:     { size: 14px, weight: 400/500, lineHeight: 1.5 }
+  display: "Bricolage Grotesque (variable, self-hosted), 700-800, tight tracking. Headings, names, buttons."
+  body:    "Public Sans (variable, self-hosted). Its zero is plain; Atkinson Hyperlegible's slashed zero looked wrong in 200+, 501(c)(3) and the EIN."
+  mono:    "JetBrains Mono (variable, self-hosted). Small uppercase tags, code, numbers in the lab."
 
 layout:
-  grid: "12 columns, 24px column gap"
-  margins: "80px each side on desktop (lg:px-20), 48px tablet, 24px phone"
-  section: "label in columns 1–3, content in columns 5–12; 160px vertical padding on desktop, 96px on phones; sections separated by one hairline"
-  measure: "60ch max for paragraphs"
+  page: "max 78rem, 20px side padding on phones, 40px from md"
+  section: "tag, h2, and an intro beside it on wide screens; then content. 80px / 112px vertical padding."
 
 components:
-  button-primary:   "fg fill, bg text, 6px radius, 40px tall, flat"
-  button-secondary: "text with an underline; no box"
-  rows:             "lists, tables and facts are rows separated by hairlines, never cards"
+  card: "white, 1.5px ink border, 14px radius, no shadow"
+  buttons: "pills: blue (primary), ink, or 2px ink outline"
+  tag: "mono, 12px, uppercase, 0.06em tracking"
 ---
 
 ## Rules
 
-- **One anchor per section.** Hero: the headline. About: the statement. How it works: the numerals. Curriculum: the 12-week timeline. Summit: the facts table. Partners: the logo table. Get involved: the list of needs. Contact: the email address.
-- **Banned:** gradients of any kind, glassmorphism and backdrop blur, drop shadows, cards and card grids, pill badges and chips, decorative backgrounds, particles, custom cursors, Inter and Roboto, a second text color inside a heading, weight changes mid-sentence.
-- **Partner logos** render as solid white (`brightness-0 invert`). Marks that don't survive that (Snap's filled square) are set as text.
-- **Motion:** content fades up 12px once when it enters the viewport; nothing else moves. Reduced motion shows everything immediately.
-- **Copy:** terse and concrete. Short sentences, real facts, no hype words ("transform", "seamless", "empower", "unlock", "revolutionize"), no filler eyebrows or scroll cues.
+- **Show the work.** The hero is Unit 1's ethics lab, run for real
+  (`src/lib/minilab.js`, pooled over 25 draws). Every number on the page is
+  sourced; regenerate the lab data from the notebook rather than editing it.
+- **Partner logos in full colour** (Adrian, 14 Sept 2026). Committed partners only.
+- **Marker underline** (`.mark`, orange on white; `.mark-light`, amber on the
+  blue summit band) under one phrase per heading, at most. Adrian asked for it
+  back on 15 Oct.
+- **The summit leads.** Mission, then the summit as a full-width blue band with
+  every committed partner, then the course.
+- **Not allowed:** tilted cards, offset "brutalist" shadows, graph-paper
+  backgrounds, gradients, glass panels, 3D or particle
+  heroes, custom cursors, marquees, typewriters, count-up numbers.
+- **Copy:** full sentences that state facts. No slogan fragments ("Nine
+  partners are in."), no hype words, no lines that only sound good.
+- **Motion:** sections fade up 12px once; the lab's bars animate their width.
+  Reduced motion shows everything at once.

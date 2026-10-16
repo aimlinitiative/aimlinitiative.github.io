@@ -8,23 +8,27 @@ const TEAM = [
 
 export default function About() {
     return (
-        <Section id="about" label="About">
-            <p className="text-pretty text-statement">
-                The students who'd gain the most from understanding AI get the least chance to learn it.
-                Well-off schools have machine-learning electives and tutors. Most public schools have nothing.
-            </p>
-            <p className="mt-10 max-w-measure text-pretty text-body text-dim">
-                So we write the curriculum, test it in real classrooms and give it away. People from Google
-                DeepMind and Y Combinator advise us, and we've shown the work at the LAUSD Innovation Expo.
-            </p>
-            <ul className="mt-20 border-t border-line">
-                {TEAM.map((m) => (
-                    <li key={m.name} className="flex items-baseline justify-between border-b border-line py-4">
-                        <span className="text-body">{m.name}</span>
-                        <span className="text-small text-dim">{m.role}</span>
-                    </li>
-                ))}
-            </ul>
+        <Section id="about" tag="Who we are" title="Run by LA high school students.">
+            <div className="grid gap-12 lg:grid-cols-12">
+                <div className="space-y-5 text-pretty text-lead lg:col-span-7">
+                    <p>
+                        Adrian Erlikhman and Michael Tarekegn founded AIML-LI in Los Angeles to build the AI class
+                        their own schools didn't have.
+                    </p>
+                    <p className="text-dim">
+                        We write the course, test it in classrooms, fix what doesn't work and give it to schools for
+                        free. We've presented it at the LAUSD Innovation Expo, and aiEDU mentors the team.
+                    </p>
+                </div>
+                <ul className="card divide-y divide-line self-start lg:col-span-5">
+                    {TEAM.map((m) => (
+                        <li key={m.name} className="flex items-baseline justify-between gap-4 px-6 py-4">
+                            <span className="font-display text-[1.1875rem] font-bold">{m.name}</span>
+                            <span className="tag">{m.role}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </Section>
     );
 }
