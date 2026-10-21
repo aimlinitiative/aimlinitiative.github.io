@@ -11,7 +11,7 @@ export default function SummitSection() {
                 <Reveal>
                     <div className="mx-auto max-w-[48rem] text-center">
                         <p className="eyebrow">The LA Student AI Summit &amp; Hackathon</p>
-                        <h2 className="mt-5 text-balance font-display text-h2"><Words text="One free Saturday with the people who build AI." /></h2>
+                        <h2 className="mt-5 text-balance font-display text-h2"><Words text="Saturday, Feb 6. Free. With the people who build AI." /></h2>
                     </div>
 
                     <div data-up style={{ "--i": 3 }} className="mt-20"><Ticket /></div>
