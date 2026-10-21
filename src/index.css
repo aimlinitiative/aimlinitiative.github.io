@@ -111,8 +111,8 @@ section[id] { scroll-margin-top: 6rem; }
 @media (prefers-reduced-motion: reduce) { .sched-in { animation: none; } }
 
 /* Section eyebrow: the label over each heading. */
-.eyebrow { @apply inline-flex items-center gap-2 rounded-full bg-sky px-3.5 py-1.5 font-display text-[0.9375rem] font-semibold text-blue; }
-.eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+/* Hand-lettered, like the notes, with a pencil squiggle under it. */
+.eyebrow { @apply inline-block pb-2 font-hand text-[1.625rem] font-semibold leading-none text-blue; background: no-repeat bottom center / 100% 9px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 9' preserveAspectRatio='none'%3E%3Cpath d='M2 6c18-5 36 2 58-1s40-3 58 0' fill='none' stroke='%231F5FBF' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E"); }
 
 /* Scroll choreography: inside a Reveal, headings rise word by word and
    [data-up] children rise in order (--i sets the step). */
