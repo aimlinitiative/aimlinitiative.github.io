@@ -3,12 +3,6 @@ import { PARTNERS } from "../lib/partners";
 
 const HEAD = "AI class for every LA public school student.";
 
-// What AIML-LI does, in the three things a visitor should leave knowing.
-const THREE = [
-    { k: "01", n: "12 weeks", t: "A free AI course", d: "Six units of notebooks a teacher can run as written. A four-week version ran at LACES; now piloting with LAUSD.", href: "#course" },
-    { k: "02", n: "500+", t: "The LA Student AI Summit", d: "One free Saturday of keynotes and a hackathon for LA public school students, late Nov or early Dec 2026.", href: "#summit" },
-    { k: "03", n: "9", t: "Committed partners", d: "Google DeepMind, Microsoft, Google, Snap, Jane Street, MongoDB, Confluent, Discovery Education and Hacker Fund.", href: "#partners" },
-];
 
 export default function Hero() {
     const words = HEAD.split(" ");
@@ -47,20 +41,6 @@ export default function Hero() {
                     ))}
                 </ul>
             </div>
-
-            <ol className="mx-auto mt-20 grid max-w-[70rem] gap-4 md:grid-cols-3">
-                {THREE.map((x) => (
-                    <li key={x.k}>
-                        <a href={x.href} className="card group flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1 lg:p-7">
-                            <span className="font-mono text-tag text-dim">{x.k}</span>
-                            <span className="mt-4 font-display text-[3rem] font-semibold leading-none tracking-[-0.04em] text-blue">{x.n}</span>
-                            <span className="mt-3 font-display text-h3">{x.t}</span>
-                            <span className="mt-2 flex-1 text-pretty text-small text-dim">{x.d}</span>
-                            <span className="mt-5 text-small font-semibold text-ink group-hover:text-blue">Read more →</span>
-                        </a>
-                    </li>
-                ))}
-            </ol>
         </section>
     );
 }
