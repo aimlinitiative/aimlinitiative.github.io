@@ -21,12 +21,12 @@ export const PARTNERS = [
     { name: "MongoDB", logo: mongodb, h: 26, role: "Sponsor", what: "Prizes and Atlas credits for the hackathon" },
     { name: "Confluent", logo: confluent, h: 21, role: "Speaker · Mentors", what: "A speaker and mentors for the hackathon floor" },
     { name: "Hacker Fund", logo: hackerfund, h: 19, role: "Sponsor", what: "In-kind support for the hackathon" },
+    { name: "aiEDU", h: 24, role: "Partner", what: "Supporting the summit" },
 ];
 
 // Behind the course and the organisation rather than the event day.
 export const SUPPORTERS = [
     { name: "Hack Club", role: "Fiscal sponsor", what: "Through The Hack Foundation, a 501(c)(3). Every sponsorship dollar runs through it." },
-    { name: "aiEDU", role: "Mentorship", what: "Mentorship for the team and the course." },
     { name: "Arm", role: "Curriculum feedback", what: "Feedback on the course material." },
     { name: "PhET, CU Boulder", role: "Curriculum feedback", what: "Feedback on the course material." },
 ];

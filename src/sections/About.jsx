@@ -1,34 +1,41 @@
-import Section from "../components/Section";
+import Reveal from "../components/Reveal";
+import Words from "../components/Words";
+import Note from "../components/Note";
 
-const TEAM = [
-    { name: "Adrian Erlikhman", role: "Co-founder" },
-    { name: "Michael Tarekegn", role: "Co-founder" },
-    { name: "Ibrahim Piri", role: "Engineering" },
+// Credits, not cards: who runs it, and who stands behind the course.
+const CREDITS = [
+    ["Co-founders", "Adrian Erlikhman, Michael Tarekegn"],
+    ["Engineering", "Ibrahim Piri"],
+    ["Fiscal sponsor", "Hack Club, a 501(c)(3)"],
+    ["Curriculum feedback", "Arm, PhET (CU Boulder)"],
+    ["Built with", "DeepMind and Microsoft engineers, a UCLA professor, a YC founder"],
 ];
 
 export default function About() {
     return (
-        <Section id="about" tag="Who we are" title="Run by LA high school students.">
-            <div className="grid gap-12 lg:grid-cols-12">
-                <div className="space-y-5 text-pretty text-lead lg:col-span-7">
-                    <p>
-                        Adrian Erlikhman and Michael Tarekegn founded AIML-LI in Los Angeles to build the AI class
-                        their own schools didn't have.
-                    </p>
-                    <p className="text-dim">
-                        We write the course, test it in classrooms, fix what doesn't work and give it to schools for
-                        free. We've presented it at the LAUSD Innovation Expo, and aiEDU mentors the team.
-                    </p>
-                </div>
-                <ul className="card divide-y divide-line self-start lg:col-span-5">
-                    {TEAM.map((m) => (
-                        <li key={m.name} className="flex items-baseline justify-between gap-4 px-6 py-4">
-                            <span className="font-display text-[1.1875rem] font-bold">{m.name}</span>
-                            <span className="tag">{m.role}</span>
-                        </li>
-                    ))}
-                </ul>
+        <section id="about">
+            <div className="page py-20 lg:py-28">
+                <Reveal>
+                    <div className="grid gap-12 lg:grid-cols-12">
+                        <div className="lg:col-span-5">
+                            <p className="eyebrow">Who we are</p>
+                            <h2 className="mt-5 text-balance font-display text-h2"><Words text="Run by LA high school students." /></h2>
+                            <p className="mt-5 max-w-[30rem] text-pretty text-lead text-dim">
+                                We wrote the AI class our schools didn&apos;t have.
+                            </p>
+                            <Note dir="left" flip className="mt-10 hidden lg:flex" tone="text-blue">all of us still in high school</Note>
+                        </div>
+                        <dl className="lg:col-span-7">
+                            {CREDITS.map(([k, v], i) => (
+                                <div key={k} data-up style={{ "--i": i + 1 }} className="grid gap-1 border-t border-line py-5 sm:grid-cols-[11rem_1fr] sm:gap-6">
+                                    <dt className="text-small font-semibold text-dim">{k}</dt>
+                                    <dd className="font-display text-[1.25rem] font-semibold leading-snug tracking-[-0.01em]">{v}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    </div>
+                </Reveal>
             </div>
-        </Section>
+        </section>
     );
 }

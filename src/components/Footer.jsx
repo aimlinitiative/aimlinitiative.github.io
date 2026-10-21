@@ -9,8 +9,7 @@ export default function Footer() {
                     <span className="font-display font-bold text-ink">AI/ML Literacy Initiative</span>
                 </div>
                 <div className="space-y-1 md:col-span-6">
-                    <p>Fiscally sponsored by The Hack Foundation (Hack Club), a 501(c)(3). <span className="whitespace-nowrap">EIN 81-2908499</span>.</p>
-                    <p>Founded by Adrian Erlikhman and Michael Tarekegn in Los Angeles.</p>
+                    <p>Fiscal sponsor: Hack Club, a 501(c)(3) · <span className="whitespace-nowrap">EIN 81-2908499</span></p>
                 </div>
                 <div className="flex gap-6 md:col-span-3 md:justify-end">
                     <a href={`mailto:${EMAIL}`} className="link">Email</a>

@@ -1,43 +1,41 @@
-import Lab from "../components/Lab";
 import { PARTNERS } from "../lib/partners";
+import Logo from "../components/Logo";
+
+const HEAD = "AI class for every LA public school student.";
+
 
 export default function Hero() {
+    const words = HEAD.split(" ");
     return (
-        <section>
-            <div className="page grid items-center gap-12 pb-16 pt-12 lg:grid-cols-12 lg:gap-14 lg:pb-20 lg:pt-20">
-                <div className="lg:col-span-7">
-                    <p className="tag text-blue">AI/ML Literacy Initiative · Los Angeles</p>
-                    <h1 className="mt-4 text-balance font-display text-hero">
-                        Every LA public school student should learn how AI <span className="mark">actually works.</span>
-                    </h1>
-                    <p className="mt-6 max-w-[35rem] text-pretty text-lead text-[#2B323A]">
-                        We're LA high schoolers making that happen. We wrote a free twelve-week AI course, taught a
-                        four-week version at LACES and are piloting it with LAUSD. This fall we're bringing 500+ students together for the
-                        LA Student AI Summit, with keynotes from Google DeepMind, Microsoft, Google and Snap.
-                    </p>
-                    <div className="mt-8 flex flex-wrap gap-3">
-                        <a href="#summit" className="btn-primary">The summit</a>
-                        <a href="#course" className="btn-outline">See the course</a>
-                    </div>
-                    <p className="mt-8 max-w-[35rem] text-small text-dim">
-                        The course was built with engineers at Google DeepMind and Microsoft, a UCLA professor and a
-                        Y Combinator-backed founder.
-                    </p>
-                </div>
-                <div className="lg:col-span-5">
-                    <Lab />
+        <section id="top" className="px-4 pt-32 sm:pt-40">
+            <div className="mx-auto max-w-[62rem] text-center">
+                <a href="#summit" className="glass inline-flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 text-[0.8125rem] font-medium">
+                    <span className="rounded-full bg-blue px-2.5 py-0.5 text-white">New</span>
+                    LA Student AI Summit<span className="hidden sm:inline">&nbsp;· LACES · Feb 6, 2027</span> <span aria-hidden="true">→</span>
+                </a>
+                <h1 className="mt-7 text-balance font-display text-hero">
+                    {words.map((w, i) => (
+                        <span key={i}><span className="rise" style={{ animationDelay: `${i * 60}ms` }}>
+                            {w === "every" ? <span className="font-hand font-semibold tracking-[-0.02em] text-blue">every</span> : w}
+                        </span>{i < words.length - 1 ? " " : ""}</span>
+                    ))}
+                </h1>
+                <p className="mx-auto mt-6 max-w-[38rem] text-pretty text-lead text-dim">
+                    A student-run nonprofit teaching LA public schools how AI works.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center gap-3">
+                    <a href="#summit" className="btn-primary">See the summit</a>
+                    <a href="#involved" className="btn-outline">Partner with us</a>
                 </div>
             </div>
 
-            <div className="page">
-                <a href="#partners" className="card block px-6 py-6 transition-colors hover:bg-sky lg:px-8">
-                    <p className="tag">Nine partners behind the LA Student AI Summit</p>
-                    <ul className="mt-5 flex flex-wrap items-center justify-between gap-x-7 gap-y-6">
-                        {PARTNERS.map((p) => (
-                            <li key={p.name}><img src={p.logo} alt={p.name} style={{ height: Math.round(p.h * 0.86) }} className="w-auto" loading="lazy" decoding="async" /></li>
-                        ))}
-                    </ul>
-                </a>
+            <div id="partners" className="mx-auto mt-16 max-w-[70rem] scroll-mt-28">
+                <p className="text-center tag">Summit partners</p>
+                <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+                    {PARTNERS.map((p) => (
+                        <li key={p.name}><Logo p={p} scale={0.85} /></li>
+                    ))}
+                </ul>
             </div>
         </section>
     );
