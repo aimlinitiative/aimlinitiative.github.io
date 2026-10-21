@@ -58,7 +58,7 @@ section[id] { scroll-margin-top: 6rem; }
     /* Hand-written annotation, like Monte's and Hivemind's pencil notes. */
     .note { @apply font-hand text-[1.0625rem] font-medium leading-snug; }
 
-    .tag { @apply font-mono text-tag font-medium uppercase tracking-[0.06em] text-dim; }
+    .tag { @apply font-sans text-[0.8125rem] font-semibold text-dim; }
     .link { @apply font-semibold text-blue underline decoration-2 underline-offset-4 hover:text-ink; }
 }
 

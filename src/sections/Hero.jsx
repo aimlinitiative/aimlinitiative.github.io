@@ -1,5 +1,6 @@
 import Note from "../components/Note";
 import { PARTNERS } from "../lib/partners";
+import Logo from "../components/Logo";
 
 const HEAD = "AI class for every LA public school student.";
 
@@ -11,7 +12,7 @@ export default function Hero() {
             <div className="mx-auto max-w-[62rem] text-center">
                 <a href="#summit" className="glass inline-flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 text-[0.8125rem] font-medium">
                     <span className="rounded-full bg-blue px-2.5 py-0.5 text-white">New</span>
-                    LA Student AI Summit<span className="hidden sm:inline"> · 500+ students · this fall</span> <span aria-hidden="true">→</span>
+                    LA Student AI Summit<span className="hidden sm:inline"> · LACES · Feb 6, 2027</span> <span aria-hidden="true">→</span>
                 </a>
                 <h1 className="mt-7 text-balance font-display text-hero">
                     {words.map((w, i) => (
@@ -29,7 +30,7 @@ export default function Hero() {
                     <a href="#involved" className="btn-outline">Partner with us</a>
                 </div>
                 <div className="relative mx-auto mt-3 hidden h-10 max-w-[30rem] sm:block">
-                    <Note dir="up" className="absolute left-[56%] top-1">sponsors, venues, mentors: start here</Note>
+                    <Note dir="up" className="absolute left-[56%] top-1">sponsors and mentors: start here</Note>
                 </div>
             </div>
 
@@ -37,7 +38,7 @@ export default function Hero() {
                 <p className="text-center tag">Committed to the summit</p>
                 <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
                     {PARTNERS.map((p) => (
-                        <li key={p.name}><img src={p.logo} alt={p.name} style={{ height: Math.round(p.h * 0.85) }} className="w-auto opacity-85 transition-opacity hover:opacity-100" decoding="async" /></li>
+                        <li key={p.name}><Logo p={p} scale={0.85} /></li>
                     ))}
                 </ul>
             </div>

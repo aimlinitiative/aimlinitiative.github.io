@@ -25,11 +25,11 @@ export default function About() {
 
             <div className="mx-auto mt-14 max-w-[56rem]">
                 <p className="text-center tag">Behind the course</p>
-                <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <ul className="mt-5 grid gap-4 sm:grid-cols-3">
                     {SUPPORTERS.map((s) => (
                         <li key={s.name} className="card p-5">
                             <p className="font-display text-[1.125rem] font-semibold">{s.name}</p>
-                            <p className="mt-1 font-mono text-tag uppercase tracking-[0.06em] text-blue">{s.role}</p>
+                            <p className="mt-1 text-small text-blue">{s.role}</p>
                         </li>
                     ))}
                 </ul>
