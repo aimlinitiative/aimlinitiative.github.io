@@ -1,43 +1,39 @@
-import Section from "../components/Section";
-import { SUPPORTERS } from "../lib/partners";
+import Reveal from "../components/Reveal";
 
-const TEAM = [
-    { name: "Adrian Erlikhman", role: "Co-founder", i: "AE" },
-    { name: "Michael Tarekegn", role: "Co-founder", i: "MT" },
-    { name: "Ibrahim Piri", role: "Engineering", i: "IP" },
+// Credits, not cards: who runs it, and who stands behind the course.
+const CREDITS = [
+    ["Co-founders", "Adrian Erlikhman, Michael Tarekegn"],
+    ["Engineering", "Ibrahim Piri"],
+    ["Fiscal sponsor", "Hack Club (The Hack Foundation, 501(c)(3))"],
+    ["Curriculum feedback", "Arm, PhET (CU Boulder)"],
+    ["Built with", "Engineers at Google DeepMind and Microsoft, a UCLA professor, a Y Combinator-backed founder"],
 ];
 
 export default function About() {
     return (
-        <Section id="about" tag="Who we are" title="Run by LA high school students."
-            intro="We founded AIML-LI to build the AI class our own schools didn't have. We write the course, test it in classrooms, fix what doesn't work and give it away.">
-            <ul className="mx-auto grid max-w-[56rem] gap-4 sm:grid-cols-3">
-                {TEAM.map((m) => (
-                    <li key={m.name} className="card flex items-center gap-4 p-5">
-                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-sky font-display text-[1rem] font-semibold text-blue">{m.i}</span>
-                        <div>
-                            <p className="font-display text-[1.125rem] font-semibold leading-tight">{m.name}</p>
-                            <p className="mt-0.5 text-small text-dim">{m.role}</p>
+        <section id="about">
+            <div className="page py-20 lg:py-28">
+                <Reveal>
+                    <div className="grid gap-12 lg:grid-cols-12">
+                        <div className="lg:col-span-5">
+                            <p className="tag text-blue">Who we are</p>
+                            <h2 className="mt-3 text-balance font-display text-h2">Run by LA high school students.</h2>
+                            <p className="mt-5 max-w-[30rem] text-pretty text-lead text-dim">
+                                Our own schools didn&apos;t have an AI class, so we wrote one. We test it in classrooms, fix
+                                what doesn&apos;t work and give it away.
+                            </p>
                         </div>
-                    </li>
-                ))}
-            </ul>
-
-            <div className="mx-auto mt-14 max-w-[56rem]">
-                <p className="text-center tag">Behind the course</p>
-                <ul className="mt-5 grid gap-4 sm:grid-cols-3">
-                    {SUPPORTERS.map((s) => (
-                        <li key={s.name} className="card p-5">
-                            <p className="font-display text-[1.125rem] font-semibold">{s.name}</p>
-                            <p className="mt-1 text-small text-blue">{s.role}</p>
-                        </li>
-                    ))}
-                </ul>
-                <p className="mt-6 text-center text-pretty text-small text-dim">
-                    The course was built with engineers at Google DeepMind and Microsoft, a UCLA professor and a
-                    Y Combinator-backed founder. We&apos;ve presented it at the LAUSD Innovation Expo.
-                </p>
+                        <dl className="lg:col-span-7">
+                            {CREDITS.map(([k, v]) => (
+                                <div key={k} className="grid gap-1 border-t border-line py-5 sm:grid-cols-[11rem_1fr] sm:gap-6">
+                                    <dt className="text-small font-semibold text-dim">{k}</dt>
+                                    <dd className="font-display text-[1.25rem] font-semibold leading-snug tracking-[-0.01em]">{v}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    </div>
+                </Reveal>
             </div>
-        </Section>
+        </section>
     );
 }
