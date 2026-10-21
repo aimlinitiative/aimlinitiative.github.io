@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Section from "../components/Section";
+import Note from "../components/Note";
 
 // The six units as the notebook files they are. Picking one shows what it covers.
 const UNITS = [
@@ -32,11 +33,14 @@ export default function CurriculumSection() {
                         </span>
                         <p className="mt-3 font-display text-[1.0625rem] font-semibold leading-tight">{t}</p>
                         <p className="mt-0.5 text-small text-dim">{d}</p>
+                        {s === "now" && <Note dir="up" className="absolute left-1/2 top-full mt-1 hidden -translate-x-1/2 whitespace-nowrap sm:flex" tone="text-blue">we&apos;re here</Note>}
                     </li>
                 ))}
             </ol>
 
-            <div className="mx-auto mt-14 max-w-[64rem] overflow-hidden rounded-[18px] bg-[#0F1420] text-[#D8E1EC] shadow-[0_30px_60px_-30px_rgba(16,20,24,0.45)]">
+            <div className="relative mx-auto mt-24 max-w-[64rem]">
+            <Note dir="down" className="absolute -top-10 left-2 hidden md:flex">click a unit</Note>
+            <div className="overflow-hidden rounded-[18px] bg-[#0F1420] text-[#D8E1EC] shadow-[0_30px_60px_-30px_rgba(16,20,24,0.45)]">
                 <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
                     <span className="h-3 w-3 rounded-full bg-[#FF5F57]" /><span className="h-3 w-3 rounded-full bg-[#FEBC2E]" /><span className="h-3 w-3 rounded-full bg-[#28C840]" />
                     <span className="ml-3 font-mono text-[0.8125rem] text-white/50">aiml-li / course</span>
@@ -58,6 +62,7 @@ export default function CurriculumSection() {
                         <p className="mt-4 max-w-[30rem] text-pretty text-lead text-white/75">{UNITS[u][2]}</p>
                     </div>
                 </div>
+            </div>
             </div>
         </Section>
     );

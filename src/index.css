@@ -109,3 +109,18 @@ section[id] { scroll-margin-top: 6rem; }
 .sched-in { animation: schedIn 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes schedIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .sched-in { animation: none; } }
+
+/* Section eyebrow: the label over each heading. */
+.eyebrow { @apply inline-flex items-center gap-2 rounded-full bg-sky px-3.5 py-1.5 font-display text-[0.9375rem] font-semibold text-blue; }
+.eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+
+/* Scroll choreography: inside a Reveal, headings rise word by word and
+   [data-up] children rise in order (--i sets the step). */
+.rw { display: inline-block; opacity: 0; transform: translateY(14px); filter: blur(8px); }
+.reveal.is-visible .rw { animation: rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--d, 0ms); }
+.reveal [data-up] { opacity: 0; transform: translateY(28px) scale(0.98); }
+.reveal.is-visible [data-up] { transition: opacity 0.8s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(250ms + var(--i, 0) * 90ms); opacity: 1; transform: none; }
+.reveal, .reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    .rw, .reveal [data-up] { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; }
+}

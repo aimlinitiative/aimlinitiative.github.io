@@ -1,5 +1,6 @@
 import Reveal from "../components/Reveal";
 import Ticket from "../components/Ticket";
+import Words from "../components/Words";
 import { mailto } from "../lib/site";
 
 
@@ -9,11 +10,11 @@ export default function SummitSection() {
             <div className="page py-20 lg:py-28">
                 <Reveal>
                     <div className="mx-auto max-w-[48rem] text-center">
-                        <p className="tag text-blue">The LA Student AI Summit &amp; Hackathon</p>
-                        <h2 className="mt-3 text-balance font-display text-h2">One free Saturday with the people who build AI.</h2>
+                        <p className="eyebrow">The LA Student AI Summit &amp; Hackathon</p>
+                        <h2 className="mt-5 text-balance font-display text-h2"><Words text="One free Saturday with the people who build AI." /></h2>
                     </div>
 
-                    <div className="mt-20"><Ticket /></div>
+                    <div data-up style={{ "--i": 3 }} className="mt-20"><Ticket /></div>
 
                     <div className="mx-auto mt-16 flex max-w-[60rem] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
                         <p className="text-small text-dim">Sponsorship runs through Hack Club, a 501(c)(3).</p>

@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import Words from "./Words";
 
 /* A section: a small tag, one headline that says the point, an optional line
  * under it, then the content. Centered, like Hivemind's section heads. */
@@ -9,11 +10,11 @@ export default function Section({ id, tag, title, intro, align = "center", class
             <div className="page py-20 lg:py-28">
                 <Reveal>
                     <div className={c ? "mx-auto max-w-[46rem] text-center" : "max-w-[46rem]"}>
-                        {tag && <p className="tag text-blue">{tag}</p>}
-                        <h2 className="mt-3 text-balance font-display text-h2">{title}</h2>
-                        {intro && <p className={`mt-5 text-pretty text-lead text-dim ${c ? "mx-auto" : ""} max-w-[38rem]`}>{intro}</p>}
+                        {tag && <p className="eyebrow">{tag}</p>}
+                        <h2 className="mt-5 text-balance font-display text-h2">{typeof title === "string" ? <Words text={title} /> : title}</h2>
+                        {intro && <p data-up style={{ "--i": 1 }} className={`mt-5 text-pretty text-lead text-dim ${c ? "mx-auto" : ""} max-w-[38rem]`}>{intro}</p>}
                     </div>
-                    <div className="mt-12 lg:mt-16">{children}</div>
+                    <div data-up style={{ "--i": 3 }} className="mt-12 lg:mt-16">{children}</div>
                 </Reveal>
             </div>
         </section>
