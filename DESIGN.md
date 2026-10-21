@@ -46,3 +46,22 @@ components:
   partners are in."), no hype words, no lines that only sound good.
 - **Motion:** sections fade up 12px once; the lab's bars animate their width.
   Reduced motion shows everything at once.
+
+## v4 (21 Oct 2026): Monte + Hivemind look
+
+Adrian, before Citadel looks at the site: emulate the Monte site a little, then
+Hivemind; easy to scan. Supersedes the v3 rules above where they conflict.
+
+- Soft grey page (#F7F8FA), white cards with a hairline ring and a soft shadow
+  (no ink borders), 20px radius. Floating frosted pill nav (mark · sections ·
+  "Partner with us"), as on Hivemind.
+- Inter Tight (600-650, tight tracking) for headings; Public Sans body;
+  JetBrains Mono tags; Shantell Sans for hand-written notes with pencil arrows
+  that draw in (`Note.jsx`, from Hivemind's notes.tsx). One or two notes per
+  section at most; anything a note says is also in the real text.
+- Centered hero, one hand-written word ("every") like Monte's "played right",
+  headline words blur-rise in. Then the partner logo strip and three cards:
+  course · summit · partners.
+- Order: hero · summit (with partners) · course · try a lesson · goals ·
+  who we are (with supporters) · four ways to help · contact.
+- The marker underline is retired.

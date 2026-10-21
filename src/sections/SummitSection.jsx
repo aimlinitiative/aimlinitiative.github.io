@@ -1,116 +1,108 @@
 import Reveal from "../components/Reveal";
+import Note from "../components/Note";
 import { PARTNERS } from "../lib/partners";
 import { mailto } from "../lib/site";
 
-const STATS = [
-    ["500+", "LA public school students"],
-    ["4", "keynotes: Google DeepMind, Microsoft, Google, Snap"],
-    ["9", "committed partners"],
-    ["$0", "for students, lunch included"],
+const FACTS = [
+    ["When", "A Saturday, late Nov or early Dec 2026"],
+    ["Where", "Los Angeles · venue being finalized"],
+    ["Who", "500+ LA public middle and high schoolers, with their teachers"],
+    ["Cost", "Free for students, lunch included"],
 ];
 
 const DAY = [
-    ["Morning", "Keynotes, a panel and demos", "Google DeepMind, Microsoft, Google and Snap on the main stage. A careers panel. Live demos students can get their hands on, including physical AI."],
-    ["Midday", "Lunch with the partners", "Free for every student, with partner tables around the room."],
-    ["Afternoon", "The hackathon", "Teams of three or four pick a problem from their own school or neighborhood. Mentors work the floor. Halfway through, teams swap and try to break each other's projects. Then three-minute pitches, judging, and prizes from Jane Street, MongoDB and Discovery Education."],
-];
-
-const FACTS = [
-    ["When", "A Saturday in late November or early December 2026"],
-    ["Where", "Los Angeles. Venue being finalized."],
-    ["Who", "LA public middle and high school students, with their teachers"],
-    ["Cost", "Free, lunch included"],
+    ["Morning", "Keynotes", "Google DeepMind, Microsoft, Google and Snap on the main stage, then a careers panel and hands-on demos."],
+    ["Midday", "Lunch with partners", "Free for every student, with partner tables around the room."],
+    ["Afternoon", "Hackathon", "Teams of three or four build for a problem in their own school or neighborhood, with mentors on the floor."],
+    ["Evening", "Pitches and prizes", "Three-minute pitches, judging, and prizes from Jane Street, MongoDB and Discovery Education."],
 ];
 
 export default function SummitSection() {
     return (
-        <section id="summit" className="bg-blue text-white">
+        <section id="summit">
             <div className="page py-20 lg:py-28">
                 <Reveal>
-                    <p className="tag text-white/75">The LA Student AI Summit &amp; Hackathon</p>
-                    <h2 className="mt-3 max-w-[18ch] text-balance font-display text-[clamp(2.5rem,1.6rem+3.6vw,4.75rem)] font-extrabold leading-[0.98] tracking-[-0.035em]">
-                        One Saturday. 500+ students. <span className="mark-light">The people who build AI.</span>
-                    </h2>
-                    <p className="mt-6 max-w-[40rem] text-pretty text-lead text-white/90">
-                        A free day for LA public school students: hear from the people building AI, see how the tools
-                        they already use really work, and build something of their own before the day is out.
-                    </p>
+                    <div className="mx-auto max-w-[48rem] text-center">
+                        <p className="tag text-blue">The LA Student AI Summit &amp; Hackathon</p>
+                        <h2 className="mt-3 text-balance font-display text-h2">One free Saturday with the people who build AI.</h2>
+                        <p className="mx-auto mt-5 max-w-[38rem] text-pretty text-lead text-dim">
+                            Keynotes in the morning, a hackathon in the afternoon. Every student leaves having built something.
+                        </p>
+                    </div>
 
-                    <dl className="mt-12 grid gap-px overflow-hidden rounded-card bg-white/25 sm:grid-cols-2 lg:grid-cols-4">
-                        {STATS.map(([n, l]) => (
-                            <div key={l} className="bg-blue px-6 py-6">
-                                <dt className="sr-only">{l}</dt>
-                                <dd>
-                                    <span className="block font-display text-[3rem] font-extrabold leading-none">{n}</span>
-                                    <span className="mt-2 block text-small text-white/85">{l}</span>
-                                </dd>
-                            </div>
-                        ))}
-                    </dl>
-
-                    <div className="mt-14 grid gap-10 lg:grid-cols-12">
-                        <ol className="lg:col-span-7">
-                            {DAY.map(([when, t, d]) => (
-                                <li key={t} className="grid gap-2 border-t-[1.5px] border-white/40 py-6 sm:grid-cols-[7.5rem_1fr] sm:gap-6">
-                                    <span className="tag pt-1.5 text-white/75">{when}</span>
-                                    <div>
-                                        <h3 className="font-display text-h3">{t}</h3>
-                                        <p className="mt-2 max-w-measure text-pretty text-body text-white/85">{d}</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ol>
-
-                        <aside className="lg:col-span-5">
-                            <dl className="card divide-y divide-line border-white text-ink">
+                    <div className="mt-14 grid gap-4 lg:grid-cols-12">
+                        <div className="card p-6 sm:p-8 lg:col-span-7">
+                            <p className="tag">The day</p>
+                            <ol className="mt-4">
+                                {DAY.map(([t, h, d]) => (
+                                    <li key={h} className="grid grid-cols-[5.5rem_1fr] gap-4 border-t border-line py-5">
+                                        <span className="pt-1 font-mono text-tag font-semibold uppercase tracking-[0.06em] text-blue">{t}</span>
+                                        <div>
+                                            <h3 className="font-display text-h3">{h}</h3>
+                                            <p className="mt-1 text-pretty text-small text-dim">{d}</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                        <div className="flex flex-col gap-4 lg:col-span-5">
+                            <dl className="card divide-y divide-line">
                                 {FACTS.map(([k, v]) => (
                                     <div key={k} className="grid grid-cols-[4.5rem_1fr] gap-4 px-6 py-4">
-                                        <dt className="tag pt-1">{k}</dt>
-                                        <dd className="font-bold">{v}</dd>
+                                        <dt className="tag pt-0.5">{k}</dt>
+                                        <dd className="font-medium">{v}</dd>
                                     </div>
                                 ))}
                             </dl>
-                            <div className="mt-5 flex flex-wrap gap-3">
-                                <a href="#involved" className="btn bg-white text-ink hover:bg-ink hover:text-white">Help make it happen</a>
-                                <a href={mailto("LA Student AI Summit")} className="btn border-2 border-white text-white hover:bg-white hover:text-ink">Email us</a>
+                            <div className="flex-1 rounded-card bg-ink p-6 text-white sm:p-7">
+                                <p className="tag text-white/60">Most needed</p>
+                                <h3 className="mt-2 font-display text-[1.5rem] font-semibold tracking-tight">A venue</h3>
+                                <p className="mt-2 text-pretty text-small text-white/80">
+                                    One Saturday, 8am to 8pm, for 500+ students and mentors, with power and Wi-Fi. It sets the date.
+                                </p>
+                                <a href={mailto("Summit venue")} className="btn mt-5 bg-white text-ink hover:bg-blue hover:text-white">I know a venue</a>
                             </div>
-                        </aside>
+                        </div>
                     </div>
 
-                    <div className="mt-14 rounded-card bg-white px-6 py-7 text-ink lg:px-8">
-                        <p className="tag">Committed partners</p>
-                        <ul className="mt-6 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+                    <div id="partners" className="card mt-4 scroll-mt-28 p-6 sm:p-8">
+                        <div className="flex flex-wrap items-baseline justify-between gap-3">
+                            <p className="tag">Committed partners</p>
+                            <p className="text-small text-dim">A partner is listed once they&apos;ve said yes.</p>
+                        </div>
+                        <ul className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[14px] bg-line sm:grid-cols-3">
                             {PARTNERS.map((p) => (
-                                <li key={p.name}>
+                                <li key={p.name} className="bg-white p-5">
                                     <div className="flex h-9 items-center">
                                         <img src={p.logo} alt={p.name} style={{ height: Math.round(p.h * 0.9) }} className="w-auto max-w-full" loading="lazy" decoding="async" />
                                     </div>
-                                    <p className="tag mt-2 text-blue">{p.role}</p>
+                                    <p className="tag mt-3 text-blue">{p.role}</p>
+                                    <p className="mt-1 text-pretty text-small text-dim">{p.what}</p>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
-                        <div className="rounded-card bg-white/10 p-6">
-                            <h3 className="font-display text-h3">Safety</h3>
-                            <p className="mt-3 text-pretty text-body text-white/85">
-                                Every student under 18 brings signed parent consent that covers AI tool use. Teachers
-                                come with their students, and partner mentors are on the floor all day. Generative AI is
-                                only used during the afternoon build, for a set block, with a mentor at each table.
-                                Tools are reviewed with each school: Teachable Machine, Google Colab, GitHub Student
-                                Developer Pack, MongoDB Atlas, Google Forms and Devpost.
+                        <div className="card p-6 sm:p-7">
+                            <h3 className="font-display text-h3">Safe for students</h3>
+                            <p className="mt-2 text-pretty text-small text-dim">
+                                Signed parent consent for every student under 18, covering AI tool use. Teachers come with
+                                their students and mentors sit at every table. Each tool is reviewed with the schools:
+                                Teachable Machine, Google Colab, GitHub Student Developer Pack, MongoDB Atlas, Google Forms and Devpost.
                             </p>
                         </div>
-                        <div className="rounded-card bg-white/10 p-6">
-                            <h3 className="font-display text-h3">Money</h3>
-                            <p className="mt-3 text-pretty text-body text-white/85">
-                                All sponsorship goes to The Hack Foundation (Hack Club), a <span className="whitespace-nowrap">501(c)(3)</span> and our fiscal
-                                sponsor. It pays for lunch, printing and prizes directly, with a receipt for every
-                                expense. Students pay nothing and never handle money.
+                        <div className="card relative p-6 sm:p-7">
+                            <h3 className="font-display text-h3">Every dollar accounted for</h3>
+                            <p className="mt-2 text-pretty text-small text-dim">
+                                Sponsorship goes to our fiscal sponsor, The Hack Foundation (Hack Club), a <span className="whitespace-nowrap">501(c)(3)</span>.
+                                It pays for lunch, printing and prizes directly, with a receipt for every expense. Students never handle money.
                             </p>
-                            <p className="mt-3 font-mono text-small text-white/75">EIN 81-2908499</p>
+                            <p className="mt-3 font-mono text-tag text-dim">EIN 81-2908499</p>
                         </div>
+                    </div>
+                    <div className="relative hidden h-12 lg:block">
+                        <Note dir="up" className="absolute right-[18%] top-2" tone="text-blue">sponsorship runs through a real 501(c)(3)</Note>
                     </div>
                 </Reveal>
             </div>

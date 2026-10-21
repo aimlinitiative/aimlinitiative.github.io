@@ -6,7 +6,8 @@ export default {
     theme: {
         extend: {
             colors: {
-                bg: "#FFFFFF",
+                bg: "#F7F8FA",
+                elev: "#F1F3F6",
                 ink: "#101418",      // text, card borders, primary button
                 dim: "#525B66",      // secondary text (7.0:1 on white)
                 line: "#E2E5EA",     // hairlines inside cards
@@ -16,13 +17,14 @@ export default {
                 warm: "#FFF6EB",     // summit band
             },
             fontFamily: {
-                display: ["'Bricolage Grotesque Variable'", "system-ui", "sans-serif"],
+                hand: ["'Shantell Sans Variable'", "cursive"],
+                display: ["'Inter Tight Variable'", "system-ui", "sans-serif"],
                 sans: ["'Public Sans Variable'", "system-ui", "-apple-system", "sans-serif"],
                 mono: ["'JetBrains Mono Variable'", "ui-monospace", "monospace"],
             },
             fontSize: {
-                hero: ["clamp(2.6rem, 1.6rem + 3.4vw, 4.5rem)", { lineHeight: "1", letterSpacing: "-0.035em", fontWeight: "800" }],
-                h2: ["clamp(2rem, 1.4rem + 2.4vw, 3.5rem)", { lineHeight: "1.04", letterSpacing: "-0.03em", fontWeight: "800" }],
+                hero: ["clamp(2.75rem, 1.4rem + 5vw, 5.5rem)", { lineHeight: "0.98", letterSpacing: "-0.045em", fontWeight: "650" }],
+                h2: ["clamp(2rem, 1.3rem + 2.4vw, 3.25rem)", { lineHeight: "1.04", letterSpacing: "-0.035em", fontWeight: "650" }],
                 h3: ["1.375rem", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700" }],
                 lead: ["1.1875rem", { lineHeight: "1.55" }],
                 body: ["1.0625rem", { lineHeight: "1.6" }],
@@ -30,7 +32,7 @@ export default {
                 tag: ["0.75rem", { lineHeight: "1.4" }],
             },
             maxWidth: { page: "78rem", measure: "36rem" },
-            borderRadius: { card: "14px" },
+            borderRadius: { card: "20px" },
         },
     },
     plugins: [],

@@ -1,33 +1,42 @@
 import Section from "../components/Section";
+import { SUPPORTERS } from "../lib/partners";
 
 const TEAM = [
-    { name: "Adrian Erlikhman", role: "Co-founder" },
-    { name: "Michael Tarekegn", role: "Co-founder" },
-    { name: "Ibrahim Piri", role: "Engineering" },
+    { name: "Adrian Erlikhman", role: "Co-founder", i: "AE" },
+    { name: "Michael Tarekegn", role: "Co-founder", i: "MT" },
+    { name: "Ibrahim Piri", role: "Engineering", i: "IP" },
 ];
 
 export default function About() {
     return (
-        <Section id="about" tag="Who we are" title="Run by LA high school students.">
-            <div className="grid gap-12 lg:grid-cols-12">
-                <div className="space-y-5 text-pretty text-lead lg:col-span-7">
-                    <p>
-                        Adrian Erlikhman and Michael Tarekegn founded AIML-LI in Los Angeles to build the AI class
-                        their own schools didn't have.
-                    </p>
-                    <p className="text-dim">
-                        We write the course, test it in classrooms, fix what doesn't work and give it to schools for
-                        free. We've presented it at the LAUSD Innovation Expo, and aiEDU mentors the team.
-                    </p>
-                </div>
-                <ul className="card divide-y divide-line self-start lg:col-span-5">
-                    {TEAM.map((m) => (
-                        <li key={m.name} className="flex items-baseline justify-between gap-4 px-6 py-4">
-                            <span className="font-display text-[1.1875rem] font-bold">{m.name}</span>
-                            <span className="tag">{m.role}</span>
+        <Section id="about" tag="Who we are" title="Run by LA high school students."
+            intro="We founded AIML-LI to build the AI class our own schools didn't have. We write the course, test it in classrooms, fix what doesn't work and give it away.">
+            <ul className="mx-auto grid max-w-[56rem] gap-4 sm:grid-cols-3">
+                {TEAM.map((m) => (
+                    <li key={m.name} className="card flex items-center gap-4 p-5">
+                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-sky font-display text-[1rem] font-semibold text-blue">{m.i}</span>
+                        <div>
+                            <p className="font-display text-[1.125rem] font-semibold leading-tight">{m.name}</p>
+                            <p className="mt-0.5 text-small text-dim">{m.role}</p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+
+            <div className="mx-auto mt-14 max-w-[56rem]">
+                <p className="text-center tag">Behind the course</p>
+                <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {SUPPORTERS.map((s) => (
+                        <li key={s.name} className="card p-5">
+                            <p className="font-display text-[1.125rem] font-semibold">{s.name}</p>
+                            <p className="mt-1 font-mono text-tag uppercase tracking-[0.06em] text-blue">{s.role}</p>
                         </li>
                     ))}
                 </ul>
+                <p className="mt-6 text-center text-pretty text-small text-dim">
+                    The course was built with engineers at Google DeepMind and Microsoft, a UCLA professor and a
+                    Y Combinator-backed founder. We&apos;ve presented it at the LAUSD Innovation Expo.
+                </p>
             </div>
         </Section>
     );

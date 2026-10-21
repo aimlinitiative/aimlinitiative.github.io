@@ -1,60 +1,43 @@
 import Section from "../components/Section";
 
 const UNITS = [
-    { n: 1, weeks: "1–2", t: "Foundations", d: "How machines learn from data, and the difference between automation and learning." },
-    { n: 2, weeks: "3–4", t: "Building models", d: "Train, test and score a first classifier." },
-    { n: 3, weeks: "5–6", t: "Prediction and error", d: "Accuracy, precision and recall, and who a model's mistakes land on." },
-    { n: 4, weeks: "7–8", t: "Neural networks", d: "A small network built step by step." },
-    { n: 5, weeks: "9–10", t: "Language and bias", d: "How language models work, and where they break." },
-    { n: 6, weeks: "11–12", t: "Capstone", d: "A project on a problem from the student's own school or neighborhood." },
+    { n: 1, t: "Foundations", d: "How machines learn from data." },
+    { n: 2, t: "Building models", d: "Train, test and score a first classifier." },
+    { n: 3, t: "Prediction and error", d: "Accuracy, precision, recall, and who the mistakes land on." },
+    { n: 4, t: "Neural networks", d: "A small network, built step by step." },
+    { n: 5, t: "Language and bias", d: "How language models work, and where they break." },
+    { n: 6, t: "Capstone", d: "A project on a problem from the student's own neighborhood." },
 ];
 
 // The template every lesson notebook follows.
-const PARTS = [
-    ["Primer", "The idea in plain language, before any code."],
-    ["Predict before you run", "Students write down what they expect, then check."],
-    ["Guided activities", "Python on real or simulated data."],
-    ["Self-checks", "Cells that test the student's own answers."],
-    ["Ethics reflection", "Who the result helps, and who it could hurt."],
-    ["Teacher key", "Answers and notes, hidden from the student view."],
-];
+const PARTS = ["Primer", "Predict before you run", "Guided activities", "Self-checks", "Ethics reflection", "Teacher key"];
 
 export default function CurriculumSection() {
     return (
         <Section id="course" tag="The course" title="Twelve weeks, from how a model learns to a project of their own."
-            intro="No coding background needed. Each unit is two weeks of Jupyter notebooks a teacher can run as written.">
-            <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            intro="No coding background needed. Each unit is two weeks of Jupyter notebooks a teacher can run as written, for free.">
+            <ol className="grid gap-px overflow-hidden rounded-card bg-line shadow-[0_0_0_1px_rgba(16,20,24,0.07)] sm:grid-cols-2 lg:grid-cols-3">
                 {UNITS.map((u) => (
-                    <li key={u.n} className={`card p-6 ${u.n === 6 ? "bg-sky" : ""}`}>
-                        <div className="flex items-center justify-between">
-                            <span className="grid h-10 w-10 place-items-center rounded-full border-[1.5px] border-ink font-display text-[1.125rem] font-extrabold">{u.n}</span>
-                            <span className="tag">Weeks {u.weeks}</span>
+                    <li key={u.n} className={`p-6 lg:p-7 ${u.n === 6 ? "bg-sky" : "bg-white"}`}>
+                        <div className="flex items-baseline justify-between">
+                            <span className="font-mono text-tag font-semibold uppercase tracking-[0.06em] text-blue">Unit {u.n}</span>
+                            <span className="font-mono text-tag text-dim">Weeks {2 * u.n - 1}–{2 * u.n}</span>
                         </div>
-                        <h3 className="mt-5 font-display text-h3">{u.t}</h3>
-                        <p className="mt-2 text-pretty text-body text-dim">{u.d}</p>
+                        <h3 className="mt-4 font-display text-h3">{u.t}</h3>
+                        <p className="mt-1.5 text-pretty text-small text-dim">{u.d}</p>
                     </li>
                 ))}
             </ol>
-
-            <div className="mt-16 grid gap-10 lg:grid-cols-12">
-                <div className="lg:col-span-4">
-                    <h3 className="font-display text-h3">Every lesson has the same six parts.</h3>
-                    <p className="mt-3 text-pretty text-body text-dim">
-                        A teacher who has run one lesson can run the next. Lesson 1 maps to California computer
-                        science standards <span className="whitespace-nowrap">3A-IC-26</span>, <span className="whitespace-nowrap">3A-DA-09</span> and <span className="whitespace-nowrap">3B-AP-14</span>.
-                    </p>
-                </div>
-                <dl className="grid gap-x-8 sm:grid-cols-2 lg:col-span-8">
-                    {PARTS.map(([t, d], k) => (
-                        <div key={t} className="flex gap-4 border-t-[1.5px] border-ink py-4">
-                            <span className="font-mono text-small font-semibold text-blue">{String(k + 1).padStart(2, "0")}</span>
-                            <div>
-                                <dt className="font-bold">{t}</dt>
-                                <dd className="mt-0.5 text-small text-dim">{d}</dd>
-                            </div>
-                        </div>
+            <div className="mx-auto mt-10 max-w-[52rem] text-center">
+                <p className="text-small text-dim">Every lesson has the same six parts, so a teacher who has run one can run the next.</p>
+                <ul className="mt-4 flex flex-wrap justify-center gap-2">
+                    {PARTS.map((p, k) => (
+                        <li key={p} className="glass rounded-full px-4 py-2 text-small font-medium">
+                            <span className="mr-2 font-mono text-tag text-blue">{String(k + 1).padStart(2, "0")}</span>{p}
+                        </li>
                     ))}
-                </dl>
+                </ul>
+                <p className="mt-5 font-mono text-tag uppercase tracking-[0.06em] text-dim">Lesson 1 maps to CA CS standards 3A-IC-26 · 3A-DA-09 · 3B-AP-14</p>
             </div>
         </Section>
     );

@@ -10,7 +10,7 @@ function Bar({ label, value, color }) {
                 <span>{label}</span>
                 <span className="font-semibold tabular-nums">{pct(value)}</span>
             </div>
-            <div className="mt-1.5 h-3 overflow-hidden rounded-full border-[1.5px] border-ink bg-white">
+            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-elev">
                 <div className={`h-full ${color} transition-[width] duration-500 ease-out`} style={{ width: pct(value) }} />
             </div>
         </div>
@@ -27,7 +27,7 @@ export default function Lab() {
 
     return (
         <figure className="card overflow-hidden">
-            <div className="flex items-center justify-between border-b-[1.5px] border-ink px-5 py-3">
+            <div className="flex items-center justify-between border-b border-line px-5 py-3">
                 <span className="tag">Unit 1 · Lesson 1 · Ethics lab</span>
                 <span className="tag text-blue">Try it</span>
             </div>
@@ -42,7 +42,7 @@ export default function Lab() {
                     <div className="mt-2 flex flex-wrap gap-2">
                         {RUNS.map((r, k) => (
                             <button key={r.label} type="button" onClick={() => setI(k)} aria-pressed={k === i}
-                                className={`h-9 rounded-full border-[1.5px] px-3.5 font-mono text-[0.8125rem] font-medium transition-colors ${k === i ? "border-ink bg-ink text-white" : "border-line text-ink hover:border-ink"}`}>
+                                className={`h-9 rounded-full border px-3.5 font-mono text-[0.8125rem] font-medium transition-colors ${k === i ? "border-ink bg-ink text-white" : "border-line bg-white text-ink hover:border-ink"}`}>
                                 {r.label}
                             </button>
                         ))}
