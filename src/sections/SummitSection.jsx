@@ -1,21 +1,9 @@
 import Reveal from "../components/Reveal";
 import Logo from "../components/Logo";
+import Schedule from "../components/Schedule";
 import { PARTNERS } from "../lib/partners";
 import { mailto } from "../lib/site";
 
-const FACTS = [
-    ["When", "Saturday, February 6, 2027"],
-    ["Where", "LACES, Los Angeles"],
-    ["Who", "500+ LA public middle and high school students"],
-    ["Cost", "Free, lunch included"],
-];
-
-const DAY = [
-    ["Morning", "Keynotes", "Google DeepMind, Microsoft, Google and Snap, then a careers panel and hands-on demos."],
-    ["Midday", "Lunch with partners", "Free for every student, with partner tables around the room."],
-    ["Afternoon", "Hackathon", "Teams of three or four build for a problem in their own school or neighborhood, with mentors on the floor."],
-    ["Evening", "Pitches and prizes", "Judging, and prizes from Jane Street, MongoDB and Discovery Education."],
-];
 
 export default function SummitSection() {
     return (
@@ -30,37 +18,13 @@ export default function SummitSection() {
                         </p>
                     </div>
 
-                    <div className="mt-14 grid gap-4 lg:grid-cols-12">
-                        <div className="card p-6 sm:p-8 lg:col-span-7">
-                            <ol>
-                                {DAY.map(([t, h, d], k) => (
-                                    <li key={h} className={`grid grid-cols-[5.5rem_1fr] gap-4 py-5 ${k ? "border-t border-line" : "pt-0"}`}>
-                                        <span className="pt-1 text-small font-semibold text-blue">{t}</span>
-                                        <div>
-                                            <h3 className="font-display text-h3">{h}</h3>
-                                            <p className="mt-1 text-pretty text-small text-dim">{d}</p>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ol>
-                        </div>
-                        <div className="flex flex-col gap-4 lg:col-span-5">
-                            <dl className="card divide-y divide-line">
-                                {FACTS.map(([k, v]) => (
-                                    <div key={k} className="grid grid-cols-[4.5rem_1fr] gap-4 px-6 py-4">
-                                        <dt className="tag pt-0.5">{k}</dt>
-                                        <dd className="font-medium">{v}</dd>
-                                    </div>
-                                ))}
-                            </dl>
-                            <div className="card flex-1 p-6 sm:p-7">
-                                <p className="text-pretty text-small text-dim">
-                                    Sponsorship runs through our fiscal sponsor, The Hack Foundation (Hack Club), a <span className="whitespace-nowrap">501(c)(3)</span>, with
-                                    a receipt for every expense. Every student under 18 brings signed parent consent, and mentors sit at every table.
-                                </p>
-                                <a href={mailto("Sponsoring the LA Student AI Summit")} className="btn-primary mt-5">Sponsor the summit</a>
-                            </div>
-                        </div>
+                    <div className="mt-14"><Schedule /></div>
+
+                    <div className="mx-auto mt-6 flex max-w-[60rem] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+                        <p className="text-pretty text-small text-dim">
+                            Sponsorship runs through our fiscal sponsor, The Hack Foundation (Hack Club), a <span className="whitespace-nowrap">501(c)(3)</span>, with a receipt for every expense.
+                        </p>
+                        <a href={mailto("Sponsoring the LA Student AI Summit")} className="btn-primary shrink-0">Sponsor the summit</a>
                     </div>
 
                     <div id="partners" className="mt-20 scroll-mt-28 text-center">
