@@ -22,7 +22,7 @@ export default function CurriculumSection() {
     const [u, setU] = useState(0);
     return (
         <Section id="course" tag="The course" title="A free AI course, headed into every LAUSD high school."
-            intro="Twelve weeks of Jupyter notebooks a teacher can run as written. No coding background needed.">
+            intro="Twelve weeks. Free. No coding needed.">
             <ol className="mx-auto flex max-w-[52rem] items-start">
                 {PATH.map(([t, d, s], k) => (
                     <li key={t} className="relative flex-1 text-center">
@@ -56,13 +56,9 @@ export default function CurriculumSection() {
                         <p className="font-mono text-[0.8125rem] text-white/45">Unit {u + 1} · weeks {2 * u + 1}–{2 * u + 2}</p>
                         <h3 className="mt-2 font-display text-[2rem] font-bold leading-none tracking-[-0.03em] text-white">{UNITS[u][1]}</h3>
                         <p className="mt-4 max-w-[30rem] text-pretty text-lead text-white/75">{UNITS[u][2]}</p>
-                        <p className="mt-8 font-mono text-[0.8125rem] text-white/45">
-                            primer → predict before you run → activities → self-checks → ethics → teacher key
-                        </p>
                     </div>
                 </div>
             </div>
-            <p className="mx-auto mt-5 max-w-[64rem] text-center text-small text-dim">Lesson 1 maps to California CS standards 3A-IC-26, 3A-DA-09 and 3B-AP-14.</p>
         </Section>
     );
 }

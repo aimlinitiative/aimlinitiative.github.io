@@ -1,4 +1,3 @@
-import Note from "../components/Note";
 import { PARTNERS } from "../lib/partners";
 import Logo from "../components/Logo";
 
@@ -22,20 +21,16 @@ export default function Hero() {
                     ))}
                 </h1>
                 <p className="mx-auto mt-6 max-w-[38rem] text-pretty text-lead text-dim">
-                    AIML-LI is a student-run nonprofit in Los Angeles. We wrote a free course on how AI works, and we're
-                    bringing 500+ students and their teachers together with the people who build it.
+                    A student-run nonprofit teaching LA public schools how AI works.
                 </p>
                 <div className="mt-8 flex flex-wrap justify-center gap-3">
                     <a href="#summit" className="btn-primary">See the summit</a>
                     <a href="#involved" className="btn-outline">Partner with us</a>
                 </div>
-                <div className="relative mx-auto mt-3 hidden h-10 max-w-[30rem] sm:block">
-                    <Note dir="up" className="absolute left-[56%] top-1">sponsors and mentors: start here</Note>
-                </div>
             </div>
 
-            <div className="mx-auto mt-12 max-w-[70rem] sm:mt-6">
-                <p className="text-center tag">Committed to the summit</p>
+            <div id="partners" className="mx-auto mt-16 max-w-[70rem] scroll-mt-28">
+                <p className="text-center tag">Summit partners</p>
                 <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
                     {PARTNERS.map((p) => (
                         <li key={p.name}><Logo p={p} scale={0.85} /></li>

@@ -12,8 +12,8 @@ const DAY = [
 ];
 
 const WHO = {
-    Student: ["500+", "LA public middle and high school students"],
-    Teacher: ["+ yours", "Teachers come with their students and build alongside them"],
+    Student: ["500+", "LA public school students"],
+    Teacher: ["+ yours", "Teachers build alongside their students"],
 };
 
 function Barcode() {
@@ -70,7 +70,6 @@ export default function Ticket() {
                             </li>
                         ))}
                     </ul>
-                    <p key={row} className="sched-in mt-4 min-h-[3rem] max-w-[34rem] text-pretty text-body text-dim" role="tabpanel">{DAY[row][3]}</p>
                 </div>
 
                 <button type="button" onClick={() => setTorn((v) => !v)} aria-pressed={torn} aria-label={torn ? "Put the stub back" : "Tear off the stub"}
@@ -90,8 +89,6 @@ export default function Ticket() {
             </div>
 
             <Note dir="up" className="absolute -bottom-11 right-[4%] hidden md:flex" tone="text-blue">{torn ? "see you Feb 6" : "click to tear it off"}</Note>
-            <Note dir="left" flip className="absolute -left-48 top-[56%] hidden w-44 justify-end xl:flex">hover the day</Note>
-            <Note dir="down" className="absolute -top-10 right-[3%] hidden md:flex">teachers come too</Note>
         </div>
     );
 }

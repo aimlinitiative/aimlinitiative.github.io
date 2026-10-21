@@ -33,9 +33,6 @@ export default function Lab() {
             </div>
             <div className="p-5 sm:p-6">
                 <h3 className="font-display text-h3">The scholarship screener</h3>
-                <p className="mt-2 text-small text-dim">
-                    Students train a model to pick scholarship winners. Then the scholarship gets harder to win.
-                </p>
 
                 <fieldset className="mt-5">
                     <legend className="text-small font-bold">How many applicants win?</legend>
@@ -65,9 +62,6 @@ export default function Lab() {
                         : <>Accuracy went <b>up</b>, from {pct(base.accuracy)}. The model missed {run.missed} of {run.winners.toLocaleString()} real winners.</>}
                 </p>
             </div>
-            <figcaption className="border-t border-line px-5 py-3 text-[0.8125rem] text-dim sm:px-6">
-                The lesson's own code and output, pooled over 25 random draws.
-            </figcaption>
         </figure>
     );
 }

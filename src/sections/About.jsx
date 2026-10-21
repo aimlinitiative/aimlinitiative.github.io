@@ -4,9 +4,9 @@ import Reveal from "../components/Reveal";
 const CREDITS = [
     ["Co-founders", "Adrian Erlikhman, Michael Tarekegn"],
     ["Engineering", "Ibrahim Piri"],
-    ["Fiscal sponsor", "Hack Club (The Hack Foundation, 501(c)(3))"],
+    ["Fiscal sponsor", "Hack Club, a 501(c)(3)"],
     ["Curriculum feedback", "Arm, PhET (CU Boulder)"],
-    ["Built with", "Engineers at Google DeepMind and Microsoft, a UCLA professor, a Y Combinator-backed founder"],
+    ["Built with", "DeepMind and Microsoft engineers, a UCLA professor, a YC founder"],
 ];
 
 export default function About() {
@@ -19,8 +19,7 @@ export default function About() {
                             <p className="tag text-blue">Who we are</p>
                             <h2 className="mt-3 text-balance font-display text-h2">Run by LA high school students.</h2>
                             <p className="mt-5 max-w-[30rem] text-pretty text-lead text-dim">
-                                Our own schools didn&apos;t have an AI class, so we wrote one. We test it in classrooms, fix
-                                what doesn&apos;t work and give it away.
+                                We wrote the AI class our schools didn&apos;t have.
                             </p>
                         </div>
                         <dl className="lg:col-span-7">
