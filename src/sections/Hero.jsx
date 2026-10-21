@@ -12,7 +12,7 @@ export default function Hero() {
             <div className="mx-auto max-w-[62rem] text-center">
                 <a href="#summit" className="glass inline-flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 text-[0.8125rem] font-medium">
                     <span className="rounded-full bg-blue px-2.5 py-0.5 text-white">New</span>
-                    LA Student AI Summit<span className="hidden sm:inline"> · LACES · Feb 6, 2027</span> <span aria-hidden="true">→</span>
+                    LA Student AI Summit<span className="hidden sm:inline">&nbsp;· LACES · Feb 6, 2027</span> <span aria-hidden="true">→</span>
                 </a>
                 <h1 className="mt-7 text-balance font-display text-hero">
                     {words.map((w, i) => (

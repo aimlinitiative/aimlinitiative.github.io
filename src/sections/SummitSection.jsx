@@ -1,6 +1,6 @@
 import Reveal from "../components/Reveal";
 import Logo from "../components/Logo";
-import Schedule from "../components/Schedule";
+import Ticket from "../components/Ticket";
 import { PARTNERS } from "../lib/partners";
 import { mailto } from "../lib/site";
 
@@ -18,9 +18,9 @@ export default function SummitSection() {
                         </p>
                     </div>
 
-                    <div className="mt-14"><Schedule /></div>
+                    <div className="mt-20"><Ticket /></div>
 
-                    <div className="mx-auto mt-6 flex max-w-[60rem] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+                    <div className="mx-auto mt-20 flex max-w-[60rem] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
                         <p className="text-pretty text-small text-dim">
                             Sponsorship runs through our fiscal sponsor, The Hack Foundation (Hack Club), a <span className="whitespace-nowrap">501(c)(3)</span>, with a receipt for every expense.
                         </p>
