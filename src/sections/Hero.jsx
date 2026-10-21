@@ -23,7 +23,7 @@ export default function Hero() {
                 </h1>
                 <p className="mx-auto mt-6 max-w-[38rem] text-pretty text-lead text-dim">
                     AIML-LI is a student-run nonprofit in Los Angeles. We wrote a free course on how AI works, and we're
-                    bringing 500+ students together to learn from the people who build it.
+                    bringing 500+ students and their teachers together with the people who build it.
                 </p>
                 <div className="mt-8 flex flex-wrap justify-center gap-3">
                     <a href="#summit" className="btn-primary">See the summit</a>

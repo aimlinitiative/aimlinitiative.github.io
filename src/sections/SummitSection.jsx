@@ -14,7 +14,7 @@ export default function SummitSection() {
                         <p className="tag text-blue">The LA Student AI Summit &amp; Hackathon</p>
                         <h2 className="mt-3 text-balance font-display text-h2">One free Saturday with the people who build AI.</h2>
                         <p className="mx-auto mt-5 max-w-[38rem] text-pretty text-lead text-dim">
-                            February 6, 2027 at LACES. Keynotes in the morning, a hackathon in the afternoon.
+                            February 6, 2027 at LACES, for students and their teachers. Teachers learn the tools beside their students and meet the people building them, so the day carries back into the classroom.
                         </p>
                     </div>
 

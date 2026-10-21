@@ -13,8 +13,8 @@ const DATE = new Date("2027-02-06T08:00:00-08:00");
 // clicking a block holds it.
 const DAY = [
     { when: "Morning", t: "Keynotes", d: "The people building AI at four of the biggest labs, on one stage, talking to high schoolers.", logos: [deepmind, microsoft, google, snap] },
-    { when: "Midday", t: "Lunch with partners", d: "Free lunch for every student, and partner tables to walk up to and ask anything." },
-    { when: "Afternoon", t: "Hackathon", d: "Teams of three or four build something for their own school or neighborhood, with mentors at every table." },
+    { when: "Midday", t: "Lunch with partners", d: "Free lunch for every student and teacher, and partner tables to walk up to and ask anything." },
+    { when: "Afternoon", t: "Hackathon", d: "Teams of three or four build something for their own school or neighborhood, with mentors and their teachers at every table." },
     { when: "Evening", t: "Pitches and prizes", d: "Three minutes per team, judges from industry, and prizes for the top teams.", logos: [janestreet, mongodb, discovery] },
 ];
 
@@ -66,6 +66,7 @@ export default function Schedule() {
                     </dl>
                     <p className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-small text-white/70">
                         <span><b className="text-white">500+</b> students</span>
+                        <span><b className="text-white">+</b> their teachers</span>
                         <span><b className="text-white">4</b> keynotes</span>
                         <span><b className="text-white">$0</b> to attend</span>
                     </p>
