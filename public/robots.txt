@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aiml-initiative.org/sitemap.xml
+Sitemap: https://aimlinitiative.github.io/sitemap.xml
