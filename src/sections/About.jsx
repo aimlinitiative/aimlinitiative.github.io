@@ -4,7 +4,7 @@ import Note from "../components/Note";
 
 // Credits, not cards: who runs it, and who stands behind the course.
 const CREDITS = [
-    ["Co-founders", "Adrian Erlikhman, Michael Tarekegn"],
+    ["Co-founders", <><a href="https://adrianerlikhman.is-a.dev/" className="link" target="_blank" rel="noreferrer">Adrian Erlikhman</a>, Michael Tarekegn</>],
     ["Engineering", "Ibrahim Piri"],
     ["Fiscal sponsor", "Hack Club, a 501(c)(3)"],
     ["Curriculum feedback", "Arm, PhET (CU Boulder)"],
