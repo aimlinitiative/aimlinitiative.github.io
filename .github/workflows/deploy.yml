@@ -33,5 +33,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          # cname: aiml-initiative.org  (off while the domain is expired, 17 Nov 2026; restore once renewed)
+          cname: aiml-initiative.org
           force_orphan: true
