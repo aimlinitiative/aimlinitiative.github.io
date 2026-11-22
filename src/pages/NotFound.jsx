@@ -1,9 +1,13 @@
 export default function NotFound() {
     return (
-        <section className="page py-32">
-            <p className="tag text-blue">404</p>
-            <h1 className="mt-3 font-display text-h2">This page doesn't exist.</h1>
-            <a href="/" className="btn-primary mt-10">Go to the homepage</a>
-        </section>
+        <div className="cards">
+            <section className="card center">
+                <p className="lbl">/404</p>
+                <h2>This page doesn't exist.</h2>
+                <div className="cta">
+                    <a className="btn dark" href="/">Go to the homepage</a>
+                </div>
+            </section>
+        </div>
     );
 }
