@@ -1,67 +1,45 @@
 ---
-version: 3
-name: AIML-LI — bright classroom
-description: "A white, student-facing page: one display face, ink-bordered cards, one blue, and real course material instead of decoration. Chosen by Adrian on 15 Oct 2026 (option C of three, 'a little less AI')."
+version: 5
+name: AIML-LI — Startup School
+description: "After YC's Startup School 2026 event page: a cream page set in mono, a blue sun rising off a horizon line, and one outlined card per topic. Chosen by Adrian on 21 Nov 2026 ('more like YC startupschool', then 'Yes, blue')."
 
 colors:
-  bg: "#FFFFFF"     # page
-  ink: "#101418"    # text, card borders, dark button, contact panel
-  dim: "#525B66"    # secondary text (7.0:1 on white)
-  line: "#E2E5EA"   # hairlines inside cards
-  blue: "#1F5FBF"   # brand: tags, links, primary button, accuracy bar, venue banner
-  sky: "#EAF1FC"    # blue tint (capstone card, nav hover)
-  ora: "#E2592A"    # only for what the model gets wrong (winners found)
-  warm: "#FFF6EB"   # the summit band
+  bg: "#F4F1DB"      # page (cream)
+  ink: "#463325"     # text, card borders at 22%, tags, the dark button
+  dim: "#6F5B4B"     # small print
+  acc: "#1F5FBF"     # AIML-LI blue: the sun, the edge glow, focus rings
+  acc2: "#3F7FE0"    # the sun's lighter rim
 
 typography:
-  display: "Bricolage Grotesque (variable, self-hosted), 700-800, tight tracking. Headings, names, buttons."
-  body:    "Public Sans (variable, self-hosted). Its zero is plain; Atkinson Hyperlegible's slashed zero looked wrong in 200+, 501(c)(3) and the EIN."
-  mono:    "JetBrains Mono (variable, self-hosted). Small uppercase tags, code, numbers in the lab."
+  body: "Geist Mono (variable, self-hosted via @fontsource), 14.5px / 1.7. Everything is mono."
+  masthead: "Martian Mono, 23px, uppercase: the title top left, the date top right."
 
 layout:
-  page: "max 78rem, 20px side padding on phones, 40px from md"
-  section: "tag, h2, and an intro beside it on wide screens; then content. 80px / 112px vertical padding."
-
-components:
-  card: "white, 1.5px ink border, 14px radius, no shadow"
-  buttons: "pills: blue (primary), ink, or 2px ink outline"
-  tag: "mono, 12px, uppercase, 0.06em tracking"
+  bar: "sticky; the mark left, the sections as outlined pills in the middle, 'Sign up →' right. Pills hide under 760px."
+  masthead: "330px (290 on phones), a horizon line at the bottom, the blurred, faintly striped half-sun centred on it."
+  cards: "max 820px, 1px ink border at 22%, 34px radius, 58px / 64px padding; a /LABEL in small caps opens each one."
 ---
 
 ## Rules
 
-- **Show the work.** The hero is Unit 1's ethics lab, run for real
-  (`src/lib/minilab.js`, pooled over 25 draws). Every number on the page is
-  sourced; regenerate the lab data from the notebook rather than editing it.
-- **Partner logos in full colour** (Adrian, 14 Sept 2026). Committed partners only.
-- **Marker underline** (`.mark`, orange on white; `.mark-light`, amber on the
-  blue summit band) under one phrase per heading, at most. Adrian asked for it
-  back on 15 Oct.
-- **The summit leads.** Mission, then the summit as a full-width blue band with
-  every committed partner, then the course.
-- **Not allowed:** tilted cards, offset "brutalist" shadows, graph-paper
-  backgrounds, gradients, glass panels, 3D or particle
-  heroes, custom cursors, marquees, typewriters, count-up numbers.
-- **Copy:** full sentences that state facts. No slogan fragments ("Nine
-  partners are in."), no hype words, no lines that only sound good.
-- **Motion:** sections fade up 12px once; the lab's bars animate their width.
-  Reduced motion shows everything at once.
+- **The summit leads.** The first card is sign-up (Student, Teacher), then /About, /Schedule, /FAQ (with the
+  sign-up buttons again), /The course, /Who we are.
+- **Plain, first-person-plural copy** ("We're bringing 500+ LA public school students to LACES..."). Full sentences
+  that state facts; no slogans, no hype words.
+- **Blue, not YC orange.** The layout and type follow YC's page closely, so the colour must be AIML-LI's own; in
+  orange it reads as a copy of YC's site. No YC name, logo or marks anywhere.
+- **Committed partners only**, logos in full colour (`src/lib/partners.js`). aiEDU has no logo file and is set as text.
+- **Sign-up links live in `src/lib/site.js` (`SIGNUP`).** They open a pre-filled email until the Google Form exists;
+  swap in the form's link there.
+- **Every number is sourced.** The Unit 1 table reads `src/lib/minilab.js` (pooled over 25 runs; regenerate it from
+  the notebook rather than editing).
+- **No motion** beyond smooth anchor scrolling: no reveals, typewriters, count-ups, tilt or hand-drawn notes.
 
-## v4 (21 Oct 2026): Monte + Hivemind look
+## History
 
-Adrian, before Citadel looks at the site: emulate the Monte site a little, then
-Hivemind; easy to scan. Supersedes the v3 rules above where they conflict.
-
-- Soft grey page (#F7F8FA), white cards with a hairline ring and a soft shadow
-  (no ink borders), 20px radius. Floating frosted pill nav (mark · sections ·
-  "Partner with us"), as on Hivemind.
-- Inter Tight (600-650, tight tracking) for headings; Public Sans body;
-  JetBrains Mono tags; Shantell Sans for hand-written notes with pencil arrows
-  that draw in (`Note.jsx`, from Hivemind's notes.tsx). One or two notes per
-  section at most; anything a note says is also in the real text.
-- Centered hero, one hand-written word ("every") like Monte's "played right",
-  headline words blur-rise in. Then the partner logo strip and three cards:
-  course · summit · partners.
-- Order: hero · summit (with partners) · course · try a lesson · goals ·
-  who we are (with supporters) · four ways to help · contact.
-- The marker underline is retired.
+- v3 (15 Oct 2026): "bright classroom", white with ink-bordered cards and Bricolage Grotesque.
+- v4 (21 Oct 2026): a Monte + Hivemind look, grey page, frosted pill nav, Inter Tight, pencil notes, a tearable
+  summit ticket and an interactive Unit 1 lab.
+- 20-21 Nov 2026: Adrian said the theme "needs a lot of work" and turned down four themed mocks (a Jupyter notebook,
+  a Swiss event poster, a student binder with a permission slip, LA freeway signs) and a plain one-column page, then
+  asked for this.
